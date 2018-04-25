@@ -1,15 +1,27 @@
 
-This is the WellTestPy package
+WellTestPy: A python-package for handling well based field campaigns
+====================================================================
+[![DOI](https://zenodo.org/badge/131002096.svg)](https://zenodo.org/badge/latestdoi/131002096)
 
-Created Feb 2017
-Contact Sebastian Mueller - sebastian.mueller@ufz.de
+Contents
+--------
+WellTestPy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
 
+Subpackages
+-----------
+Using any of these subpackages requires an explicit import.
+For example: ``import anaflow.helper``
 
-It can be installed with the usual setup.py commands using distutils:
-    python setup.py install
+ - `data    ` -- module for data representation
+ - `estimate` -- module to estimate field parameters from given data
+ - `process ` -- module for processing data
+ - `tools   ` -- several helper-functions
 
-The package is compatible with Python 2 (> 2.6) and 3 (> 3.2).
+Installation
+------------
+Just download the code an run the following command from the
+source code directory:
 
-Essential third-party packages are numpy and scipy.
-Some functions provide visual checks using matplotlib for plotting.
+    pip install -U .
 
+Created April 2018, Copyright Sebastian Mueller 2018
