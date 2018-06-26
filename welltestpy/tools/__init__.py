@@ -1,9 +1,21 @@
-# -*- coding: utf-8 -*-
-"""The tools package of welltestpy.
 """
+welltestpy subpackage providing miscellaneous tools.
 
+.. currentmodule:: welltestpy.tools
+
+Included functions
+------------------
+The following classes and functions are provided
+
+.. autosummary::
+    triangulate
+"""
 from __future__ import absolute_import
 
-from welltestpy.tools import triangulate as tri
+from welltestpy.tools.trilib import (
+    triangulate,
+)
 
-__all__ = ["tri"]
+__all__ = [
+    "triangulate",
+]

@@ -1,8 +1,14 @@
-# -*- coding: utf-8 -*-
 """
-Created on Tue Aug  2 13:40:35 2016
+welltestpy subpackage providing flow datastructures for tests on a fieldsite.
 
-@author: Sebastian Mueller
+.. currentmodule:: welltestpy.data.testslib
+
+The following classes and functions are provided
+
+.. autosummary::
+   Test
+   PumpingTest
+   load_test
 """
 from __future__ import absolute_import, division, print_function
 
@@ -15,15 +21,53 @@ from io import TextIOWrapper as TxtIO
 
 import numpy as np
 
-# from ..tools._extimport import *
-
 from welltestpy.tools._extimport import BytIO
-from welltestpy.data.varlib import (Variable, Observation, loadVar, loadObs)
-from .varlib import (_nextr, _formstr, _formname)
+from welltestpy.data.varlib import (
+    Variable,
+    Observation,
+    load_var,
+    load_obs,
+    _nextr,
+    _formstr,
+    _formname,
+)
+
+__all__ = [
+    "Test",
+    "PumpingTest",
+    "load_test",
+]
 
 
 class Test(object):
+    """General class for a well based test.
+
+    This is a class for a well based test on a field site.
+    It has a name, a descrition and a timeframe string.
+
+    Attributes
+    ----------
+    name : :class:`str`
+        Name of the test.
+    description : :class:`str`
+        Description of the test.
+    timeframe : :class:`str`
+        Timeframe of the test.
+    """
     def __init__(self, name, description="no description", timeframe=None):
+        """Test initialisation.
+
+        Parameters
+        ----------
+        name : :class:`str`
+            Name of the test.
+        description : :class:`str`, optional
+            Description of the test.
+            Default: ``"no description"``
+        timeframe : :class:`str`, optional
+            Timeframe of the test.
+            Default: ``None``
+        """
         self.name = _formstr(name)
         self.description = str(description)
         self.timeframe = str(timeframe)
@@ -34,13 +78,61 @@ class Test(object):
 
     @property
     def testtype(self):
+        """:class:`str`: String containing the test type"""
         return self._testtype
 
 
 class PumpingTest(Test):
+    """Class for a pumping test.
+
+    This is a class for a pumping test on a field site.
+    It has a name, a descrition, a timeframe and a pumpingwell string.
+
+    Attributes
+    ----------
+    name : :class:`str`
+        Name of the test.
+    description : :class:`str`
+        Description of the test.
+    timeframe : :class:`str`
+        Timeframe of the test.
+    pumpingwell : :class:`str`
+        Pumping well of the test.
+    """
     def __init__(self, name, pumpingwell, pumpingrate, observations=None,
                  aquiferdepth=1.0, aquiferradius=np.inf,
                  description="Pumpingtest", timeframe=None):
+        """Pumping test initialisation.
+
+        Parameters
+        ----------
+        name : :class:`str`
+            Name of the test.
+        pumpingwell : :class:`str`
+            Pumping well of the test.
+        pumpingrate : :class:`float` or :class:`Variable`
+            Pumping rate of at the pumping well. If a `float` is given,
+            it is assumed to be given in ``m^3/s``.
+        observations : :class:`dict`, optional
+            Observations made within the pumping test. The dict-keys are the
+            well names of the observation wells or the pumpingwell. Values
+            need to be an instance of :class:`Observation`
+            Default: ``None``
+        aquiferdepth : :class:`float` or :class:`Variable`, optional
+            Aquifer depth at the field site. If a `float` is given,
+            it is assumed to be given in ``m``.
+            Default: ``1.0``
+        aquiferradius : :class:`float` or :class:`Variable`, optional
+            Aquifer radius ot the field site. If a `float` is given,
+            it is assumed to be given in ``m``.
+            Default: ``inf``
+        description : :class:`str`, optional
+            Description of the test.
+            Default: ``"Pumpingtest"``
+        timeframe : :class:`str`, optional
+            Timeframe of the test.
+            Default: ``None``
+        """
         super(PumpingTest, self).__init__(name, description, timeframe)
 
         self._testtype = "PumpingTest"
@@ -82,18 +174,20 @@ class PumpingTest(Test):
                              "needs to be positiv")
 
         if observations is None:
-            self.observations = {}
+            self.__observations = {}
         else:
             self.observations = observations
 
     @property
     def wells(self):
+        """:class:`tuple` of :class:`str`: all well names"""
         tmp = list(self.__observations.keys())
         tmp.append(self.pumpingwell)
         return tuple(set(tmp))
 
     @property
     def pumpingrate(self):
+        """:class:`float`: pumping rate at the pumping well"""
         return self._pumpingrate.value
 
     @pumpingrate.setter
@@ -109,6 +203,7 @@ class PumpingTest(Test):
 
     @property
     def aquiferdepth(self):
+        """:class:`float`: aquifer depth at the field site"""
         return self._aquiferdepth.value
 
     @aquiferdepth.setter
@@ -127,6 +222,7 @@ class PumpingTest(Test):
 
     @property
     def aquiferradius(self):
+        """:class:`float`: aquifer radius at the field site"""
         return self._aquiferradius.value
 
     @aquiferradius.setter
@@ -146,6 +242,7 @@ class PumpingTest(Test):
 
     @property
     def observations(self):
+        """:class:`dict`: observations made at the field site"""
         return self.__observations
 
     @observations.setter
@@ -164,6 +261,15 @@ class PumpingTest(Test):
             self.__observations = {}
 
     def addobservations(self, obs):
+        """Add some specified observations.
+
+        This will add observations to the pumping test.
+
+        Parameters
+        ----------
+        obs : :class:`dict`
+            Observations to be added.
+        """
         if isinstance(obs, dict):
             for k in obs:
                 if not isinstance(obs[k], Observation):
@@ -180,6 +286,16 @@ class PumpingTest(Test):
                              "should be given as dictonary with well as key")
 
     def delobservations(self, obs):
+        """Delete some specified observations.
+
+        This will delete observations from the pumping test. You can give a
+        list of observations or a single observation by name.
+
+        Parameters
+        ----------
+        obs : :class:`list` of :class:`str` or :class:`str`
+            Observations to be deleted.
+        """
         if isinstance(obs, (list, tuple)):
             for k in obs:
                 if k in self.observations:
@@ -188,7 +304,25 @@ class PumpingTest(Test):
             if obs in self.observations:
                 del self.__observations[obs]
 
-    def _addplot(self, ax, wells, exclude=None):
+    def _addplot(self, plt_ax, wells, exclude=None):
+        """Generate a plot of the pumping test.
+
+        This will plot the pumping test on the given figure axes.
+
+        Parameters
+        ----------
+        ax : :class:`Axes`
+            Axes where the plot should be done.
+        wells : :class:`dict`
+            Dictonary containing the well classes sorted by name.
+        exclude: :class:`list`, optional
+            List of wells that should be excluded from the plot.
+            Default: ``None``
+
+        Note
+        ----
+        This will be used by the Campaign class.
+        """
         if exclude is None:
             exclude = []
         for k in self.observations:
@@ -203,18 +337,35 @@ class PumpingTest(Test):
             else:
                 displace = np.minimum(self.observations[k].value[1], 0.0)
 
-            ax.plot(self.observations[k].value[0],
-                    displace,
-                    linewidth=2,
-                    label=self.observations[k].name+" r={:1.2f}".format(dist))
-            ax.set_xlabel(self.observations[k].labels[0])
-            ax.set_ylabel(self.observations[k].labels[1])
+            plt_ax.plot(self.observations[k].value[0],
+                        displace,
+                        linewidth=2,
+                        label=(self.observations[k].name +
+                               " r={:1.2f}".format(dist)))
+            plt_ax.set_xlabel(self.observations[k].labels[0])
+            plt_ax.set_ylabel(self.observations[k].labels[1])
 
-        ax.set_title(repr(self))
-        ax.legend(loc='center right', fancybox=True, framealpha=0.75)
-#        ax.legend(loc='best', fancybox=True, framealpha=0.75)
+        plt_ax.set_title(repr(self))
+        plt_ax.legend(loc='center right', fancybox=True, framealpha=0.75)
+#        plt_ax.legend(loc='best', fancybox=True, framealpha=0.75)
 
     def save(self, path="./", name=None):
+        """Save a pumping test to file.
+
+        This writes the variable to a csv file.
+
+        Parameters
+        ----------
+        path : :class:`str`, optional
+            Path where the variable should be saved. Default: ``"./"``
+        name : :class:`str`, optional
+            Name of the file. If ``None``, the name will be generated by
+            ``"Test_"+name``. Default: ``None``
+
+        Note
+        ----
+        The file will get the suffix ``".tst"``.
+        """
         # ensure that 'path' is a string [ needed ?! ]
         # path = _formstr(path)
         # ensure that 'path' ends with a '/' if it's not empty
@@ -277,7 +428,16 @@ class PumpingTest(Test):
         shutil.rmtree(patht, ignore_errors=True)
 
 
-def loadTest(tstfile):
+def load_test(tstfile):
+    """Load a test from file.
+
+    This reads a test from a csv file.
+
+    Parameters
+    ----------
+    tstfile : :class:`str`
+        Path to the file
+    """
     try:
         with zipfile.ZipFile(tstfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
@@ -286,17 +446,26 @@ def loadTest(tstfile):
             if row[0] != "Testtype":
                 raise Exception
             if row[1] == "PumpingTest":
-                routine = _loadPumpingTest
+                routine = _load_pumping_test
             else:
                 raise Exception
-    except:
+    except Exception:
         raise Exception("loadTest: loading the test " +
                         "was not possible")
 
     return routine(tstfile)
 
 
-def _loadPumpingTest(tstfile):
+def _load_pumping_test(tstfile):
+    """Load a pumping test from file.
+
+    This reads a pumping test from a csv file.
+
+    Parameters
+    ----------
+    tstfile : :class:`str`
+        Path to the file
+    """
     try:
         with zipfile.ZipFile(tstfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
@@ -307,19 +476,19 @@ def _loadPumpingTest(tstfile):
             description = next(data)[1]
             timeframe = next(data)[1]
             pumpingwell = next(data)[1]
-            pumpingrate = loadVar(TxtIO(zfile.open(next(data)[1])))
-            aquiferdepth = loadVar(TxtIO(zfile.open(next(data)[1])))
-            aquiferradius = loadVar(TxtIO(zfile.open(next(data)[1])))
+            pumpingrate = load_var(TxtIO(zfile.open(next(data)[1])))
+            aquiferdepth = load_var(TxtIO(zfile.open(next(data)[1])))
+            aquiferradius = load_var(TxtIO(zfile.open(next(data)[1])))
             obscnt = np.int(next(data)[1])
             observations = {}
             for __ in range(obscnt):
                 row = _nextr(data)
-                observations[row[0]] = loadObs(BytIO(zfile.read(row[1])))
+                observations[row[0]] = load_obs(BytIO(zfile.read(row[1])))
 
         pumpingtest = PumpingTest(name, pumpingwell, pumpingrate, observations,
                                   aquiferdepth, aquiferradius,
                                   description, timeframe)
-    except:
+    except Exception:
         raise Exception("loadPumpingTest: loading the pumpingtest " +
                         "was not possible")
     return pumpingtest

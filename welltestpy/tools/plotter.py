@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, division, print_function
-# from ._extimport import *
 
 import numpy as np
 import pandas as pd
@@ -312,7 +309,7 @@ class Editor(object):
 
 def CampaignPlot(campaign, select_test=None, **kwargs):
     if select_test is None:
-        tests = campaign.tests.keys()
+        tests = list(campaign.tests.keys())
     else:
         tests = select_test
 
@@ -416,7 +413,7 @@ def plotres(res, names=None, title="", filename=None):
 
 ######
 
-def WellPlot(campaign):
+def WellPlot(campaign, plot_tests=True):
 
     res0 = []
     names = []
@@ -429,22 +426,24 @@ def WellPlot(campaign):
 
     __, ax = plotres(res, names, campaign.name)
 
-    testlist = campaign.tests.keys()
-    testlist.sort()
-
-    for i, t in enumerate(testlist):
-        for j, obs in enumerate(campaign.tests[t].observations):
-            x0 = campaign.wells[campaign.tests[t].pumpingwell].coordinates[0]
-            y0 = campaign.wells[campaign.tests[t].pumpingwell].coordinates[1]
-            x1 = campaign.wells[obs].coordinates[0]
-            y1 = campaign.wells[obs].coordinates[1]
-            if j == 0:
-                label = "test at "+t
-            else:
-                label = None
-            fadeline(ax, [x0, x1], [y0, y1], label,
-                     "C"+str((i+2) % 10), linestyle=":")
-
+    if plot_tests:
+        testlist = list(campaign.tests.keys())
+        testlist.sort()
+        for i, t in enumerate(testlist):
+            for j, obs in enumerate(campaign.tests[t].observations):
+                x0 = campaign.wells[
+                        campaign.tests[t].pumpingwell].coordinates[0]
+                y0 = campaign.wells[
+                        campaign.tests[t].pumpingwell].coordinates[1]
+                x1 = campaign.wells[obs].coordinates[0]
+                y1 = campaign.wells[obs].coordinates[1]
+                if j == 0:
+                    label = "test at "+t
+                else:
+                    label = None
+                fadeline(ax, [x0, x1], [y0, y1], label,
+                         "C"+str((i+2) % 10), linestyle=":")
+    # get equal axis (for realism)
     ax.axis('equal')
     ax.legend()
     plt.show()
@@ -452,7 +451,8 @@ def WellPlot(campaign):
 
 # Estimation plotting
 
-def plotfitting3D(data, para, rad, time, radnames, prate, plotname):
+def plotfitting3D(data, para, rad, time, radnames, prate, plotname,
+                  rwell=0.0, rinf=np.inf):
 
     radarr = np.linspace(rad.min(), rad.max(), 100)
     timarr = np.linspace(time.min(), time.max(), 100)
@@ -476,14 +476,16 @@ def plotfitting3D(data, para, rad, time, radnames, prate, plotname):
                             sig2=para[1],
                             corr=para[2],
                             S=np.exp(para[3]),
-                            Qw=prate).reshape(-1)
+                            Qw=prate,
+                            rwell=rwell, rinf=rinf).reshape(-1)
         h1 = data[:, ri]
         h2 = ana.ext_theis2D(re, timarr,
                              TG=np.exp(para[0]),
                              sig2=para[1],
                              corr=para[2],
                              S=np.exp(para[3]),
-                             Qw=prate).reshape(-1)
+                             Qw=prate,
+                             rwell=rwell, rinf=rinf).reshape(-1)
 
         zord = 1000*(len(rad) - ri)
 
@@ -502,14 +504,15 @@ def plotfitting3D(data, para, rad, time, radnames, prate, plotname):
                             sig2=para[1],
                             corr=para[2],
                             S=np.exp(para[3]),
-                            Qw=prate).reshape(-1)
+                            Qw=prate,
+                            rwell=rwell, rinf=rinf).reshape(-1)
         ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
 
     ax.view_init(elev=45, azim=155)
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
     ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
     ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left")
+#    ax.legend(loc="lower left", fontsize='x-small')
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
 
@@ -566,7 +569,7 @@ def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
     ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
     ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
     ax.legend(loc="lower left")
-    plt.tight_layout()
+#    plt.tight_layout()
     plt.savefig(plotname, format="pdf")
 
 
@@ -576,8 +579,8 @@ def plotparainteract(result, paranames, plotname):
     parameterdistribtion = result[fields]
     df = pd.DataFrame(np.asarray(parameterdistribtion).T.tolist(),
                       columns=paranames)
-    pd.tools.plotting.scatter_matrix(df, alpha=0.2,
-                                     figsize=(12, 12), diagonal='kde')
+    pd.plotting.scatter_matrix(df, alpha=0.2,
+                               figsize=(12, 12), diagonal='kde')
     plt.savefig(plotname, format="pdf")
 
 

@@ -2,6 +2,8 @@
 *.orig
 *~
 .spyproject/
+__pycache__/
+docs/build/
 #_build
 #_static
 #_templates

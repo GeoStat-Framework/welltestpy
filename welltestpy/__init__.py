@@ -1,14 +1,37 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Nov 18 16:04:53 2016
+==========
+welltestpy
+==========
 
-@author: Sebastian Mueller
+Contents
+--------
+WellTestPy provides a framework to handle and plot data from well based
+field campaigns as well as a data interpretation module.
+
+Subpackages
+-----------
+The following subpackages are provided
+
+.. autosummary::
+    data
+    estimate
+    process
+    tools
 """
 from __future__ import absolute_import
 
-import welltestpy.data as data
-import welltestpy.estimate as estimate
-import welltestpy.process as process
-import welltestpy.tools as tools
+from welltestpy import (
+    data,
+    estimate,
+    process,
+    tools,
+)
 
-__all__ = ["data", "estimate", "process", "tools"]
+__all__ = [
+    "data",
+    "estimate",
+    "process",
+    "tools",
+]
+
+__version__ = '0.1.1'

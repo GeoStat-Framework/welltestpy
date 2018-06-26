@@ -10,8 +10,6 @@ from copy import deepcopy as dcopy
 import numpy as np
 
 import matplotlib.pyplot as plt
-# suppress the standard keybinding 's' for saving
-plt.rcParams['keymap.save'] = ''
 # use the ggplot style like R
 plt.style.use('ggplot')
 
@@ -19,9 +17,10 @@ plt.style.use('ggplot')
 def triangulate(distances, prec, all_pos=False):
     '''
     try to triangulate points by given distances within a symmetric matrix
-    'distances' with distances[i,j] = |pi-pj|
+    'distances' with ``distances[i,j] = |pi-pj|``
 
-    thereby p0 will be set to the origin (0,0) and p1 to (|p0-p1|,0)
+    thereby ``p0`` will be set to the origin ``(0,0)`` and ``p1`` to
+    ``(|p0-p1|,0)``
     '''
 
     if not distvalid(distances, prec/3.0):

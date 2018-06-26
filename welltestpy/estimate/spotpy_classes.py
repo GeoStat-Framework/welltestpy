@@ -1,9 +1,17 @@
-# -*- coding: utf-8 -*-
-"""Spotpy classes for the estimation library from welltestpy
-
-This module contanins spotpy classes to define estimation procedures
 """
+welltestpy subpackage providing classes for Spotpy classes for the\
+estimation library
 
+.. currentmodule:: welltestpy.estimate.spotpy_classes
+
+The following functions and classes are provided
+
+.. autosummary::
+   ext_theis2D
+   theis
+   Stat2Dsetup
+   Theissetup
+"""
 from __future__ import absolute_import, division, print_function
 
 from copy import deepcopy as dcopy
@@ -14,11 +22,71 @@ import spotpy
 
 import anaflow as ana
 
+__all__ = [
+    "ext_theis2D",
+    "theis",
+    "Stat2Dsetup",
+    "Theissetup",
+]
+
 
 # functions for fitting
 
 def ext_theis2D(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
+    '''
+    The extended Theis solution in 2D
+
+    The extended Theis solution for transient flow under
+    a pumping condition in a confined aquifer.
+    The type curve is describing the effective drawdown
+    in a 2D statistical framework, where the transmissivity distribution is
+    following a log-normal distribution with a gaussian correlation function.
+
+    Parameters
+    ----------
+    rad : :class:`numpy.ndarray`
+        Array with all radii where the function should be evaluated
+    time : :class:`numpy.ndarray`
+        Array with all time-points where the function should be evaluated
+    Qw : :class:`float`
+        Pumpingrate at the well
+    rwell : :class:`float`, optional
+        Inner radius of the pumping-well. Default: ``0.0``
+    rinf : :class:`float`, optional
+        Radius of the outer boundary of the aquifer. Default: ``np.inf``
+
+    Returns
+    -------
+    ext_theis2D : :any:`callable`
+        callable function taking ``mu``, ``sig2``, ``corr`` and ``lnS``.
+    '''
     def function(mu, sig2, corr, lnS):
+        '''
+        The extended Theis solution in 2D
+
+        The extended Theis solution for transient flow under
+        a pumping condition in a confined aquifer.
+        The type curve is describing the effective drawdown
+        in a 2D statistical framework, where the transmissivity distribution is
+        following a log-normal distribution with a gaussian correlation
+        function.
+
+        Parameters
+        ----------
+        mu : :class:`float`
+            Geometric-mean transmissivity (log val)
+        sig2 : :class:`float`
+            log-normal-variance of the transmissivity-distribution
+        corr : :class:`float`
+            corralation-length of transmissivity-distribution
+        lnS : :class:`float`
+            Given log-storativity of the aquifer
+
+        Returns
+        -------
+        ext_theis2D : :class:`numpy.ndarray`
+            Array with all heads at the given radii and time-points.
+        '''
         return ana.ext_theis2D(rad=rad, time=time,
                                TG=np.exp(mu), sig2=sig2,
                                corr=corr, S=np.exp(lnS),
@@ -28,7 +96,52 @@ def ext_theis2D(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
 
 
 def theis(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
+    '''
+    The Theis solution
+
+    The Theis solution for transient flow under a pumping condition
+    in a confined and homogeneous aquifer.
+    This solution was presented in [Theis35]_.
+
+    .. [Theis35] Theis, C.,
+       ''The relation between the lowering of the piezometric surface and the
+       rate and duration of discharge of a well using groundwater storage'',
+       Trans. Am. Geophys. Union, 16, 519–524, 1935
+
+    Parameters
+    ----------
+    rad : :class:`numpy.ndarray`
+        Array with all radii where the function should be evaluated
+    time : :class:`numpy.ndarray`
+        Array with all time-points where the function should be evaluated
+    Qw : :class:`float`
+        Pumpingrate at the well
+    rwell : :class:`float`, optional
+        Inner radius of the pumping-well. Default: ``0.0``
+    rinf : :class:`float`, optional
+        Radius of the outer boundary of the aquifer. Default: ``np.inf``
+
+    Returns
+    -------
+    theis : :any:`callable`
+        callable function taking ``mu`` and ``lnS``.
+    '''
     def function(mu, lnS):
+        '''
+        The Theis solution
+
+        Parameters
+        ----------
+        mu : :class:`float`
+            Given log-transmissivity of the aquifer
+        lnS : :class:`float`
+            Given log-storativity of the aquifer
+
+        Returns
+        -------
+        theis : :class:`numpy.ndarray`
+            Array with all heads at the given radii and time-points.
+        '''
         return ana.theis(rad=rad, time=time,
                          T=np.exp(mu), S=np.exp(lnS),
                          Qw=Qw, rwell=rwell, rinf=rinf, stehfestn=12)
@@ -38,9 +151,77 @@ def theis(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
 # spotpy classes
 
 class Stat2Dsetup(object):
+    """Spotpy class for an estimation of stochastic subsurface parameters.
+
+    This class uses the extended Theis solution in 2D to estimate parameters
+    of heterogeneity of an aquifer from pumping test data.
+    """
     def __init__(self, rad, time, rtdata, Qw, bestvalues=None,
                  mu=None, sig2=None, corr=None, lnS=None,
-                 murange=None, sig2range=None, corrrange=None, lnSrange=None):
+                 murange=None, sig2range=None, corrrange=None, lnSrange=None,
+                 rwell=0.0, rinf=np.inf):
+        """Spotpy class initialisation.
+
+        Parameters
+        ----------
+        rad : :class:`numpy.ndarray`
+            Array of the radii apearing in the wellsetup
+        time : :class:`numpy.ndarray`
+            Array of time-points of the pumping test data
+        rtdata : :class:`numpy.ndarray`
+            Observed head data as array.
+        Qw : :class:`float`
+            Pumpingrate at the well
+        bestvalues : :class:`dict`, optional
+            Guessed best values by name ``mu``, ``sig2``, ``corr`` and ``lnS``.
+            Default: ``None``
+        mu : :class:`float`, optional
+            Here you can fix the value for mean log-transmissivity ``mu``.
+            Default: ``None``
+        sig2 : :class:`float`, optional
+            Here you can fix the value for variance of
+            log-transmissivity ``sig2``.
+            Default: ``None``
+        corr : :class:`float`, optional
+            Here you can fix the value for correlation length of
+            log-transmissivity ``sig2``.
+            Default: ``None``
+        lnS : :class:`float`, optional
+            Here you can fix the value for log-storativity ``lnS``.
+            Default: ``None``
+        murange : :class:`tuple`, optional
+            Here you can specifiy the range of ``mu``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        sig2range : :class:`tuple`, optional
+            Here you can specifiy the range of ``sig2``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        corrrange : :class:`tuple`, optional
+            Here you can specifiy the range of ``corr``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        lnSrange : :class:`tuple`, optional
+            Here you can specifiy the range of ``lnS``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        rwell : :class:`float`, optional
+            Inner radius of the pumping-well. Default: ``0.0``
+        rinf : :class:`float`, optional
+            Radius of the outer boundary of the aquifer. Default: ``np.inf``
+        """
         self.params = []
         self.kwargs = {}
         self.ranges = {}
@@ -56,34 +237,20 @@ class Stat2Dsetup(object):
         self.data = dcopy(rtdata)
         self.Qw = Qw
 
-        # weights by time and radius
-#        for ti, te in enumerate(self.time):
-#            self.data[ti] /= np.log(te)
-#        for ti, te in enumerate(self.time):
-#            self.data[ti] /= np.log10(te)
-#        for ri, re in enumerate(self.rad):
-#            self.data[:,ri] *= 10. + re
-#        for ri, re in enumerate(self.rad):
-#            self.data[:,ri] /= 10. + re
-
         if murange is None:
-#            self.ranges["mu"] = (-16., -1., 1., -9., -16., -1.)
-            self.ranges["mu"] = (-10., -4., 1., -6., -10., -4.)
+            self.ranges["mu"] = (-16., -1., 1., -9., -16., -1.)
         else:
             self.ranges["mu"] = murange
         if sig2range is None:
-#            self.ranges["sig2"] = (.01, 6., .5, 2.55, .01, 6.)
-            self.ranges["sig2"] = (.01, 4., .5, 2, .01, 4.)
+            self.ranges["sig2"] = (.01, 6., .5, 2.55, .01, 6.)
         else:
             self.ranges["sig2"] = sig2range
         if corrrange is None:
-#            self.ranges["corr"] = (.5, 40., 2., 18., .5, 40.)
-            self.ranges["corr"] = (.5, 15., 2., 4., .5, 15.)
+            self.ranges["corr"] = (.5, 40., 2., 18., .5, 40.)
         else:
             self.ranges["corr"] = corrrange
         if lnSrange is None:
-#            self.ranges["lnS"] = (-16., -1., 1., -9., -16., -1.)
-            self.ranges["lnS"] = (-10., -4., 1., -6., -10., -4.)
+            self.ranges["lnS"] = (-16., -1., 1., -9., -16., -1.)
         else:
             self.ranges["lnS"] = lnSrange
 
@@ -132,53 +299,92 @@ class Stat2Dsetup(object):
         else:
             self.bestvalues = bestvalues
 
-        self.sim_raw = ext_theis2D(self.rad, self.time, self.Qw)
+        self.sim_raw = ext_theis2D(self.rad, self.time, self.Qw,
+                                   rwell=rwell, rinf=rinf)
 
         self.sim = ft.partial(self.sim_raw, **self.kwargs)
 
     def parameters(self):
+        """Generate a set of parameters"""
         ret = spotpy.parameter.generate(self.params)
         return ret
 
     def simulation(self, vector):
+        """Run a simulation with the given parameters"""
         x = np.array(vector)
-        for i, m in enumerate(self.simkw):
+        for i, kw_i in enumerate(self.simkw):
             if not np.isfinite(x[i]):
                 # if FAST-alg is producing nan-values, set the best value
-                self.simkwargs[m] = self.bestvalues[m]
+                self.simkwargs[kw_i] = self.bestvalues[kw_i]
             else:
-                self.simkwargs[m] = x[i]
+                self.simkwargs[kw_i] = x[i]
         ret = self.sim(**self.simkwargs)
-
-        # weights by time and radius
-#        for ti, te in enumerate(self.time):
-#            ret[ti] /= np.log(te)
-#        for ti, te in enumerate(self.time):
-#            ret[ti] /= np.log10(te)
-#        for ri, re in enumerate(self.rad):
-#            ret[:,ri] *= 10. + re
-#        for ri, re in enumerate(self.rad):
-#            ret[:,ri] /= 10. + re
-        print("sim: ", np.min(ret), np.max(ret))
-        print(self.simkwargs)
         return ret.reshape(-1)
 
     def evaluation(self):
+        '''Accesss the drawdown data'''
         ret = np.squeeze(np.array(self.data).reshape(-1))
-        print("eva: ", np.min(ret), np.max(ret))
         return ret
 
     def objectivefunction(self, simulation=simulation,
                           evaluation=evaluation):
+        '''Calculate the root mean square error between observation and
+        simulation'''
         ret = -spotpy.objectivefunctions.rmse(evaluation=evaluation,
                                               simulation=simulation)
         return ret
 
 
 class Theissetup(object):
+    """Spotpy class for an estimation of subsurface parameters.
+
+    This class uses the Theis solution to estimate parameters
+    of an homogeneous aquifer from pumping test data.
+    """
     def __init__(self, rad, time, rtdata, Qw, bestvalues=None,
                  mu=None, lnS=None,
-                 murange=None, lnSrange=None):
+                 murange=None, lnSrange=None,
+                 rwell=0.0, rinf=np.inf):
+        """Spotpy class initialisation.
+
+        Parameters
+        ----------
+        rad : :class:`numpy.ndarray`
+            Array of the radii apearing in the wellsetup
+        time : :class:`numpy.ndarray`
+            Array of time-points of the pumping test data
+        rtdata : :class:`numpy.ndarray`
+            Observed head data as array.
+        Qw : :class:`float`
+            Pumpingrate at the well
+        bestvalues : :class:`dict`, optional
+            Guessed best values by name ``mu``, ``sig2``, ``corr`` and ``lnS``.
+            Default: ``None``
+        mu : :class:`float`, optional
+            Here you can fix the value for log-transmissivity ``mu``.
+            Default: ``None``
+        lnS : :class:`float`, optional
+            Here you can fix the value for log-storativity ``lnS``.
+            Default: ``None``
+        murange : :class:`tuple`, optional
+            Here you can specifiy the range of ``mu``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        lnSrange : :class:`tuple`, optional
+            Here you can specifiy the range of ``lnS``. It has the following
+            structure:
+
+                ``(min, max, step, start-value, min-value, max-value)``
+
+            Default: ``None``
+        rwell : :class:`float`, optional
+            Inner radius of the pumping-well. Default: ``0.0``
+        rinf : :class:`float`, optional
+            Radius of the outer boundary of the aquifer. Default: ``np.inf``
+        """
         self.params = []
         self.kwargs = {}
         self.ranges = {}
@@ -191,16 +397,6 @@ class Theissetup(object):
         self.time = time
         self.data = dcopy(rtdata)
         self.Qw = Qw
-
-        # weights by time and radius
-#        for ti, te in enumerate(self.time):
-#            self.data[ti] /= np.log(te)
-#        for ti, te in enumerate(self.time):
-#            self.data[ti] /= np.log10(te)
-#        for ri, re in enumerate(self.rad):
-#            self.data[:,ri] *= 10. + re
-#        for ri, re in enumerate(self.rad):
-#            self.data[:,ri] /= 10. + re
 
         if murange is None:
             self.ranges["mu"] = (-16., -1., 1., -9., -16., -1.)
@@ -236,42 +432,37 @@ class Theissetup(object):
         else:
             self.bestvalues = bestvalues
 
-        self.sim_raw = theis(self.rad, self.time, self.Qw)
+        self.sim_raw = theis(self.rad, self.time, self.Qw,
+                             rwell=rwell, rinf=rinf)
 
         self.sim = ft.partial(self.sim_raw, **self.kwargs)
 
     def parameters(self):
+        """Generate a set of parameters"""
         ret = spotpy.parameter.generate(self.params)
         return ret
 
     def simulation(self, vector):
+        """Run a simulation with the given parameters"""
         x = np.array(vector)
-        for i, m in enumerate(self.simkw):
+        for i, kw_i in enumerate(self.simkw):
             if np.isnan(x[i]):
                 # if FAST-alg is producing nan-values, set the best value
-                self.simkwargs[m] = self.bestvalues[m]
+                self.simkwargs[kw_i] = self.bestvalues[kw_i]
             else:
-                self.simkwargs[m] = x[i]
+                self.simkwargs[kw_i] = x[i]
         ret = self.sim(**self.simkwargs)
-
-        # weights by time and radius
-#        for ti, te in enumerate(self.time):
-#            ret[ti] /= np.log(te)
-#        for ti, te in enumerate(self.time):
-#            ret[ti] /= np.log10(te)
-#        for ri, re in enumerate(self.rad):
-#            ret[:,ri] *= 10. + re
-#        for ri, re in enumerate(self.rad):
-#            ret[:,ri] /= 10. + re
-
         return ret.reshape(-1)
 
     def evaluation(self):
+        '''Accesss the drawdown data'''
         ret = np.squeeze(np.array(self.data).reshape(-1))
         return ret
 
     def objectivefunction(self, simulation=simulation,
                           evaluation=evaluation):
+        '''Calculate the root mean square error between observation and
+        simulation'''
         ret = -spotpy.objectivefunctions.rmse(evaluation=evaluation,
                                               simulation=simulation)
         return ret
