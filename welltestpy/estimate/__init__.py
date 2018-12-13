@@ -22,19 +22,8 @@ The following subpackages are provided
 """
 from __future__ import absolute_import
 
-from welltestpy.estimate import (
-    estimatelib,
-    spotpy_classes,
-)
+from welltestpy.estimate import estimatelib, spotpy_classes
 
-from welltestpy.estimate.estimatelib import (
-    Stat2Dest,
-    Theisest,
-)
+from welltestpy.estimate.estimatelib import Stat2Dest, Theisest
 
-__all__ = [
-    "Stat2Dest",
-    "Theisest",
-    "estimatelib",
-    "spotpy_classes",
-]
+__all__ = ["Stat2Dest", "Theisest", "estimatelib", "spotpy_classes"]

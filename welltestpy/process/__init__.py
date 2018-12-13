@@ -20,8 +20,4 @@ from welltestpy.process.processlib import (
     filterdrawdown,
 )
 
-__all__ = [
-    "normpumptest",
-    "combinepumptest",
-    "filterdrawdown",
-]
+__all__ = ["normpumptest", "combinepumptest", "filterdrawdown"]

@@ -1,17 +1,24 @@
-# -*- coding: utf-8 -*-
 """
-Created on Mon Dec 12 16:43:13 2016
+welltestpy subpackage providing functions to pre process data.
 
-@author: Sebastian Mueller
+.. currentmodule:: welltestpy.process.processlib
+
+The following classes are provided
+
+.. autosummary::
+   normpumptest
+   combinepumptest
+   filterdrawdown
 """
-
 from __future__ import absolute_import, division, print_function
 
 from copy import deepcopy as dcopy
 import numpy as np
 from scipy import signal
 
-from welltestpy.data.testslib import (PumpingTest)
+from welltestpy.data.testslib import PumpingTest
+
+__all__ = ["normpumptest", "combinepumptest", "filterdrawdown"]
 
 
 def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
@@ -25,19 +32,28 @@ def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
         Scaling factor that can be used for unit conversion. Default: ``1.0``
     """
     if not isinstance(pumptest, PumpingTest):
-        raise ValueError(str(pumptest)+" is no pumping test")
+        raise ValueError(str(pumptest) + " is no pumping test")
 
     oldprate = dcopy(pumptest.pumpingrate)
     pumptest.pumpingrate = pumpingrate
 
     for obs in pumptest.observations:
-        pumptest.observations[obs].observation *= factor*pumpingrate/oldprate
+        pumptest.observations[obs].observation *= (
+            factor * pumpingrate / oldprate
+        )
 
 
-def combinepumptest(campaign, test1, test2,
-                    pumpingrate=None, finalname=None,
-                    factor1=1.0, factor2=1.0,
-                    infooftest1=True, replace=True):
+def combinepumptest(
+    campaign,
+    test1,
+    test2,
+    pumpingrate=None,
+    finalname=None,
+    factor1=1.0,
+    factor2=1.0,
+    infooftest1=True,
+    replace=True,
+):
     """Combine two pumping tests to one.
 
     They need to have the same pumping well.
@@ -71,26 +87,42 @@ def combinepumptest(campaign, test1, test2,
         Default: ``True``
     """
     if test1 not in campaign.tests:
-        raise ValueError("combinepumptest: "+str(test1)+" not a test in " +
-                         "campaign "+str(campaign.name))
+        raise ValueError(
+            "combinepumptest: "
+            + str(test1)
+            + " not a test in "
+            + "campaign "
+            + str(campaign.name)
+        )
     if test2 not in campaign.tests:
-        raise ValueError("combinepumptest: "+str(test2)+" not a test in " +
-                         "campaign "+str(campaign.name))
+        raise ValueError(
+            "combinepumptest: "
+            + str(test2)
+            + " not a test in "
+            + "campaign "
+            + str(campaign.name)
+        )
 
     if finalname is None:
         if replace:
             finalname = test1
         else:
-            finalname = test1+"+"+test2
+            finalname = test1 + "+" + test2
 
     if campaign.tests[test1].testtype != "PumpingTest":
-        raise ValueError("combinepumptest:"+str(test1)+" is no pumpingtest")
+        raise ValueError(
+            "combinepumptest:" + str(test1) + " is no pumpingtest"
+        )
     if campaign.tests[test2].testtype != "PumpingTest":
-        raise ValueError("combinepumptest:"+str(test2)+" is no pumpingtest")
+        raise ValueError(
+            "combinepumptest:" + str(test2) + " is no pumpingtest"
+        )
 
     if campaign.tests[test1].pumpingwell != campaign.tests[test2].pumpingwell:
-        raise ValueError("combinepumptest: The Pumpingtests do not have the " +
-                         "same pumping-well")
+        raise ValueError(
+            "combinepumptest: The Pumpingtests do not have the "
+            + "same pumping-well"
+        )
 
     pwell = campaign.tests[test1].pumpingwell
 
@@ -100,8 +132,10 @@ def combinepumptest(campaign, test1, test2,
     commonwells = wellset1 & wellset2
 
     if commonwells != {pwell} and commonwells != set():
-        raise ValueError("combinepumptest: The Pumpingtests shouldn't have " +
-                         "common observation-wells")
+        raise ValueError(
+            "combinepumptest: The Pumpingtests shouldn't have "
+            + "common observation-wells"
+        )
 
     temptest1 = dcopy(campaign.tests[test1])
     temptest2 = dcopy(campaign.tests[test2])
@@ -146,9 +180,16 @@ def combinepumptest(campaign, test1, test2,
         description = temptest2.description
         timeframe = temptest2.timeframe
 
-    finalpt = PumpingTest(finalname, pwell, prate, observations,
-                          aquiferdepth, aquiferradius,
-                          description, timeframe)
+    finalpt = PumpingTest(
+        finalname,
+        pwell,
+        prate,
+        observations,
+        aquiferdepth,
+        aquiferradius,
+        description,
+        timeframe,
+    )
 
     campaign.addtests(finalpt)
 
@@ -180,14 +221,14 @@ def filterdrawdown(observation, tout=None, dxscale=2):
 
     # make the data equal-spaced to use filter with
     # a fraction of the minimal timestep
-    dxv = dxscale*int((time[-1]-time[0])/max(np.diff(time).min(), 1.))
+    dxv = dxscale * int((time[-1] - time[0]) / max(np.diff(time).min(), 1.0))
 
     tequal = np.linspace(time[0], time[-1], dxv)
     hequal = np.interp(tequal, time, head)
 
     # size = h.max() - h.min()
 
-    para1, para2 = signal.butter(1, .025)  # size/10.)
+    para1, para2 = signal.butter(1, 0.025)  # size/10.)
     hfilt = signal.filtfilt(para1, para2, hequal, padlen=150)
 
     hout = np.interp(tout, tequal, hfilt)

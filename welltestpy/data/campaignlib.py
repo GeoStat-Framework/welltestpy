@@ -25,17 +25,19 @@ import numpy as np
 
 from welltestpy.tools._extimport import BytIO
 from welltestpy.tools.plotter import CampaignPlot, WellPlot
-from welltestpy.data.varlib import (Variable, CoordinatesVar, load_var,
-                                    Well, load_well,
-                                    _nextr, _formstr, _formname)
-from welltestpy.data.testslib import (Test, load_test)
+from welltestpy.data.varlib import (
+    Variable,
+    CoordinatesVar,
+    load_var,
+    Well,
+    load_well,
+    _nextr,
+    _formstr,
+    _formname,
+)
+from welltestpy.data.testslib import Test, load_test
 
-__all__ = [
-    "FieldSite",
-    "Campaign",
-    "load_fieldsite",
-    "load_campaign",
-]
+__all__ = ["FieldSite", "Campaign", "load_fieldsite", "load_campaign"]
 
 
 class FieldSite(object):
@@ -51,6 +53,7 @@ class FieldSite(object):
     description : :class:`str`
         Description of the field site.
     """
+
     def __init__(self, name, description="Field site", coordinates=None):
         """Field site initialisation.
 
@@ -74,20 +77,20 @@ class FieldSite(object):
     def info(self):
         """:class:`str`: Info about the field site."""
         info = ""
-        info += "----"+"\n"
-        info += "Field-site:   "+str(self.name)+"\n"
-        info += "Description:  "+str(self.description)+"\n"
-        info += "--"+"\n"
+        info += "----" + "\n"
+        info += "Field-site:   " + str(self.name) + "\n"
+        info += "Description:  " + str(self.description) + "\n"
+        info += "--" + "\n"
         if self._coordinates is not None:
-            info += self._coordinates.info+"\n"
-        info += "----"+"\n"
-#        print("----")
-#        print("Field-site:   "+str(self.name))
-#        print("Description:  "+str(self.description))
-#        print("--")
-#        if hasattr(self, '_coordinates'):
-#            self._coordinates.info
-#        print("----")
+            info += self._coordinates.info + "\n"
+        info += "----" + "\n"
+        #        print("----")
+        #        print("Field-site:   "+str(self.name))
+        #        print("Description:  "+str(self.description))
+        #        print("--")
+        #        if hasattr(self, '_coordinates'):
+        #            self._coordinates.info
+        #        print("----")
         return info
 
     @property
@@ -103,8 +106,9 @@ class FieldSite(object):
             if isinstance(coordinates, Variable):
                 self._coordinates = dcopy(coordinates)
             else:
-                self._coordinates = CoordinatesVar(coordinates[0],
-                                                   coordinates[1])
+                self._coordinates = CoordinatesVar(
+                    coordinates[0], coordinates[1]
+                )
         else:
             self._coordinates = None
 
@@ -140,37 +144,37 @@ class FieldSite(object):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Field_"+self.name
+            name = "Field_" + self.name
         # ensure the name ends with '.csv'
         if name[-4:] != ".fds":
             name += ".fds"
         name = _formname(name)
         # create temporal directory for the included files
         tmp = ".tmpfield/"
-        patht = path+tmp
+        patht = path + tmp
         if os.path.exists(patht):
             shutil.rmtree(patht, ignore_errors=True)
         os.makedirs(patht)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(patht+"info.csv", 'w') as csvf:
+        with open(patht + "info.csv", "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Fieldsite"])
             writer.writerow(["name", self.name])
             writer.writerow(["description", self.description])
             # define names for the variable-files
             if self._coordinates is not None:
-                coordname = name[:-4]+"_CooVar.var"
+                coordname = name[:-4] + "_CooVar.var"
                 # save variable-files
                 writer.writerow(["coordinates", coordname])
                 self._coordinates.save(patht, coordname)
             else:
                 writer.writerow(["coordinates", "None"])
         # compress everything to one zip-file
-        with zipfile.ZipFile(path+name, "w") as zfile:
-            zfile.write(patht+"info.csv", "info.csv")
+        with zipfile.ZipFile(path + name, "w") as zfile:
+            zfile.write(patht + "info.csv", "info.csv")
             if self._coordinates is not None:
-                zfile.write(patht+coordname, coordname)
+                zfile.write(patht + coordname, coordname)
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
 
@@ -190,8 +194,16 @@ class Campaign(object):
     timeframe : :class:`str`
         Timeframe of the test.
     """
-    def __init__(self, name, fieldsite="Fieldsite", wells=None, tests=None,
-                 timeframe=None, description="Welltest campaign"):
+
+    def __init__(
+        self,
+        name,
+        fieldsite="Fieldsite",
+        wells=None,
+        tests=None,
+        timeframe=None,
+        description="Welltest campaign",
+    ):
         """Campaign initialisation.
 
         Parameters
@@ -252,23 +264,29 @@ class Campaign(object):
             if isinstance(wells, dict):
                 for k in wells.keys():
                     if not isinstance(wells[k], Well):
-                        raise ValueError("Campaign: some 'wells' are not of " +
-                                         "type Well")
+                        raise ValueError(
+                            "Campaign: some 'wells' are not of " + "type Well"
+                        )
                     if not k == wells[k].name:
-                        raise ValueError("Campaign: 'well'-keys should be " +
-                                         "the Well name")
+                        raise ValueError(
+                            "Campaign: 'well'-keys should be "
+                            + "the Well name"
+                        )
                 self.__wells = dcopy(wells)
             elif isinstance(wells, (list, tuple)):
                 for wel in wells:
                     if not isinstance(wel, Well):
-                        raise ValueError("Campaign: some 'wells' " +
-                                         "are not of type Well")
+                        raise ValueError(
+                            "Campaign: some 'wells' " + "are not of type Well"
+                        )
                 self.__wells = {}
                 for wel in wells:
                     self.__wells[wel.name] = dcopy(wel)
             else:
-                raise ValueError("Campaign: 'wells' should be given " +
-                                 "as dictonary or list")
+                raise ValueError(
+                    "Campaign: 'wells' should be given "
+                    + "as dictonary or list"
+                )
         else:
             self.__wells = {}
         self.__updatewells()
@@ -286,31 +304,43 @@ class Campaign(object):
         if isinstance(wells, dict):
             for k in wells.keys():
                 if not isinstance(wells[k], Well):
-                    raise ValueError("Campaign_addwells: some 'wells' " +
-                                     "are not of type Well")
+                    raise ValueError(
+                        "Campaign_addwells: some 'wells' "
+                        + "are not of type Well"
+                    )
                 if k in tuple(self.__wells.keys()):
-                    raise ValueError("Campaign_addwells: some 'wells' " +
-                                     "are already present")
+                    raise ValueError(
+                        "Campaign_addwells: some 'wells' "
+                        + "are already present"
+                    )
                 if not k == wells[k].name:
-                    raise ValueError("Campaign_addwells: 'well'-keys " +
-                                     "should be the Well name")
+                    raise ValueError(
+                        "Campaign_addwells: 'well'-keys "
+                        + "should be the Well name"
+                    )
             for k in wells.keys():
                 self.__wells[k] = dcopy(wells[k])
         elif isinstance(wells, (list, tuple)):
             for wel in wells:
                 if not isinstance(wel, Well):
-                    raise ValueError("Campaign_addwells: some 'wells' " +
-                                     "are not of type Well")
+                    raise ValueError(
+                        "Campaign_addwells: some 'wells' "
+                        + "are not of type Well"
+                    )
                 if wel.name in tuple(self.__wells.keys()):
-                    raise ValueError("Campaign_addwells: some 'wells' " +
-                                     "are already present")
+                    raise ValueError(
+                        "Campaign_addwells: some 'wells' "
+                        + "are already present"
+                    )
             for wel in wells:
                 self.__wells[wel.name] = dcopy(wel)
         elif isinstance(wells, Well):
             self.__wells[wells.name] = dcopy(wells)
         else:
-            raise ValueError("Campaign_addwells: 'wells' should be " +
-                             "given as dictonary, list or single 'Well'")
+            raise ValueError(
+                "Campaign_addwells: 'wells' should be "
+                + "given as dictonary, list or single 'Well'"
+            )
 
     def delwells(self, wells):
         """Delete some specified wells.
@@ -342,25 +372,31 @@ class Campaign(object):
             if isinstance(tests, dict):
                 for k in tests.keys():
                     if not isinstance(tests[k], Test):
-                        raise ValueError("Campaign: 'tests' are not of " +
-                                         "type Test")
+                        raise ValueError(
+                            "Campaign: 'tests' are not of " + "type Test"
+                        )
                     if not k == tests[k].name:
-                        raise ValueError("Campaign: 'tests'-keys " +
-                                         "should be the Test name")
+                        raise ValueError(
+                            "Campaign: 'tests'-keys "
+                            + "should be the Test name"
+                        )
                 self.__tests = dcopy(tests)
             elif isinstance(tests, (list, tuple)):
                 for tes in tests:
                     if not isinstance(tes, Test):
-                        raise ValueError("Campaign: some 'tests' are not of " +
-                                         "type Test")
+                        raise ValueError(
+                            "Campaign: some 'tests' are not of " + "type Test"
+                        )
                 self.__tests = {}
                 for tes in tests:
                     self.__tests[tes.name] = dcopy(tes)
             elif isinstance(tests, Test):
                 self.__tests[tests.name] = dcopy(tests)
             else:
-                raise ValueError("Campaign: 'tests' should be given " +
-                                 "as dictonary, list or 'Test'")
+                raise ValueError(
+                    "Campaign: 'tests' should be given "
+                    + "as dictonary, list or 'Test'"
+                )
         else:
             self.__tests = {}
 
@@ -377,31 +413,43 @@ class Campaign(object):
         if isinstance(tests, dict):
             for k in tests.keys():
                 if not isinstance(tests[k], Test):
-                    raise ValueError("Campaign_addtests: some 'tests' " +
-                                     "are not of type Test")
+                    raise ValueError(
+                        "Campaign_addtests: some 'tests' "
+                        + "are not of type Test"
+                    )
                 if k in tuple(self.__tests.keys()):
-                    raise ValueError("Campaign_addtests: some 'tests' " +
-                                     "are already present")
+                    raise ValueError(
+                        "Campaign_addtests: some 'tests' "
+                        + "are already present"
+                    )
                 if not k == tests[k].name:
-                    raise ValueError("Campaign_addtests: 'tests'-keys " +
-                                     "should be the Test name")
+                    raise ValueError(
+                        "Campaign_addtests: 'tests'-keys "
+                        + "should be the Test name"
+                    )
             for k in tests.keys():
                 self.__tests[k] = dcopy(tests[k])
         elif isinstance(tests, (list, tuple)):
             for tes in tests:
                 if not isinstance(tes, Test):
-                    raise ValueError("Campaign_addtests: some 'tests' " +
-                                     "are not of type Test")
+                    raise ValueError(
+                        "Campaign_addtests: some 'tests' "
+                        + "are not of type Test"
+                    )
                 if tes.name in tuple(self.__tests.keys()):
-                    raise ValueError("Campaign_addtests: some 'tests' " +
-                                     "are already present")
+                    raise ValueError(
+                        "Campaign_addtests: some 'tests' "
+                        + "are already present"
+                    )
             for tes in tests:
                 self.__tests[tes.name] = dcopy(tes)
         elif isinstance(tests, Test):
             self.__tests[tests.name] = dcopy(tests)
         else:
-            raise ValueError("Campaign_addtests: 'tests' should be " +
-                             "given as dictonary, list or single 'Test'")
+            raise ValueError(
+                "Campaign_addtests: 'tests' should be "
+                + "given as dictonary, list or single 'Test'"
+            )
 
     def deltests(self, tests):
         """Delete some specified tests.
@@ -481,20 +529,20 @@ class Campaign(object):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Cmp_"+self.name
+            name = "Cmp_" + self.name
         # ensure the name ends with '.csv'
         if name[-4:] != ".cmp":
             name += ".cmp"
         name = _formname(name)
         # create temporal directory for the included files
         tmp = ".tmpcmp/"
-        patht = path+tmp
+        patht = path + tmp
         if os.path.exists(patht):
             shutil.rmtree(patht, ignore_errors=True)
         os.makedirs(patht)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(patht+"info.csv", 'w') as csvf:
+        with open(patht + "info.csv", "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Campaign"])
             writer.writerow(["name", self.name])
@@ -502,7 +550,7 @@ class Campaign(object):
             writer.writerow(["timeframe", self.timeframe])
             # define names for the variable-files
             if self._fieldsite is not None:
-                fieldsname = name[:-4]+"_Fieldsite.fds"
+                fieldsname = name[:-4] + "_Fieldsite.fds"
                 # save variable-files
                 writer.writerow(["fieldsite", fieldsname])
                 self._fieldsite.save(patht, fieldsname)
@@ -513,7 +561,7 @@ class Campaign(object):
             writer.writerow(["Wells", len(wkeys)])
             wellsname = {}
             for k in wkeys:
-                wellsname[k] = name[:-4]+"_"+k+"_Well.wel"
+                wellsname[k] = name[:-4] + "_" + k + "_Well.wel"
                 writer.writerow([k, wellsname[k]])
                 self.wells[k].save(patht, wellsname[k])
 
@@ -521,19 +569,19 @@ class Campaign(object):
             writer.writerow(["Tests", len(tkeys)])
             testsname = {}
             for k in tkeys:
-                testsname[k] = name[:-4]+"_"+k+"_Test.tst"
+                testsname[k] = name[:-4] + "_" + k + "_Test.tst"
                 writer.writerow([k, testsname[k]])
                 self.tests[k].save(patht, testsname[k])
 
         # compress everything to one zip-file
-        with zipfile.ZipFile(path+name, "w") as zfile:
-            zfile.write(patht+"info.csv", "info.csv")
+        with zipfile.ZipFile(path + name, "w") as zfile:
+            zfile.write(patht + "info.csv", "info.csv")
             if self._fieldsite is not None:
-                zfile.write(patht+fieldsname, fieldsname)
+                zfile.write(patht + fieldsname, fieldsname)
             for k in wkeys:
-                zfile.write(patht+wellsname[k], wellsname[k])
+                zfile.write(patht + wellsname[k], wellsname[k])
             for k in tkeys:
-                zfile.write(patht+testsname[k], testsname[k])
+                zfile.write(patht + testsname[k], testsname[k])
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
 
@@ -563,8 +611,9 @@ def load_fieldsite(fdsfile):
                 coordinates = load_var(TxtIO(zfile.open(coordinfo)))
         fieldsite = FieldSite(name, description, coordinates)
     except Exception:
-        raise Exception("loadFieldSite: loading the fieldsite " +
-                        "was not possible")
+        raise Exception(
+            "loadFieldSite: loading the fieldsite " + "was not possible"
+        )
     return fieldsite
 
 
@@ -604,9 +653,11 @@ def load_campaign(cmpfile):
                 row = _nextr(data)
                 tests[row[0]] = load_test(BytIO(zfile.read(row[1])))
 
-        campaign = Campaign(name, fieldsite, wells, tests,
-                            timeframe, description)
+        campaign = Campaign(
+            name, fieldsite, wells, tests, timeframe, description
+        )
     except Exception:
-        raise Exception("loadPumpingTest: loading the pumpingtest " +
-                        "was not possible")
+        raise Exception(
+            "loadPumpingTest: loading the pumpingtest " + "was not possible"
+        )
     return campaign

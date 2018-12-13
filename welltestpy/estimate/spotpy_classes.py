@@ -1,5 +1,5 @@
 """
-welltestpy subpackage providing classes for Spotpy classes for the\
+welltestpy subpackage providing classes for Spotpy classes for the
 estimation library
 
 .. currentmodule:: welltestpy.estimate.spotpy_classes
@@ -22,18 +22,14 @@ import spotpy
 
 import anaflow as ana
 
-__all__ = [
-    "ext_theis2D",
-    "theis",
-    "Stat2Dsetup",
-    "Theissetup",
-]
+__all__ = ["ext_theis2D", "theis", "Stat2Dsetup", "Theissetup"]
 
 
 # functions for fitting
 
-def ext_theis2D(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
-    '''
+
+def ext_theis2D(rad, time, Qw=-0.0001, rwell=0.0, rinf=np.inf):
+    """
     The extended Theis solution in 2D
 
     The extended Theis solution for transient flow under
@@ -59,9 +55,10 @@ def ext_theis2D(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
     -------
     ext_theis2D : :any:`callable`
         callable function taking ``mu``, ``sig2``, ``corr`` and ``lnS``.
-    '''
+    """
+
     def function(mu, sig2, corr, lnS):
-        '''
+        """
         The extended Theis solution in 2D
 
         The extended Theis solution for transient flow under
@@ -86,17 +83,26 @@ def ext_theis2D(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
         -------
         ext_theis2D : :class:`numpy.ndarray`
             Array with all heads at the given radii and time-points.
-        '''
-        return ana.ext_theis2D(rad=rad, time=time,
-                               TG=np.exp(mu), sig2=sig2,
-                               corr=corr, S=np.exp(lnS),
-                               Qw=Qw, rwell=rwell, rinf=rinf,
-                               parts=25, stehfestn=12)
+        """
+        return ana.ext_theis2D(
+            rad=rad,
+            time=time,
+            TG=np.exp(mu),
+            sig2=sig2,
+            corr=corr,
+            S=np.exp(lnS),
+            Qw=Qw,
+            rwell=rwell,
+            rinf=rinf,
+            parts=25,
+            stehfestn=12,
+        )
+
     return function
 
 
-def theis(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
-    '''
+def theis(rad, time, Qw=-0.0001, rwell=0.0, rinf=np.inf):
+    """
     The Theis solution
 
     The Theis solution for transient flow under a pumping condition
@@ -125,9 +131,10 @@ def theis(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
     -------
     theis : :any:`callable`
         callable function taking ``mu`` and ``lnS``.
-    '''
+    """
+
     def function(mu, lnS):
-        '''
+        """
         The Theis solution
 
         Parameters
@@ -141,14 +148,23 @@ def theis(rad, time, Qw=-.0001, rwell=0.0, rinf=np.inf):
         -------
         theis : :class:`numpy.ndarray`
             Array with all heads at the given radii and time-points.
-        '''
-        return ana.theis(rad=rad, time=time,
-                         T=np.exp(mu), S=np.exp(lnS),
-                         Qw=Qw, rwell=rwell, rinf=rinf, stehfestn=12)
+        """
+        return ana.theis(
+            rad=rad,
+            time=time,
+            T=np.exp(mu),
+            S=np.exp(lnS),
+            Qw=Qw,
+            rwell=rwell,
+            rinf=rinf,
+            stehfestn=12,
+        )
+
     return function
 
 
 # spotpy classes
+
 
 class Stat2Dsetup(object):
     """Spotpy class for an estimation of stochastic subsurface parameters.
@@ -156,10 +172,25 @@ class Stat2Dsetup(object):
     This class uses the extended Theis solution in 2D to estimate parameters
     of heterogeneity of an aquifer from pumping test data.
     """
-    def __init__(self, rad, time, rtdata, Qw, bestvalues=None,
-                 mu=None, sig2=None, corr=None, lnS=None,
-                 murange=None, sig2range=None, corrrange=None, lnSrange=None,
-                 rwell=0.0, rinf=np.inf):
+
+    def __init__(
+        self,
+        rad,
+        time,
+        rtdata,
+        Qw,
+        bestvalues=None,
+        mu=None,
+        sig2=None,
+        corr=None,
+        lnS=None,
+        murange=None,
+        sig2range=None,
+        corrrange=None,
+        lnSrange=None,
+        rwell=0.0,
+        rinf=np.inf,
+    ):
         """Spotpy class initialisation.
 
         Parameters
@@ -238,51 +269,55 @@ class Stat2Dsetup(object):
         self.Qw = Qw
 
         if murange is None:
-            self.ranges["mu"] = (-16., -1., 1., -9., -16., -1.)
+            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
         else:
             self.ranges["mu"] = murange
         if sig2range is None:
-            self.ranges["sig2"] = (.01, 6., .5, 2.55, .01, 6.)
+            self.ranges["sig2"] = (0.01, 6.0, 0.5, 2.55, 0.01, 6.0)
         else:
             self.ranges["sig2"] = sig2range
         if corrrange is None:
-            self.ranges["corr"] = (.5, 40., 2., 18., .5, 40.)
+            self.ranges["corr"] = (0.5, 40.0, 2.0, 18.0, 0.5, 40.0)
         else:
             self.ranges["corr"] = corrrange
         if lnSrange is None:
-            self.ranges["lnS"] = (-16., -1., 1., -9., -16., -1.)
+            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
         else:
             self.ranges["lnS"] = lnSrange
 
         if self.mu is None:
-            self.params.append(spotpy.parameter.Uniform('mu',
-                                                        *self.ranges["mu"]))
+            self.params.append(
+                spotpy.parameter.Uniform("mu", *self.ranges["mu"])
+            )
             self.simkw.append("mu")
-            self.simkwargs["mu"] = 0.
+            self.simkwargs["mu"] = 0.0
         else:
             self.kwargs["mu"] = self.mu
 
         if self.sig2 is None:
-            self.params.append(spotpy.parameter.Uniform('sig2',
-                                                        *self.ranges["sig2"]))
+            self.params.append(
+                spotpy.parameter.Uniform("sig2", *self.ranges["sig2"])
+            )
             self.simkw.append("sig2")
-            self.simkwargs["sig2"] = 0.
+            self.simkwargs["sig2"] = 0.0
         else:
             self.kwargs["sig2"] = self.sig2
 
         if self.corr is None:
-            self.params.append(spotpy.parameter.Uniform('corr',
-                                                        *self.ranges["corr"]))
+            self.params.append(
+                spotpy.parameter.Uniform("corr", *self.ranges["corr"])
+            )
             self.simkw.append("corr")
-            self.simkwargs["corr"] = 0.
+            self.simkwargs["corr"] = 0.0
         else:
             self.kwargs["corr"] = self.corr
 
         if self.lnS is None:
-            self.params.append(spotpy.parameter.Uniform('lnS',
-                                                        *self.ranges["lnS"]))
+            self.params.append(
+                spotpy.parameter.Uniform("lnS", *self.ranges["lnS"])
+            )
             self.simkw.append("lnS")
-            self.simkwargs["lnS"] = 0.
+            self.simkwargs["lnS"] = 0.0
         else:
             self.kwargs["lnS"] = self.lnS
 
@@ -299,8 +334,9 @@ class Stat2Dsetup(object):
         else:
             self.bestvalues = bestvalues
 
-        self.sim_raw = ext_theis2D(self.rad, self.time, self.Qw,
-                                   rwell=rwell, rinf=rinf)
+        self.sim_raw = ext_theis2D(
+            self.rad, self.time, self.Qw, rwell=rwell, rinf=rinf
+        )
 
         self.sim = ft.partial(self.sim_raw, **self.kwargs)
 
@@ -322,16 +358,16 @@ class Stat2Dsetup(object):
         return ret.reshape(-1)
 
     def evaluation(self):
-        '''Accesss the drawdown data'''
+        """Accesss the drawdown data"""
         ret = np.squeeze(np.array(self.data).reshape(-1))
         return ret
 
-    def objectivefunction(self, simulation=simulation,
-                          evaluation=evaluation):
-        '''Calculate the root mean square error between observation and
-        simulation'''
-        ret = -spotpy.objectivefunctions.rmse(evaluation=evaluation,
-                                              simulation=simulation)
+    def objectivefunction(self, simulation=simulation, evaluation=evaluation):
+        """Calculate the root mean square error between observation and
+        simulation"""
+        ret = -spotpy.objectivefunctions.rmse(
+            evaluation=evaluation, simulation=simulation
+        )
         return ret
 
 
@@ -341,10 +377,21 @@ class Theissetup(object):
     This class uses the Theis solution to estimate parameters
     of an homogeneous aquifer from pumping test data.
     """
-    def __init__(self, rad, time, rtdata, Qw, bestvalues=None,
-                 mu=None, lnS=None,
-                 murange=None, lnSrange=None,
-                 rwell=0.0, rinf=np.inf):
+
+    def __init__(
+        self,
+        rad,
+        time,
+        rtdata,
+        Qw,
+        bestvalues=None,
+        mu=None,
+        lnS=None,
+        murange=None,
+        lnSrange=None,
+        rwell=0.0,
+        rinf=np.inf,
+    ):
         """Spotpy class initialisation.
 
         Parameters
@@ -399,27 +446,29 @@ class Theissetup(object):
         self.Qw = Qw
 
         if murange is None:
-            self.ranges["mu"] = (-16., -1., 1., -9., -16., -1.)
+            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
         else:
             self.ranges["mu"] = murange
         if lnSrange is None:
-            self.ranges["lnS"] = (-16., -1., 1., -9., -16., -1.)
+            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
         else:
             self.ranges["lnS"] = lnSrange
 
         if self.mu is None:
-            self.params.append(spotpy.parameter.Uniform('mu',
-                                                        *self.ranges["mu"]))
+            self.params.append(
+                spotpy.parameter.Uniform("mu", *self.ranges["mu"])
+            )
             self.simkw.append("mu")
-            self.simkwargs["mu"] = 0.
+            self.simkwargs["mu"] = 0.0
         else:
             self.kwargs["mu"] = self.mu
 
         if self.lnS is None:
-            self.params.append(spotpy.parameter.Uniform('lnS',
-                                                        *self.ranges["lnS"]))
+            self.params.append(
+                spotpy.parameter.Uniform("lnS", *self.ranges["lnS"])
+            )
             self.simkw.append("lnS")
-            self.simkwargs["lnS"] = 0.
+            self.simkwargs["lnS"] = 0.0
         else:
             self.kwargs["lnS"] = self.lnS
 
@@ -432,8 +481,9 @@ class Theissetup(object):
         else:
             self.bestvalues = bestvalues
 
-        self.sim_raw = theis(self.rad, self.time, self.Qw,
-                             rwell=rwell, rinf=rinf)
+        self.sim_raw = theis(
+            self.rad, self.time, self.Qw, rwell=rwell, rinf=rinf
+        )
 
         self.sim = ft.partial(self.sim_raw, **self.kwargs)
 
@@ -455,14 +505,14 @@ class Theissetup(object):
         return ret.reshape(-1)
 
     def evaluation(self):
-        '''Accesss the drawdown data'''
+        """Accesss the drawdown data"""
         ret = np.squeeze(np.array(self.data).reshape(-1))
         return ret
 
-    def objectivefunction(self, simulation=simulation,
-                          evaluation=evaluation):
-        '''Calculate the root mean square error between observation and
-        simulation'''
-        ret = -spotpy.objectivefunctions.rmse(evaluation=evaluation,
-                                              simulation=simulation)
+    def objectivefunction(self, simulation=simulation, evaluation=evaluation):
+        """Calculate the root mean square error between observation and
+        simulation"""
+        ret = -spotpy.objectivefunctions.rmse(
+            evaluation=evaluation, simulation=simulation
+        )
         return ret

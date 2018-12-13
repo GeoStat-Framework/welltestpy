@@ -69,8 +69,10 @@ class Variable(object):
     description : :class:`str`
         Description of the Variable.
     """
-    def __init__(self, name, value,
-                 symbol="x", units="-", description="no description"):
+
+    def __init__(
+        self, name, value, symbol="x", units="-", description="no description"
+    ):
         """Variable initialisation.
 
         Parameters
@@ -117,16 +119,16 @@ class Variable(object):
     def info(self):
         """:class:`str`: Info about the Variable."""
         info = ""
-        info += " Variable-name: "+str(self.name)+"\n"
-        info += " -Value:        "+str(self.value)+"\n"
-        info += " -Symbol:       "+str(self.symbol)+"\n"
-        info += " -Units:        "+str(self.units)+"\n"
-        info += " -Description:  "+str(self.description)+"\n"
-#        print(" Variable-name: "+str(self.name))
-#        print(" -Value:        "+str(self.value))
-#        print(" -Symbol:       "+str(self.symbol))
-#        print(" -Units:        "+str(self.units))
-#        print(" -Description:  "+str(self.description))
+        info += " Variable-name: " + str(self.name) + "\n"
+        info += " -Value:        " + str(self.value) + "\n"
+        info += " -Symbol:       " + str(self.symbol) + "\n"
+        info += " -Units:        " + str(self.units) + "\n"
+        info += " -Description:  " + str(self.description) + "\n"
+        #        print(" Variable-name: "+str(self.name))
+        #        print(" -Value:        "+str(self.value))
+        #        print(" -Symbol:       "+str(self.symbol))
+        #        print(" -Units:        "+str(self.units))
+        #        print(" -Description:  "+str(self.description))
         return info
 
     @property
@@ -137,7 +139,7 @@ class Variable(object):
     @property
     def label(self):
         """:class:`str`: String containing: ``symbol in units``."""
-        return self.symbol+" in "+self.units
+        return self.symbol + " in " + self.units
 
     @property
     def value(self):
@@ -161,11 +163,18 @@ class Variable(object):
             raise ValueError("Variable: 'value' is neither integer nor float")
 
     def __repr__(self):
-        return str(self.name)+" "+self.symbol+": " + \
-               str(self.value)+" "+self.units
+        return (
+            str(self.name)
+            + " "
+            + self.symbol
+            + ": "
+            + str(self.value)
+            + " "
+            + self.units
+        )
 
     def __str__(self):
-        return str(self.name)+" "+self.label
+        return str(self.name) + " " + self.label
 
     def save(self, path="./", name=None):
         """Save a variable to file.
@@ -196,13 +205,13 @@ class Variable(object):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Var_"+self.name
+            name = "Var_" + self.name
         # ensure the name ends with '.var'
         if name[-4:] != ".var":
             name += ".var"
         name = _formname(name)
         # write the csv-file
-        with open(path+name, 'w') as csvf:
+        with open(path + name, "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Variable"])
             writer.writerow(["name", self.name])
@@ -217,7 +226,7 @@ class Variable(object):
                 writer.writerow(["scalar"])
                 writer.writerow(["value", self.value])
             else:
-                writer.writerow(["shape"]+list(np.shape(self.value)))
+                writer.writerow(["shape"] + list(np.shape(self.value)))
                 tmpvalue = np.reshape(self.value, -1)
                 writer.writerow(["values", len(tmpvalue)])
                 for val in tmpvalue:
@@ -232,8 +241,10 @@ class TimeVar(Variable):
     Here the variable should be at most 1 dimensional and the name is fix set
     to ``"time"``.
     """
-    def __init__(self, value,
-                 symbol="t", units="s", description="time given in seconds"):
+
+    def __init__(
+        self, value, symbol="t", units="s", description="time given in seconds"
+    ):
         """Time variable initialisation.
 
         Parameters
@@ -247,11 +258,13 @@ class TimeVar(Variable):
         description : :class:`str`, optional
             Description of the Variable. Default: ``"time given in seconds"``
         """
-        super(TimeVar, self).__init__("time", value,
-                                      symbol, units, description)
+        super(TimeVar, self).__init__(
+            "time", value, symbol, units, description
+        )
         if np.ndim(self.value) > 1:
-            raise ValueError("TimeVar: 'time' should have " +
-                             "at most one dimension")
+            raise ValueError(
+                "TimeVar: 'time' should have " + "at most one dimension"
+            )
 
 
 class HeadVar(Variable):
@@ -261,8 +274,10 @@ class HeadVar(Variable):
     ----
     Here the variable name is fix set to ``"head"``.
     """
-    def __init__(self, value,
-                 symbol="h", units="m", description="head given in meters"):
+
+    def __init__(
+        self, value, symbol="h", units="m", description="head given in meters"
+    ):
         """Head variable initialisation.
 
         Parameters
@@ -276,13 +291,15 @@ class HeadVar(Variable):
         description : :class:`str`, optional
             Description of the Variable. Default: ``"head given in meters"``
         """
-        super(HeadVar, self).__init__("head", value,
-                                      symbol, units, description)
+        super(HeadVar, self).__init__(
+            "head", value, symbol, units, description
+        )
 
 
 class TemporalVar(Variable):
     """Variable class for a temporal variable.
     """
+
     def __init__(self, value=0.0):
         """Temporal variable initialisation.
 
@@ -292,8 +309,9 @@ class TemporalVar(Variable):
         optional
             Value of the Variable. Default: ``0.0``
         """
-        super(TemporalVar, self).__init__("temporal", value,
-                                          description="temporal variable")
+        super(TemporalVar, self).__init__(
+            "temporal", value, description="temporal variable"
+        )
 
 
 class CoordinatesVar(Variable):
@@ -305,10 +323,15 @@ class CoordinatesVar(Variable):
 
     ``lat`` and ``lon`` should have the same shape.
     """
-    def __init__(self, lat, lon,
-                 symbol="[Lat,Lon]", units="[deg,deg]",
-                 description="Coordinates given in " +
-                 "degree-North and degree-East"):
+
+    def __init__(
+        self,
+        lat,
+        lon,
+        symbol="[Lat,Lon]",
+        units="[deg,deg]",
+        description="Coordinates given in " + "degree-North and degree-East",
+    ):
         """Coordinate variable initialisation.
 
         Parameters
@@ -328,16 +351,21 @@ class CoordinatesVar(Variable):
         ilat = np.array(np.squeeze(lat), ndmin=1)
         ilon = np.array(np.squeeze(lon), ndmin=1)
 
-        if (len(ilat.shape) != 1 or
-                len(ilon.shape) != 1 or
-                ilat.shape != ilon.shape):
-            raise ValueError("CoordinatesVar: 'lat' and 'lon' should have" +
-                             "same quantity and should be given as lists")
+        if (
+            len(ilat.shape) != 1
+            or len(ilon.shape) != 1
+            or ilat.shape != ilon.shape
+        ):
+            raise ValueError(
+                "CoordinatesVar: 'lat' and 'lon' should have"
+                + "same quantity and should be given as lists"
+            )
 
         value = np.array([ilat, ilon]).T
 
-        super(CoordinatesVar, self).__init__("coordinates", value,
-                                             symbol, units, description)
+        super(CoordinatesVar, self).__init__(
+            "coordinates", value, symbol, units, description
+        )
 
 
 class Observation(object):
@@ -354,8 +382,8 @@ class Observation(object):
     description : :class:`str`
         Description of the Variable.
     """
-    def __init__(self, name, time, observation,
-                 description="Observation"):
+
+    def __init__(self, name, time, observation, description="Observation"):
         """Observation initialisation.
 
         Parameters
@@ -377,8 +405,10 @@ class Observation(object):
         if isinstance(observation, Variable):
             self._observation = dcopy(observation)
         else:
-            raise ValueError("Observation: " +
-                             "'observation' must be instance of 'variable'")
+            raise ValueError(
+                "Observation: "
+                + "'observation' must be instance of 'variable'"
+            )
 
         if time is not None:
             if isinstance(time, Variable):
@@ -434,9 +464,11 @@ class Observation(object):
             if not self._checkshape():
                 self._settime(tmp1)
                 self._setobservation(tmp2)
-                raise ValueError("Observation: " +
-                                 "'observation' and 'time' have a " +
-                                 "shape-missmatch")
+                raise ValueError(
+                    "Observation: "
+                    + "'observation' and 'time' have a "
+                    + "shape-missmatch"
+                )
             return self.time, self.observation
         else:
             if observation is None:
@@ -445,7 +477,7 @@ class Observation(object):
             return self.observation
 
     def __repr__(self):
-        return "Observation '"+str(self.name)+"' "+str(self.label)
+        return "Observation '" + str(self.name) + "' " + str(self.label)
 
     def __str__(self):
         return self.__repr__()
@@ -471,24 +503,24 @@ class Observation(object):
         Here you can display informations about the observation.
         """
         info = ""
-        info += "Observation-name: "+str(self.name)+"\n"
-        info += " -Description:    "+str(self.description)+"\n"
-        info += " -Kind:           "+str(self.kind)+"\n"
-        info += " -State:          "+str(self.state)+"\n"
+        info += "Observation-name: " + str(self.name) + "\n"
+        info += " -Description:    " + str(self.description) + "\n"
+        info += " -Kind:           " + str(self.kind) + "\n"
+        info += " -State:          " + str(self.state) + "\n"
         if self.state == "transient":
-            info += " --- "+"\n"
-            info += self._time.info+"\n"
-        info += " --- "+"\n"
-        info += self._observation.info+"\n"
-#        print("Observation-name: "+str(self.name))
-#        print(" -Description:    "+str(self.description))
-#        print(" -Kind:           "+str(self.kind))
-#        print(" -State:          "+str(self.state))
-#        if self.state == "transient":
-#            print(" --- ")
-#            self._time.info
-#        print(" --- ")
-#        self._observation.info
+            info += " --- " + "\n"
+            info += self._time.info + "\n"
+        info += " --- " + "\n"
+        info += self._observation.info + "\n"
+        #        print("Observation-name: "+str(self.name))
+        #        print(" -Description:    "+str(self.description))
+        #        print(" -Kind:           "+str(self.kind))
+        #        print(" -State:          "+str(self.state))
+        #        if self.state == "transient":
+        #            print(" --- ")
+        #            self._time.info
+        #        print(" --- ")
+        #        self._observation.info
         return info
 
     @property
@@ -513,16 +545,16 @@ class Observation(object):
 
     @property
     def time(self):
-        ''':class:`int` or :class:`float` or :class:`numpy.ndarray`:
-        time values of the observation'''
+        """:class:`int` or :class:`float` or :class:`numpy.ndarray`:
+        time values of the observation"""
         if self.state == "transient":
             return self._time.value
         return None
 
     @property
     def observation(self):
-        ''':class:`int` or :class:`float` or :class:`numpy.ndarray`:
-        observed values of the observation'''
+        """:class:`int` or :class:`float` or :class:`numpy.ndarray`:
+        observed values of the observation"""
         return self._observation.value
 
     @property
@@ -531,7 +563,7 @@ class Observation(object):
         String containing the units of the observation"""
         if self.state == "steady":
             return self._observation.units
-        return self._time.units+","+self._observation.units
+        return self._time.units + "," + self._observation.units
 
     @time.setter
     def time(self, time):
@@ -540,17 +572,21 @@ class Observation(object):
             self._settime(time)
             if not self._checkshape():
                 del self.time
-                raise ValueError("Observation: " +
-                                 "'time' has a " +
-                                 "shape-missmatch with 'observation'")
+                raise ValueError(
+                    "Observation: "
+                    + "'time' has a "
+                    + "shape-missmatch with 'observation'"
+                )
         else:
             tmp = dcopy(self._time)
             self._settime(time)
             if not self._checkshape():
                 self._settime(tmp)
-                raise ValueError("Observation: " +
-                                 "'time' has a " +
-                                 "shape-missmatch with 'observation'")
+                raise ValueError(
+                    "Observation: "
+                    + "'time' has a "
+                    + "shape-missmatch with 'observation'"
+                )
 
     @time.deleter
     def time(self):
@@ -563,16 +599,18 @@ class Observation(object):
         self._setobservation(observation)
         if not self._checkshape():
             self._setobservation(tmp)
-            raise ValueError("Observation: " +
-                             "'observation' has a " +
-                             "shape-missmatch with 'time'")
+            raise ValueError(
+                "Observation: "
+                + "'observation' has a "
+                + "shape-missmatch with 'time'"
+            )
 
     def reshape(self):
-        '''Reshape obeservations to flat array.'''
+        """Reshape obeservations to flat array."""
         if self.state == "transient":
             tmp = len(np.shape(self.time))
             self._settime(np.reshape(self.time, -1))
-            shp = np.shape(self.time)+np.shape(self.observation)[tmp:]
+            shp = np.shape(self.time) + np.shape(self.observation)[tmp:]
             self._setobservation(np.reshape(self.observation, shp))
 
     def _settime(self, time):
@@ -589,25 +627,29 @@ class Observation(object):
 
     def _checkshape(self):
         if self.state == "transient":
-            if np.shape(self.time) != \
-               np.shape(self.observation)[:len(np.shape(self._time()))]:
+            if (
+                np.shape(self.time)
+                != np.shape(self.observation)[: len(np.shape(self._time()))]
+            ):
                 return False
         return True
 
     def __iter__(self):
         if self.state == "transient":
-            self.__it = np.nditer(self.time, flags=['multi_index'])
+            self.__it = np.nditer(self.time, flags=["multi_index"])
         else:
             self.__itfinished = False
         return self
 
     def next(self):
-        '''Iterate through observations'''
+        """Iterate through observations"""
         if self.state == "transient":
             if self.__it.finished:
                 raise StopIteration
-            ret = (np.asscalar(self.__it[0]),
-                   self.observation[self.__it.multi_index])
+            ret = (
+                np.asscalar(self.__it[0]),
+                self.observation[self.__it.multi_index],
+            )
             self.__it.iternext()
         else:
             if self.__itfinished:
@@ -620,7 +662,7 @@ class Observation(object):
     __next__ = next
 
     def edit(self):
-        '''Edit the observed time-series with a graphical interface.'''
+        """Edit the observed time-series with a graphical interface."""
         if self.state == "transient" and len(np.shape(self.time)) == 1:
             Editor(self)
 
@@ -653,51 +695,51 @@ class Observation(object):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Obs_"+self.name
+            name = "Obs_" + self.name
         # ensure the name ends with '.obs'
         if name[-4:] != ".obs":
             name += ".obs"
         name = _formname(name)
         # create temporal directory for the included files
         tmp = ".tmpobserv/"
-        patht = path+tmp
+        patht = path + tmp
         if os.path.exists(patht):
             shutil.rmtree(patht, ignore_errors=True)
         os.makedirs(patht)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(patht+"info.csv", 'w') as csvf:
+        with open(patht + "info.csv", "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Observation"])
             writer.writerow(["name", self.name])
             writer.writerow(["state", self.state])
             writer.writerow(["description", self.description])
             if self.state == "steady":
-                obsname = name[:-4]+"_ObsVar.var"
+                obsname = name[:-4] + "_ObsVar.var"
                 writer.writerow(["observation", obsname])
                 self._observation.save(patht, obsname)
             else:
-                timname = name[:-4]+"_TimVar.var"
-                obsname = name[:-4]+"_ObsVar.var"
+                timname = name[:-4] + "_TimVar.var"
+                obsname = name[:-4] + "_ObsVar.var"
                 writer.writerow(["time", timname])
                 writer.writerow(["observation", obsname])
                 self._time.save(patht, timname)
                 self._observation.save(patht, obsname)
         # compress everything to one zip-file
-        with zipfile.ZipFile(path+name, "w") as zfile:
+        with zipfile.ZipFile(path + name, "w") as zfile:
             # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
-            zfile.write(patht+"info.csv", "info.csv")
+            zfile.write(patht + "info.csv", "info.csv")
             if self.state == "transient":
-                zfile.write(patht+timname, timname)
-            zfile.write(patht+obsname, obsname)
+                zfile.write(patht + timname, timname)
+            zfile.write(patht + obsname, obsname)
         shutil.rmtree(patht, ignore_errors=True)
 
 
 class StdyObs(Observation):
     """Observation class special for steady observations.
     """
-    def __init__(self, name, observation,
-                 description="Steady observation"):
+
+    def __init__(self, name, observation, description="Steady observation"):
         """Steady observation initialisation.
 
         Parameters
@@ -712,16 +754,19 @@ class StdyObs(Observation):
         super(StdyObs, self).__init__(name, None, observation, description)
 
     def _settime(self, time):
-        '''For steady observations, this raises a ``ValueError``'''
-        raise ValueError("Observation: " +
-                         "'time' not allowed in steady-state")
+        """For steady observations, this raises a ``ValueError``"""
+        raise ValueError(
+            "Observation: " + "'time' not allowed in steady-state"
+        )
 
 
 class DrawdownObs(Observation):
     """Observation class special for drawdown observations.
     """
-    def __init__(self, name, time, observation,
-                 description="Drawdown observation"):
+
+    def __init__(
+        self, name, time, observation, description="Drawdown observation"
+    ):
         """Steady observation initialisation.
 
         Parameters
@@ -745,16 +790,22 @@ class DrawdownObs(Observation):
 class StdyHeadObs(Observation):
     """Observation class special for steady drawdown observations.
     """
-    def __init__(self, name, observation,
-                 description="Steady State Drawdown observation"):
+
+    def __init__(
+        self,
+        name,
+        observation,
+        description="Steady State Drawdown observation",
+    ):
         if not isinstance(observation, Variable):
             observation = HeadVar(observation)
         super(StdyHeadObs, self).__init__(name, None, observation, description)
 
     def _settime(self, time):
-        '''For steady observations, this raises a ``ValueError``'''
-        raise ValueError("Observation: " +
-                         "'time' not allowed in steady-state")
+        """For steady observations, this raises a ``ValueError``"""
+        raise ValueError(
+            "Observation: " + "'time' not allowed in steady-state"
+        )
 
 
 class Well(object):
@@ -774,8 +825,10 @@ class Well(object):
     You can calculate the distance between two wells ``w1`` and ``w2`` by
     simply calculating the difference ``w1 - w2``.
     """
-    def __init__(self, name, radius, coordinates, welldepth=1.0,
-                 aquiferdepth=None):
+
+    def __init__(
+        self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
+    ):
         """Well initialisation.
 
         Parameters
@@ -796,8 +849,13 @@ class Well(object):
         if isinstance(radius, Variable):
             self._radius = dcopy(radius)
         else:
-            self._radius = Variable("radius", radius, "r", "m",
-                                    "Inner radius of well '"+str(name)+"'")
+            self._radius = Variable(
+                "radius",
+                radius,
+                "r",
+                "m",
+                "Inner radius of well '" + str(name) + "'",
+            )
         if not self._radius.scalar:
             raise ValueError("Well: 'radius' needs to be scalar")
         if self.radius <= 0.0:
@@ -806,18 +864,31 @@ class Well(object):
         if isinstance(coordinates, Variable):
             self._coordinates = dcopy(coordinates)
         else:
-            self._coordinates = Variable("coordinates", coordinates, "XY", "m",
-                                         "coordinates of well '"+str(name)+"'")
-        if np.shape(self.coordinates) != (2,) and\
-           not np.isscalar(self.coordinates):
-            raise ValueError("Well: 'coordinates' should be given as " +
-                             "[x,y] values or one single distance value")
+            self._coordinates = Variable(
+                "coordinates",
+                coordinates,
+                "XY",
+                "m",
+                "coordinates of well '" + str(name) + "'",
+            )
+        if np.shape(self.coordinates) != (2,) and not np.isscalar(
+            self.coordinates
+        ):
+            raise ValueError(
+                "Well: 'coordinates' should be given as "
+                + "[x,y] values or one single distance value"
+            )
 
         if isinstance(welldepth, Variable):
             self._welldepth = dcopy(welldepth)
         else:
-            self._welldepth = Variable("welldepth", welldepth, "L_w", "m",
-                                       "depth of well '"+str(name)+"'")
+            self._welldepth = Variable(
+                "welldepth",
+                welldepth,
+                "L_w",
+                "m",
+                "depth of well '" + str(name) + "'",
+            )
         if not self._welldepth.scalar:
             raise ValueError("Well: 'welldepth' needs to be scalar")
         if self.welldepth <= 0.0:
@@ -827,15 +898,21 @@ class Well(object):
             self._aquiferdepth = dcopy(aquiferdepth)
         else:
             if aquiferdepth is None:
-                self._aquiferdepth = Variable("aquiferdepth", welldepth,
-                                              "L_a", "m",
-                                              "aquiferdepth at well '" +
-                                              str(name)+"'")
+                self._aquiferdepth = Variable(
+                    "aquiferdepth",
+                    welldepth,
+                    "L_a",
+                    "m",
+                    "aquiferdepth at well '" + str(name) + "'",
+                )
             else:
-                self._aquiferdepth = Variable("aquiferdepth", aquiferdepth,
-                                              "L_a", "m",
-                                              "aquiferdepth at well '" +
-                                              str(name)+"'")
+                self._aquiferdepth = Variable(
+                    "aquiferdepth",
+                    aquiferdepth,
+                    "L_a",
+                    "m",
+                    "aquiferdepth at well '" + str(name) + "'",
+                )
         if not self._aquiferdepth.scalar:
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
         if self.aquiferdepth <= 0.0:
@@ -848,22 +925,22 @@ class Well(object):
         Here you can display informations about the variable.
         """
         info = ""
-        info += "----"+"\n"
-        info += "Well-name: "+str(self.name)+"\n"
-        info += "--"+"\n"
-        info += self._radius.info+"\n"
-        info += self._coordinates.info+"\n"
-        info += self._welldepth.info+"\n"
-        info += self._aquiferdepth.info+"\n"
-        info += "----"+"\n"
-#        print("----")
-#        print("Well-name: "+str(self.name))
-#        print("--")
-#        self._radius.info
-#        self._coordinates.info
-#        self._welldepth.info
-#        self._aquiferdepth.info
-#        print("----")
+        info += "----" + "\n"
+        info += "Well-name: " + str(self.name) + "\n"
+        info += "--" + "\n"
+        info += self._radius.info + "\n"
+        info += self._coordinates.info + "\n"
+        info += self._welldepth.info + "\n"
+        info += self._aquiferdepth.info + "\n"
+        info += "----" + "\n"
+        #        print("----")
+        #        print("Well-name: "+str(self.name))
+        #        print("--")
+        #        self._radius.info
+        #        self._coordinates.info
+        #        self._welldepth.info
+        #        self._aquiferdepth.info
+        #        print("----")
         return info
 
     @property
@@ -897,11 +974,14 @@ class Well(object):
             self._coordinates = dcopy(coordinates)
         else:
             self._coordinates(coordinates)
-        if np.shape(self.coordinates) != (2,) and\
-           not np.isscalar(self.coordinates):
+        if np.shape(self.coordinates) != (2,) and not np.isscalar(
+            self.coordinates
+        ):
             self._coordinates = dcopy(tmp)
-            raise ValueError("Well: 'coordinates' should be given as " +
-                             "[x,y] values or one single distance value")
+            raise ValueError(
+                "Well: 'coordinates' should be given as "
+                + "[x,y] values or one single distance value"
+            )
 
     @property
     def welldepth(self):
@@ -955,15 +1035,22 @@ class Well(object):
             try:
                 return np.linalg.norm(self.coordinates - well)
             except ValueError:
-                raise ValueError("Well: the distant-well needs to be an " +
-                                 "instance of Well-class " +
-                                 "or a tupel of x-y coordinates " +
-                                 "or a single distance value " +
-                                 "and of same coordinates-type.")
+                raise ValueError(
+                    "Well: the distant-well needs to be an "
+                    + "instance of Well-class "
+                    + "or a tupel of x-y coordinates "
+                    + "or a single distance value "
+                    + "and of same coordinates-type."
+                )
 
     def __repr__(self):
-        return (str(self.name)+" r="+str(self.radius) +
-                " at "+repr(self._coordinates))
+        return (
+            str(self.name)
+            + " r="
+            + str(self.radius)
+            + " at "
+            + repr(self._coordinates)
+        )
 
     def __sub__(self, well):
         return self.distance(well)
@@ -1015,28 +1102,28 @@ class Well(object):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Well_"+self.name
+            name = "Well_" + self.name
         # ensure the name ends with '.csv'
         if name[-4:] != ".wel":
             name += ".wel"
         name = _formname(name)
         # create temporal directory for the included files
         tmp = ".tmpwell/"
-        patht = path+tmp
+        patht = path + tmp
         if os.path.exists(patht):
             shutil.rmtree(patht, ignore_errors=True)
         os.makedirs(patht)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(patht+"info.csv", 'w') as csvf:
+        with open(patht + "info.csv", "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Well"])
             writer.writerow(["name", self.name])
             # define names for the variable-files
-            radiuname = name[:-4]+"_RadVar.var"
-            coordname = name[:-4]+"_CooVar.var"
-            welldname = name[:-4]+"_WedVar.var"
-            aquifname = name[:-4]+"_AqdVar.var"
+            radiuname = name[:-4] + "_RadVar.var"
+            coordname = name[:-4] + "_CooVar.var"
+            welldname = name[:-4] + "_WedVar.var"
+            aquifname = name[:-4] + "_AqdVar.var"
             # save variable-files
             writer.writerow(["radius", radiuname])
             self._radius.save(patht, radiuname)
@@ -1047,18 +1134,19 @@ class Well(object):
             writer.writerow(["aquiferdepth", aquifname])
             self._aquiferdepth.save(patht, aquifname)
         # compress everything to one zip-file
-        with zipfile.ZipFile(path+name, "w") as zfile:
+        with zipfile.ZipFile(path + name, "w") as zfile:
             # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
-            zfile.write(patht+"info.csv", "info.csv")
-            zfile.write(patht+radiuname, radiuname)
-            zfile.write(patht+coordname, coordname)
-            zfile.write(patht+welldname, welldname)
-            zfile.write(patht+aquifname, aquifname)
+            zfile.write(patht + "info.csv", "info.csv")
+            zfile.write(patht + radiuname, radiuname)
+            zfile.write(patht + coordname, coordname)
+            zfile.write(patht + welldname, welldname)
+            zfile.write(patht + aquifname, aquifname)
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
 
 
 # Loading routines ###
+
 
 def load_var(varfile):
     """Load a variable from file.
@@ -1079,7 +1167,7 @@ def load_var(varfile):
             symbol = next(data)[1]
             units = next(data)[1]
             description = next(data)[1]
-            integer = (next(data)[0] == "integer")
+            integer = next(data)[0] == "integer"
             shapenfo = _nextr(data)
             if shapenfo[0] == "scalar":
                 if integer:
@@ -1107,7 +1195,7 @@ def load_var(varfile):
             symbol = next(data)[1]
             units = next(data)[1]
             description = next(data)[1]
-            integer = (next(data)[0] == "integer")
+            integer = next(data)[0] == "integer"
             shapenfo = _nextr(data)
             if shapenfo[0] == "scalar":
                 if integer:
@@ -1148,7 +1236,7 @@ def load_obs(obsfile):
             if next(data)[0] != "Observation":
                 raise Exception
             name = next(data)[1]
-            steady = (next(data)[1] == "steady")
+            steady = next(data)[1] == "steady"
             description = next(data)[1]
             if not steady:
                 timef = next(data)[1]
@@ -1202,14 +1290,15 @@ def load_well(welfile):
 
 # TOOLS ###
 
+
 def _formstr(string):
     # remove spaces, tabs, linebreaks and other separators
-    return ''.join(str(string).split())
+    return "".join(str(string).split())
 
 
 def _formname(string):
     # remove slashes
-    string = ''.join(str(string).split("/"))
+    string = "".join(str(string).split("/"))
     # remove spaces, tabs, linebreaks and other separators
     return _formstr(string)
 

@@ -20,18 +20,8 @@ The following subpackages are provided
 """
 from __future__ import absolute_import
 
-from welltestpy import (
-    data,
-    estimate,
-    process,
-    tools,
-)
+from welltestpy import data, estimate, process, tools
 
-__all__ = [
-    "data",
-    "estimate",
-    "process",
-    "tools",
-]
+__all__ = ["data", "estimate", "process", "tools"]
 
-__version__ = '0.1.1'
+__version__ = "0.1.1"

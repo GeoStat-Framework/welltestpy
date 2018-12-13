@@ -45,11 +45,7 @@ The following subpackages are provided
 """
 from __future__ import absolute_import
 
-from welltestpy.data import (
-    varlib,
-    testslib,
-    campaignlib,
-)
+from welltestpy.data import varlib, testslib, campaignlib
 
 from welltestpy.data.varlib import (
     Variable,
@@ -66,10 +62,7 @@ from welltestpy.data.varlib import (
     load_obs,
     load_well,
 )
-from welltestpy.data.testslib import (
-    PumpingTest,
-    load_test,
-)
+from welltestpy.data.testslib import PumpingTest, load_test
 from welltestpy.data.campaignlib import (
     FieldSite,
     Campaign,

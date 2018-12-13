@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 from welltestpy import __version__ as VERSION
 
 DOCLINES = __doc__.split("\n")
-README = open('README.md').read()
+README = open("README.md").read()
 CLASSIFIERS = """\
 Development Status :: 3 - Alpha
 Intended Audience :: Developers
@@ -33,7 +33,7 @@ Topic :: Utilities
 """
 
 setup(
-    name='welltestpy',
+    name="welltestpy",
     version=VERSION,
     maintainer="Sebastian Mueller",
     maintainer_email="sebastian.mueller@ufz.de",
@@ -42,16 +42,16 @@ setup(
     long_description_content_type="text/markdown",
     author="Sebastian Mueller",
     author_email="sebastian.mueller@ufz.de",
-    url='https://github.com/MuellerSeb/welltestpy',
-    license='LGPL -  see LICENSE',
-    classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
+    url="https://github.com/MuellerSeb/welltestpy",
+    license="LGPL -  see LICENSE",
+    classifiers=[_f for _f in CLASSIFIERS.split("\n") if _f],
     platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     include_package_data=True,
     install_requires=[
-        'numpy >= 1.10.0',
-        'scipy >= 0.19.0',
-        'anaflow',
-        'matplotlib',
+        "numpy >= 1.10.0",
+        "scipy >= 0.19.0",
+        "anaflow",
+        "matplotlib",
     ],
-    packages=find_packages(exclude=['tests*', 'docs*']),
+    packages=find_packages(exclude=["tests*", "docs*"]),
 )

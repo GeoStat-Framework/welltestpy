@@ -32,11 +32,7 @@ from welltestpy.data.varlib import (
     _formname,
 )
 
-__all__ = [
-    "Test",
-    "PumpingTest",
-    "load_test",
-]
+__all__ = ["Test", "PumpingTest", "load_test"]
 
 
 class Test(object):
@@ -54,6 +50,7 @@ class Test(object):
     timeframe : :class:`str`
         Timeframe of the test.
     """
+
     def __init__(self, name, description="no description", timeframe=None):
         """Test initialisation.
 
@@ -74,7 +71,9 @@ class Test(object):
         self._testtype = "Test"
 
     def __repr__(self):
-        return self.testtype+" '"+self.name+"', Info: "+self.description
+        return (
+            self.testtype + " '" + self.name + "', Info: " + self.description
+        )
 
     @property
     def testtype(self):
@@ -99,9 +98,18 @@ class PumpingTest(Test):
     pumpingwell : :class:`str`
         Pumping well of the test.
     """
-    def __init__(self, name, pumpingwell, pumpingrate, observations=None,
-                 aquiferdepth=1.0, aquiferradius=np.inf,
-                 description="Pumpingtest", timeframe=None):
+
+    def __init__(
+        self,
+        name,
+        pumpingwell,
+        pumpingrate,
+        observations=None,
+        aquiferdepth=1.0,
+        aquiferradius=np.inf,
+        description="Pumpingtest",
+        timeframe=None,
+    ):
         """Pumping test initialisation.
 
         Parameters
@@ -142,19 +150,26 @@ class PumpingTest(Test):
         if isinstance(pumpingrate, Variable):
             self._pumpingrate = dcopy(pumpingrate)
         else:
-            self._pumpingrate = Variable("pumpingrate", pumpingrate, "Q",
-                                         "m^3/s",
-                                         "Pumpingrate at test '"+self.name+"'")
+            self._pumpingrate = Variable(
+                "pumpingrate",
+                pumpingrate,
+                "Q",
+                "m^3/s",
+                "Pumpingrate at test '" + self.name + "'",
+            )
         if not self._pumpingrate.scalar:
             raise ValueError("PumpingTest: 'pumpingrate' needs to be scalar")
 
         if isinstance(aquiferdepth, Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
         else:
-            self._aquiferdepth = Variable("aquiferdepth", aquiferdepth,
-                                          "L_a", "m",
-                                          "mean aquiferdepth for test '" +
-                                          str(name)+"'")
+            self._aquiferdepth = Variable(
+                "aquiferdepth",
+                aquiferdepth,
+                "L_a",
+                "m",
+                "mean aquiferdepth for test '" + str(name) + "'",
+            )
         if not self._aquiferdepth.scalar:
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
         if self.aquiferdepth <= 0.0:
@@ -163,15 +178,19 @@ class PumpingTest(Test):
         if isinstance(aquiferradius, Variable):
             self._aquiferradius = dcopy(aquiferradius)
         else:
-            self._aquiferradius = Variable("aquiferradius", aquiferradius,
-                                           "R", "m",
-                                           "mean aquiferradius for test '" +
-                                           str(name)+"'")
+            self._aquiferradius = Variable(
+                "aquiferradius",
+                aquiferradius,
+                "R",
+                "m",
+                "mean aquiferradius for test '" + str(name) + "'",
+            )
         if not self._aquiferradius.scalar:
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
         if self.aquiferradius <= 0.0:
-            raise ValueError("PumpingTest: 'aquiferradius' " +
-                             "needs to be positiv")
+            raise ValueError(
+                "PumpingTest: 'aquiferradius' " + "needs to be positiv"
+            )
 
         if observations is None:
             self.__observations = {}
@@ -237,8 +256,9 @@ class PumpingTest(Test):
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
         if self.aquiferradius <= 0.0:
             self._aquiferradius = dcopy(tmp)
-            raise ValueError("PumpingTest: 'aquiferradius' " +
-                             "needs to be positiv")
+            raise ValueError(
+                "PumpingTest: 'aquiferradius' " + "needs to be positiv"
+            )
 
     @property
     def observations(self):
@@ -251,12 +271,16 @@ class PumpingTest(Test):
             if isinstance(obs, dict):
                 for k in obs.keys():
                     if not isinstance(obs[k], Observation):
-                        raise ValueError("PumpingTest: some 'observations' " +
-                                         "are not of type Observation")
+                        raise ValueError(
+                            "PumpingTest: some 'observations' "
+                            + "are not of type Observation"
+                        )
                 self.__observations = dcopy(obs)
             else:
-                raise ValueError("PumpingTest: 'observations' should" +
-                                 " be given as dictonary")
+                raise ValueError(
+                    "PumpingTest: 'observations' should"
+                    + " be given as dictonary"
+                )
         else:
             self.__observations = {}
 
@@ -273,17 +297,23 @@ class PumpingTest(Test):
         if isinstance(obs, dict):
             for k in obs:
                 if not isinstance(obs[k], Observation):
-                    raise ValueError("PumpingTest_addobservations: some " +
-                                     "'observations' are not " +
-                                     "of type Observation")
+                    raise ValueError(
+                        "PumpingTest_addobservations: some "
+                        + "'observations' are not "
+                        + "of type Observation"
+                    )
                 if k in self.observations:
-                    raise ValueError("PumpingTest_addobservations: some " +
-                                     "'observations' are already present")
+                    raise ValueError(
+                        "PumpingTest_addobservations: some "
+                        + "'observations' are already present"
+                    )
             for k in obs:
                 self.__observations[k] = dcopy(obs[k])
         else:
-            raise ValueError("PumpingTest_addobservations: 'observations' " +
-                             "should be given as dictonary with well as key")
+            raise ValueError(
+                "PumpingTest_addobservations: 'observations' "
+                + "should be given as dictonary with well as key"
+            )
 
     def delobservations(self, obs):
         """Delete some specified observations.
@@ -337,17 +367,19 @@ class PumpingTest(Test):
             else:
                 displace = np.minimum(self.observations[k].value[1], 0.0)
 
-            plt_ax.plot(self.observations[k].value[0],
-                        displace,
-                        linewidth=2,
-                        label=(self.observations[k].name +
-                               " r={:1.2f}".format(dist)))
+            plt_ax.plot(
+                self.observations[k].value[0],
+                displace,
+                linewidth=2,
+                label=(self.observations[k].name + " r={:1.2f}".format(dist)),
+            )
             plt_ax.set_xlabel(self.observations[k].labels[0])
             plt_ax.set_ylabel(self.observations[k].labels[1])
 
         plt_ax.set_title(repr(self))
-        plt_ax.legend(loc='center right', fancybox=True, framealpha=0.75)
-#        plt_ax.legend(loc='best', fancybox=True, framealpha=0.75)
+        plt_ax.legend(loc="center right", fancybox=True, framealpha=0.75)
+
+    #        plt_ax.legend(loc='best', fancybox=True, framealpha=0.75)
 
     def save(self, path="./", name=None):
         """Save a pumping test to file.
@@ -378,20 +410,20 @@ class PumpingTest(Test):
             os.makedirs(path)
         # create a standard name if None is given
         if name is None:
-            name = "Test_"+self.name
+            name = "Test_" + self.name
         # ensure the name ends with '.csv'
         if name[-4:] != ".tst":
             name += ".tst"
         name = _formname(name)
         # create temporal directory for the included files
         tmp = ".tmptest/"
-        patht = path+tmp
+        patht = path + tmp
         if os.path.exists(patht):
             shutil.rmtree(patht, ignore_errors=True)
         os.makedirs(patht)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(patht+"info.csv", 'w') as csvf:
+        with open(patht + "info.csv", "w") as csvf:
             writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow(["Testtype", "PumpingTest"])
             writer.writerow(["name", self.name])
@@ -399,9 +431,9 @@ class PumpingTest(Test):
             writer.writerow(["timeframe", self.timeframe])
             writer.writerow(["pumpingwell", self.pumpingwell])
             # define names for the variable-files
-            pumprname = name[:-4]+"_PprVar.var"
-            aquidname = name[:-4]+"_AqdVar.var"
-            aquirname = name[:-4]+"_AqrVar.var"
+            pumprname = name[:-4] + "_PprVar.var"
+            aquidname = name[:-4] + "_AqdVar.var"
+            aquirname = name[:-4] + "_AqrVar.var"
             # save variable-files
             writer.writerow(["pumpingrate", pumprname])
             self._pumpingrate.save(patht, pumprname)
@@ -413,17 +445,17 @@ class PumpingTest(Test):
             writer.writerow(["Observations", len(okeys)])
             obsname = {}
             for k in okeys:
-                obsname[k] = name[:-4]+"_"+k+"_Obs.obs"
+                obsname[k] = name[:-4] + "_" + k + "_Obs.obs"
                 writer.writerow([k, obsname[k]])
                 self.observations[k].save(patht, obsname[k])
         # compress everything to one zip-file
-        with zipfile.ZipFile(path+name, "w") as zfile:
-            zfile.write(patht+"info.csv", "info.csv")
-            zfile.write(patht+pumprname, pumprname)
-            zfile.write(patht+aquidname, aquidname)
-            zfile.write(patht+aquirname, aquirname)
+        with zipfile.ZipFile(path + name, "w") as zfile:
+            zfile.write(patht + "info.csv", "info.csv")
+            zfile.write(patht + pumprname, pumprname)
+            zfile.write(patht + aquidname, aquidname)
+            zfile.write(patht + aquirname, aquirname)
             for k in okeys:
-                zfile.write(patht+obsname[k], obsname[k])
+                zfile.write(patht + obsname[k], obsname[k])
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
 
@@ -450,8 +482,7 @@ def load_test(tstfile):
             else:
                 raise Exception
     except Exception:
-        raise Exception("loadTest: loading the test " +
-                        "was not possible")
+        raise Exception("loadTest: loading the test " + "was not possible")
 
     return routine(tstfile)
 
@@ -485,10 +516,18 @@ def _load_pumping_test(tstfile):
                 row = _nextr(data)
                 observations[row[0]] = load_obs(BytIO(zfile.read(row[1])))
 
-        pumpingtest = PumpingTest(name, pumpingwell, pumpingrate, observations,
-                                  aquiferdepth, aquiferradius,
-                                  description, timeframe)
+        pumpingtest = PumpingTest(
+            name,
+            pumpingwell,
+            pumpingrate,
+            observations,
+            aquiferdepth,
+            aquiferradius,
+            description,
+            timeframe,
+        )
     except Exception:
-        raise Exception("loadPumpingTest: loading the pumpingtest " +
-                        "was not possible")
+        raise Exception(
+            "loadPumpingTest: loading the pumpingtest " + "was not possible"
+        )
     return pumpingtest

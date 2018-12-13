@@ -18,14 +18,8 @@ import time as timemodule
 import numpy as np
 import spotpy
 
-from welltestpy.process.processlib import (
-    normpumptest,
-    filterdrawdown,
-)
-from welltestpy.estimate.spotpy_classes import (
-    Theissetup,
-    Stat2Dsetup,
-)
+from welltestpy.process.processlib import normpumptest, filterdrawdown
+from welltestpy.estimate.spotpy_classes import Theissetup, Stat2Dsetup
 from welltestpy.tools.plotter import (
     plotfitting3D,
     plotfitting3Dtheis,
@@ -34,10 +28,7 @@ from welltestpy.tools.plotter import (
     plotsensitivity,
 )
 
-__all__ = [
-    "Stat2Dest",
-    "Theisest",
-]
+__all__ = ["Stat2Dest", "Theisest"]
 
 
 class Stat2Dest(object):
@@ -48,6 +39,7 @@ class Stat2Dest(object):
     a log-normal distributed transmissivity field with a gaussian correlation
     function.
     """
+
     def __init__(self, name, campaign, testinclude=None):
         """Estimation initialisation.
 
@@ -98,7 +90,8 @@ class Stat2Dest(object):
             pumpdict = {}
             for wel in wells:
                 pumpdict[wel] = list(
-                    self.campaign.tests[wel].observations.keys())
+                    self.campaign.tests[wel].observations.keys()
+                )
             self.testinclude = pumpdict
         else:
             self.testinclude = testinclude
@@ -116,7 +109,7 @@ class Stat2Dest(object):
         print("rwell", self.rwell)
         print("rinf", self.rinf)
 
-    def setpumprate(self, prate=-1.):
+    def setpumprate(self, prate=-1.0):
         """Set a uniform pumping rate at all pumpingwells wells.
 
         Parameters
@@ -155,14 +148,21 @@ class Stat2Dest(object):
             # set the first timepoint to at least 10s
             tmin = max(tmin, 10)
 
-#            time = np.expm1(np.linspace(np.log1p(tmin),
-#                                        np.log1p(tmax), 10))
-            time = np.power(np.linspace(np.sqrt(tmin+1.),
-                                        np.sqrt(tmax+1.), 10)+1., 2) - 1.
+            #            time = np.expm1(np.linspace(np.log1p(tmin),
+            #                                        np.log1p(tmax), 10))
+            time = (
+                np.power(
+                    np.linspace(np.sqrt(tmin + 1.0), np.sqrt(tmax + 1.0), 10)
+                    + 1.0,
+                    2,
+                )
+                - 1.0
+            )
         for test in self.testinclude:
             for obs in self.testinclude[test]:
-                filterdrawdown(self.campaign.tests[test].observations[obs],
-                               tout=time)
+                filterdrawdown(
+                    self.campaign.tests[test].observations[obs], tout=time
+                )
 
         self.time = time
 
@@ -196,7 +196,7 @@ class Stat2Dest(object):
                     temprad = pwell - owell
                 rad = np.hstack((rad, temprad))
 
-                tempname = self.campaign.tests[test].pumpingwell+"-"+obs
+                tempname = self.campaign.tests[test].pumpingwell + "-" + obs
                 radnames = np.hstack((radnames, tempname))
 
         # sort everything by the radii
@@ -206,11 +206,27 @@ class Stat2Dest(object):
         self.data = data[:, idx]
         self.radnames = radnames[idx]
 
-    def run(self, rep=5000, parallel="seq", run=True, folder=None,
-            dbname=None, plotname1=None, plotname2=None, plotname3=None,
-            mu=None, sig2=None, corr=None, lnS=None,
-            murange=None, sig2range=None, corrrange=None, lnSrange=None,
-            rwell=None, rinf=None):
+    def run(
+        self,
+        rep=5000,
+        parallel="seq",
+        run=True,
+        folder=None,
+        dbname=None,
+        plotname1=None,
+        plotname2=None,
+        plotname3=None,
+        mu=None,
+        sig2=None,
+        corr=None,
+        lnS=None,
+        murange=None,
+        sig2range=None,
+        corrrange=None,
+        lnSrange=None,
+        rwell=None,
+        rinf=None,
+    ):
         """Run the estimation.
 
         Parameters
@@ -304,7 +320,7 @@ class Stat2Dest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd()+"/"
+            folder = os.getcwd() + "/"
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
@@ -312,38 +328,38 @@ class Stat2Dest(object):
             os.makedirs(dire)
 
         if dbname is None:
-            dbname = folder+act_time+"_stat2D_db"
+            dbname = folder + act_time + "_stat2D_db"
         else:
-            dbname = folder+dbname
+            dbname = folder + dbname
         if plotname1 is None:
-            plotname1 = folder+act_time+"_stat2D_plot_paratrace.pdf"
+            plotname1 = folder + act_time + "_stat2D_plot_paratrace.pdf"
         else:
-            plotname1 = folder+plotname1
+            plotname1 = folder + plotname1
         if plotname2 is None:
-            plotname2 = folder+act_time+"_stat2D_plot_fit.pdf"
+            plotname2 = folder + act_time + "_stat2D_plot_fit.pdf"
         else:
-            plotname2 = folder+plotname2
+            plotname2 = folder + plotname2
         if plotname3 is None:
-            plotname3 = folder+act_time+"_stat2D_plot_parainteract.pdf"
+            plotname3 = folder + act_time + "_stat2D_plot_parainteract.pdf"
         else:
-            plotname3 = folder+plotname3
-        paraname = folder+act_time+"_estimate.txt"
+            plotname3 = folder + plotname3
+        paraname = folder + act_time + "_estimate.txt"
 
         # generate the parameter-names for plotting
         paralabels = []
         paranames = []
         if mu is None:
-            paralabels.append(r'$\mu$')
-            paranames.append('mu')
+            paralabels.append(r"$\mu$")
+            paranames.append("mu")
         if sig2 is None:
-            paralabels.append(r'$\sigma^{2}$')
-            paranames.append('sig2')
+            paralabels.append(r"$\sigma^{2}$")
+            paranames.append("sig2")
         if corr is None:
-            paralabels.append(r'$\ell$')
-            paranames.append('corr')
+            paralabels.append(r"$\ell$")
+            paranames.append("corr")
         if lnS is None:
             paralabels.append(r"$\ln(S)$")
-            paranames.append('lnS')
+            paranames.append("lnS")
 
         if rwell is None:
             rwell = self.rwell
@@ -352,18 +368,31 @@ class Stat2Dest(object):
 
         if run:
             # generate the spotpy-setup
-            setup = Stat2Dsetup(self.rad, self.time, self.data, Qw=self.prate,
-                                mu=mu, sig2=sig2, corr=corr, lnS=lnS,
-                                # to fix some parameters
-                                murange=murange, sig2range=sig2range,
-                                corrrange=corrrange, lnSrange=lnSrange,
-                                rwell=rwell, rinf=rinf)
+            setup = Stat2Dsetup(
+                self.rad,
+                self.time,
+                self.data,
+                Qw=self.prate,
+                mu=mu,
+                sig2=sig2,
+                corr=corr,
+                lnS=lnS,
+                # to fix some parameters
+                murange=murange,
+                sig2range=sig2range,
+                corrrange=corrrange,
+                lnSrange=lnSrange,
+                rwell=rwell,
+                rinf=rinf,
+            )
             # initialize the sampler
-            sampler = spotpy.algorithms.sceua(setup,
-                                              dbname=dbname,
-                                              dbformat='csv',
-                                              parallel=parallel,
-                                              save_sim=False)
+            sampler = spotpy.algorithms.sceua(
+                setup,
+                dbname=dbname,
+                dbformat="csv",
+                parallel=parallel,
+                save_sim=False,
+            )
             # start the estimation with the sce-ua algorithm
             sampler.sample(rep, ngs=20, kstop=100, pcento=1e-4, peps=1e-3)
             # save best parameter-set
@@ -373,22 +402,45 @@ class Stat2Dest(object):
             self.result = sampler.getdata()
 
         # plot the estimation-results
-        plotparatrace(self.result,
-                      parameternames=paranames,
-                      parameterlabels=paralabels,
-                      stdvalues=self.para,
-                      filename=plotname1)
-        plotfitting3D(self.data, self.para, self.rad, self.time,
-                      self.radnames, self.prate, plotname2,
-                      rwell=rwell, rinf=rinf)
+        plotparatrace(
+            self.result,
+            parameternames=paranames,
+            parameterlabels=paralabels,
+            stdvalues=self.para,
+            filename=plotname1,
+        )
+        plotfitting3D(
+            self.data,
+            self.para,
+            self.rad,
+            self.time,
+            self.radnames,
+            self.prate,
+            plotname2,
+            rwell=rwell,
+            rinf=rinf,
+        )
         plotparainteract(self.result, paralabels, plotname3)
 
-    def sensitivity(self, rep=5000, parallel="seq",
-                    folder=None, dbname=None, plotname=None, plotname1=None,
-                    mu=None, sig2=None, corr=None, lnS=None,
-                    murange=None, sig2range=None,
-                    corrrange=None, lnSrange=None,
-                    rwell=None, rinf=None):
+    def sensitivity(
+        self,
+        rep=5000,
+        parallel="seq",
+        folder=None,
+        dbname=None,
+        plotname=None,
+        plotname1=None,
+        mu=None,
+        sig2=None,
+        corr=None,
+        lnS=None,
+        murange=None,
+        sig2range=None,
+        corrrange=None,
+        lnSrange=None,
+        rwell=None,
+        rinf=None,
+    ):
         """Run the sensitivity analysis.
 
         Parameters
@@ -473,7 +525,7 @@ class Stat2Dest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd()+"/"
+            folder = os.getcwd() + "/"
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
@@ -481,34 +533,34 @@ class Stat2Dest(object):
             os.makedirs(dire)
 
         if dbname is None:
-            dbname = folder+act_time+"_sensitivity_db"
+            dbname = folder + act_time + "_sensitivity_db"
         else:
-            dbname = folder+dbname
+            dbname = folder + dbname
         if plotname is None:
-            plotname = folder+act_time+"_stat2D_plot_sensitivity.pdf"
+            plotname = folder + act_time + "_stat2D_plot_sensitivity.pdf"
         else:
-            plotname = folder+plotname
+            plotname = folder + plotname
         if plotname1 is None:
-            plotname1 = folder+act_time+"_stat2D_plot_senstrace.pdf"
+            plotname1 = folder + act_time + "_stat2D_plot_senstrace.pdf"
         else:
-            plotname1 = folder+plotname1
-        sensname = folder+act_time+"_FAST_estimate.txt"
+            plotname1 = folder + plotname1
+        sensname = folder + act_time + "_FAST_estimate.txt"
 
         # generate the parameter-names for plotting
         paralabels = []
         paranames = []
         if mu is None:
-            paralabels.append(r'$T^G$')
-            paranames.append('mu')
+            paralabels.append(r"$T^G$")
+            paranames.append("mu")
         if sig2 is None:
-            paralabels.append(r'$\sigma^{2}$')
-            paranames.append('sig2')
+            paralabels.append(r"$\sigma^{2}$")
+            paranames.append("sig2")
         if corr is None:
-            paralabels.append(r'$\ell$')
-            paranames.append('corr')
+            paralabels.append(r"$\ell$")
+            paranames.append("corr")
         if lnS is None:
             paralabels.append(r"$S$")
-            paranames.append('lnS')
+            paranames.append("lnS")
 
         bestvalues = {}
 
@@ -521,46 +573,61 @@ class Stat2Dest(object):
             rinf = self.rinf
 
         # generate the spotpy-setup
-        setup = Stat2Dsetup(self.rad, self.time, self.data, Qw=self.prate,
-                            bestvalues=bestvalues,
-                            mu=mu, sig2=sig2, corr=corr, lnS=lnS,
-                            # to fix some parameters
-                            murange=murange, sig2range=sig2range,
-                            corrrange=corrrange, lnSrange=lnSrange,
-                            rwell=rwell, rinf=rinf)
+        setup = Stat2Dsetup(
+            self.rad,
+            self.time,
+            self.data,
+            Qw=self.prate,
+            bestvalues=bestvalues,
+            mu=mu,
+            sig2=sig2,
+            corr=corr,
+            lnS=lnS,
+            # to fix some parameters
+            murange=murange,
+            sig2range=sig2range,
+            corrrange=corrrange,
+            lnSrange=lnSrange,
+            rwell=rwell,
+            rinf=rinf,
+        )
 
         # initialize the sampler
-        sampler = spotpy.algorithms.fast(setup,
-                                         dbname=dbname,
-                                         dbformat='csv',
-                                         parallel=parallel,
-                                         save_sim=True)
+        sampler = spotpy.algorithms.fast(
+            setup,
+            dbname=dbname,
+            dbformat="csv",
+            parallel=parallel,
+            save_sim=True,
+        )
 
         sampler.sample(rep)
 
         data = sampler.getdata()
 
-        parmin = sampler.parameter()['minbound']
-        parmax = sampler.parameter()['maxbound']
+        parmin = sampler.parameter()["minbound"]
+        parmax = sampler.parameter()["maxbound"]
 
         bounds = list(zip(parmin, parmax))
 
-        self.sens = sampler.analyze(bounds,
-                                    np.nan_to_num(data['like1']),
-                                    len(self.para),
-                                    paranames)
+        self.sens = sampler.analyze(
+            bounds, np.nan_to_num(data["like1"]), len(self.para), paranames
+        )
 
         np.savetxt(sensname, self.sens["ST"])
 
         plotsensitivity(paralabels, self.sens, plotname)
-        plotparatrace(data,
-                      parameternames=paranames,
-                      parameterlabels=paralabels,
-                      stdvalues=self.para,
-                      filename=plotname1)
+        plotparatrace(
+            data,
+            parameternames=paranames,
+            parameterlabels=paralabels,
+            stdvalues=self.para,
+            filename=plotname1,
+        )
 
 
 # theis
+
 
 class Theisest(object):
     """Class for an estimation of homogeneous subsurface parameters.
@@ -568,6 +635,7 @@ class Theisest(object):
     With this class you can run an estimation of homogeneous subsurface
     parameters. It utilizes the theis solution.
     """
+
     def __init__(self, name, campaign, testinclude=None):
         """Estimation initialisation.
 
@@ -615,12 +683,13 @@ class Theisest(object):
             pumpdict = {}
             for wel in wells:
                 pumpdict[wel] = list(
-                    self.campaign.tests[wel].observations.keys())
+                    self.campaign.tests[wel].observations.keys()
+                )
             self.testinclude = pumpdict
         else:
             self.testinclude = testinclude
 
-    def setpumprate(self, prate=-1.):
+    def setpumprate(self, prate=-1.0):
         """Set a uniform pumping rate at all pumpingwells wells.
 
         Parameters
@@ -659,14 +728,21 @@ class Theisest(object):
             # set the first timepoint to at least 10s
             tmin = max(tmin, 10)
 
-#            time = np.expm1(np.linspace(np.log1p(tmin),
-#                                        np.log1p(tmax), 10))
-            time = np.power(np.linspace(np.sqrt(tmin+1.),
-                                        np.sqrt(tmax+1.), 10)+1., 2) - 1.
+            #            time = np.expm1(np.linspace(np.log1p(tmin),
+            #                                        np.log1p(tmax), 10))
+            time = (
+                np.power(
+                    np.linspace(np.sqrt(tmin + 1.0), np.sqrt(tmax + 1.0), 10)
+                    + 1.0,
+                    2,
+                )
+                - 1.0
+            )
         for test in self.testinclude:
             for obs in self.testinclude[test]:
-                filterdrawdown(self.campaign.tests[test].observations[obs],
-                               tout=time)
+                filterdrawdown(
+                    self.campaign.tests[test].observations[obs], tout=time
+                )
 
         self.time = time
 
@@ -700,7 +776,7 @@ class Theisest(object):
                     temprad = pwell - owell
                 rad = np.hstack((rad, temprad))
 
-                tempname = self.campaign.tests[test].pumpingwell+"-"+obs
+                tempname = self.campaign.tests[test].pumpingwell + "-" + obs
                 radnames = np.hstack((radnames, tempname))
 
         # sort everything by the radii
@@ -710,10 +786,21 @@ class Theisest(object):
         self.data = data[:, idx]
         self.radnames = radnames[idx]
 
-    def run(self, rep=5000, parallel="seq", run=True, folder=None,
-            dbname=None, plotname1=None, plotname2=None, plotname3=None,
-            mu=None, lnS=None,
-            murange=None, lnSrange=None):
+    def run(
+        self,
+        rep=5000,
+        parallel="seq",
+        run=True,
+        folder=None,
+        dbname=None,
+        plotname1=None,
+        plotname2=None,
+        plotname3=None,
+        mu=None,
+        lnS=None,
+        murange=None,
+        lnSrange=None,
+    ):
         """Run the estimation.
 
         Parameters
@@ -782,7 +869,7 @@ class Theisest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd()+"/"
+            folder = os.getcwd() + "/"
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
@@ -790,44 +877,53 @@ class Theisest(object):
             os.makedirs(dire)
 
         if dbname is None:
-            dbname = folder+act_time+"_Theis_db"
+            dbname = folder + act_time + "_Theis_db"
         else:
-            dbname = folder+dbname
+            dbname = folder + dbname
         if plotname1 is None:
-            plotname1 = folder+act_time+"_Theis_plot_paratrace.pdf"
+            plotname1 = folder + act_time + "_Theis_plot_paratrace.pdf"
         else:
-            plotname1 = folder+plotname1
+            plotname1 = folder + plotname1
         if plotname2 is None:
-            plotname2 = folder+act_time+"_Theis_plot_fit.pdf"
+            plotname2 = folder + act_time + "_Theis_plot_fit.pdf"
         else:
-            plotname2 = folder+plotname2
+            plotname2 = folder + plotname2
         if plotname3 is None:
-            plotname3 = folder+act_time+"_Theis_plot_parainteract.pdf"
+            plotname3 = folder + act_time + "_Theis_plot_parainteract.pdf"
         else:
-            plotname3 = folder+plotname3
-        paraname = folder+act_time+"_Theis_estimate.txt"
+            plotname3 = folder + plotname3
+        paraname = folder + act_time + "_Theis_estimate.txt"
 
         # generate the parameter-names for plotting
         paralabels = []
         paranames = []
         if mu is None:
-            paralabels.append(r'$\mu$')
-            paranames.append('mu')
+            paralabels.append(r"$\mu$")
+            paranames.append("mu")
         if lnS is None:
             paralabels.append(r"$\ln(S)$")
-            paranames.append('lnS')
+            paranames.append("lnS")
 
         if run:
             # generate the spotpy-setup
-            setup = Theissetup(self.rad, self.time, self.data, Qw=self.prate,
-                               mu=mu, lnS=lnS,  # to fix some parameters
-                               murange=murange, lnSrange=lnSrange)
+            setup = Theissetup(
+                self.rad,
+                self.time,
+                self.data,
+                Qw=self.prate,
+                mu=mu,
+                lnS=lnS,  # to fix some parameters
+                murange=murange,
+                lnSrange=lnSrange,
+            )
             # initialize the sampler
-            sampler = spotpy.algorithms.sceua(setup,
-                                              dbname=dbname,
-                                              dbformat='csv',
-                                              parallel=parallel,
-                                              save_sim=False)
+            sampler = spotpy.algorithms.sceua(
+                setup,
+                dbname=dbname,
+                dbformat="csv",
+                parallel=parallel,
+                save_sim=False,
+            )
             # start the estimation with the sce-ua algorithm
             sampler.sample(rep, ngs=20, kstop=100, pcento=1e-4, peps=1e-3)
             # save best parameter-set
@@ -837,19 +933,36 @@ class Theisest(object):
             self.result = sampler.getdata()
 
         # plot the estimation-results
-        plotparatrace(self.result,
-                      parameternames=paranames,
-                      parameterlabels=paralabels,
-                      stdvalues=self.para,
-                      filename=plotname1)
-        plotfitting3Dtheis(self.data, self.para, self.rad, self.time,
-                           self.radnames, self.prate, plotname2)
+        plotparatrace(
+            self.result,
+            parameternames=paranames,
+            parameterlabels=paralabels,
+            stdvalues=self.para,
+            filename=plotname1,
+        )
+        plotfitting3Dtheis(
+            self.data,
+            self.para,
+            self.rad,
+            self.time,
+            self.radnames,
+            self.prate,
+            plotname2,
+        )
         plotparainteract(self.result, paralabels, plotname3)
 
-    def sensitivity(self, rep=5000, parallel="seq",
-                    folder=None, dbname=None, plotname=None,
-                    mu=None, lnS=None,
-                    murange=None, lnSrange=None):
+    def sensitivity(
+        self,
+        rep=5000,
+        parallel="seq",
+        folder=None,
+        dbname=None,
+        plotname=None,
+        mu=None,
+        lnS=None,
+        murange=None,
+        lnSrange=None,
+    ):
         """Run the sensitivity analysis.
 
         Parameters
@@ -903,7 +1016,7 @@ class Theisest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd()+"/"
+            folder = os.getcwd() + "/"
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
@@ -911,24 +1024,24 @@ class Theisest(object):
             os.makedirs(dire)
 
         if dbname is None:
-            dbname = folder+act_time+"_Theis_sensitivity_db"
+            dbname = folder + act_time + "_Theis_sensitivity_db"
         else:
-            dbname = folder+dbname
+            dbname = folder + dbname
         if plotname is None:
-            plotname = folder+act_time+"_Theis_plot_sensitivity.pdf"
+            plotname = folder + act_time + "_Theis_plot_sensitivity.pdf"
         else:
-            plotname = folder+plotname
-        sensname = folder+act_time+"_Theis_FAST_estimate.txt"
+            plotname = folder + plotname
+        sensname = folder + act_time + "_Theis_FAST_estimate.txt"
 
         # generate the parameter-names for plotting
         paralabels = []
         paranames = []
         if mu is None:
-            paralabels.append(r'$T^G$')
-            paranames.append('mu')
+            paralabels.append(r"$T^G$")
+            paranames.append("mu")
         if lnS is None:
             paralabels.append(r"$S$")
-            paranames.append('lnS')
+            paranames.append("lnS")
 
         bestvalues = {}
 
@@ -936,31 +1049,39 @@ class Theisest(object):
             bestvalues[par_e] = self.para[par_i]
 
         # generate the spotpy-setup
-        setup = Theissetup(self.rad, self.time, self.data, Qw=self.prate,
-                           bestvalues=bestvalues,
-                           mu=mu, lnS=lnS,  # to fix some parameters
-                           murange=murange, lnSrange=lnSrange)
+        setup = Theissetup(
+            self.rad,
+            self.time,
+            self.data,
+            Qw=self.prate,
+            bestvalues=bestvalues,
+            mu=mu,
+            lnS=lnS,  # to fix some parameters
+            murange=murange,
+            lnSrange=lnSrange,
+        )
 
         # initialize the sampler
-        sampler = spotpy.algorithms.fast(setup,
-                                         dbname=dbname,
-                                         dbformat='csv',
-                                         parallel=parallel,
-                                         save_sim=True)
+        sampler = spotpy.algorithms.fast(
+            setup,
+            dbname=dbname,
+            dbformat="csv",
+            parallel=parallel,
+            save_sim=True,
+        )
 
         sampler.sample(rep)
 
         data = sampler.getdata()
 
-        parmin = sampler.parameter()['minbound']
-        parmax = sampler.parameter()['maxbound']
+        parmin = sampler.parameter()["minbound"]
+        parmax = sampler.parameter()["maxbound"]
 
         bounds = list(zip(parmin, parmax))
 
-        self.sens = sampler.analyze(bounds,
-                                    np.nan_to_num(data['like1']),
-                                    len(self.para),
-                                    paranames)
+        self.sens = sampler.analyze(
+            bounds, np.nan_to_num(data["like1"]), len(self.para), paranames
+        )
 
         np.savetxt(sensname, self.sens["ST"])
 
