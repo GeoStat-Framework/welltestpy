@@ -21,7 +21,6 @@ The following classes and functions are provided
 from __future__ import absolute_import, division, print_function
 
 import numpy as np
-import pandas as pd
 import anaflow as ana
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -742,6 +741,7 @@ def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
 
 def plotparainteract(result, paranames, plotname):
     """plot of parameter interaction"""
+    import pandas as pd
     fields = [word for word in result.dtype.names if word.startswith("par")]
     parameterdistribtion = result[fields]
     df = pd.DataFrame(
