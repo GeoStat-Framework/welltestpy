@@ -42,6 +42,8 @@ Requirements
 - `AnaFlow <https://github.com/GeoStat-Framework/AnaFlow>`_
 - `Matplotlib <https://matplotlib.org>`_
 - `Pandas <https://pandas.pydata.org>`_
+- `SpotPy <https://github.com/thouska/spotpy>`_
+
 
 
 License

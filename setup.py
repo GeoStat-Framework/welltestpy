@@ -78,6 +78,7 @@ setup(
         "anaflow",
         "matplotlib",
         "pandas",
+        "spotpy",
     ],
     packages=find_packages(exclude=["tests*", "docs*"]),
 )

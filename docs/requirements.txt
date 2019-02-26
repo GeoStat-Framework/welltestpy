@@ -4,4 +4,5 @@ scipy>=0.19.1
 anaflow
 matplotlib
 pandas
+spotpy
 numpydoc

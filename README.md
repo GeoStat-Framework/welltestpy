@@ -158,8 +158,9 @@ welltestpy.tools     # Subpackage with miscellaneous tools
 - [NumPy >= 1.13.0](https://www.numpy.org)
 - [SciPy >= 0.19.1](https://www.scipy.org)
 - [AnaFlow](https://github.com/GeoStat-Framework/AnaFlow)
-- [Matplotlib](https://matplotlib.org/)
-- [Pandas](https://pandas.pydata.org/)
+- [Matplotlib](https://matplotlib.org)
+- [Pandas](https://pandas.pydata.org)
+- [SpotPy](https://github.com/thouska/spotpy)
 
 
 ## Contact
