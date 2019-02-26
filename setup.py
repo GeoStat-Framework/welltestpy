@@ -1,12 +1,36 @@
-#!/usr/bin/env python
-"""
-wtp: WellTestPy
+# -*- coding: utf-8 -*-
+"""welltestpy - package to handle well-based Field-campaigns."""
 
-welltestpy is a general package offering data-classes to handle well-based Field-campaigns.
+import os
+import codecs
+import re
 
-"""
 from setuptools import setup, find_packages
-from welltestpy import __version__ as VERSION
+
+
+# find __version__ ############################################################
+
+
+def read(*parts):
+    """read file data"""
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, *parts), "r") as fp:
+        return fp.read()
+
+
+def find_version(*file_paths):
+    """find version without importing module"""
+    version_file = read(*file_paths)
+    version_match = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M
+    )
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+###############################################################################
+
 
 DOCLINES = __doc__.split("\n")
 README = open("README.md").read()
@@ -15,8 +39,7 @@ Development Status :: 3 - Alpha
 Intended Audience :: Developers
 Intended Audience :: End Users/Desktop
 Intended Audience :: Science/Research
-License :: OSI Approved :: \
-GNU Lesser General Public License v3 or later (LGPLv3+)
+License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Natural Language :: English
 Operating System :: MacOS
 Operating System :: MacOS :: MacOS X
@@ -32,6 +55,8 @@ Topic :: Software Development
 Topic :: Utilities
 """
 
+VERSION = find_version("welltestpy", "_version.py")
+
 setup(
     name="welltestpy",
     version=VERSION,
@@ -43,13 +68,13 @@ setup(
     author="Sebastian Mueller",
     author_email="sebastian.mueller@ufz.de",
     url="https://github.com/MuellerSeb/welltestpy",
-    license="LGPL -  see LICENSE",
+    license="GPL -  see LICENSE",
     classifiers=[_f for _f in CLASSIFIERS.split("\n") if _f],
     platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     include_package_data=True,
     install_requires=[
-        "numpy >= 1.10.0",
-        "scipy >= 0.19.0",
+        "numpy >= 1.13.0",
+        "scipy >= 0.19.1",
         "anaflow",
         "matplotlib",
     ],
