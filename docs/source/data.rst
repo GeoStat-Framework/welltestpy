@@ -1,19 +1,15 @@
-data
-----
+welltestpy.data
+===============
 
 .. automodule:: welltestpy.data
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
-   .. only:: html
+.. raw:: latex
 
-      .. toctree::
-         :maxdepth: 1
+    \clearpage
 
-         varlib.rst
-         testslib.rst
-         campaignlib.rst
+.. toctree::
+   :hidden:
 
-   Details
-   -------
+   data.campaignlib.rst
+   data.testslib.rst
+   data.varlib.rst

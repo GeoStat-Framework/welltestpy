@@ -1,48 +1,49 @@
-====================================================================
-welltestpy: A python-package for handling well based field campaigns
-====================================================================
+=====================
+WellTestPy Quickstart
+=====================
 
-.. image:: WTP.png
-   :width: 200px
+.. image:: pics/WTP.png
+   :width: 150px
    :align: center
 
-About
------
-WellTestPy provides a framework to handle and plot data from well based
-field campaigns as well as a data interpretation module.
-
-Dependencies
-------------
-- `Numpy <http://www.numpy.org>`_: 1.10.0 or higher
-- `SciPy <http://www.scipy.org>`_: 0.19.0 or higher
-- `matplotlib <https://matplotlib.org>`_
-- `anaflow <https://github.com/MuellerSeb/AnaFlow>`_
+WellTestPy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
 
 
 Installation
-------------
-Download the
-`code <https://github.com/MuellerSeb/welltestpy/archive/master.zip>`_
-from github and run the following command from the source code directory:
+============
 
-    ``pip install -U .``
+The package can be installed via `pip <https://pypi.org/project/welltestpy/>`_.
+On Windows you can install `WinPython <https://winpython.github.io/>`_ to get
+Python and pip running.
 
-It is highly recomended to install the scipy-scikit `umfpack` to get a solver
-for sparse linear systems if you want to use the estimation routines:
+.. code-block:: none
 
-    ``pip install -U scikit-umfpack``
+    pip install welltestpy
 
-Under Ubuntu you can install the required SuiteSparse library with:
 
-    ``sudo apt-get install libsuitesparse-dev``
+Provided Subpackages
+====================
 
-For further information have a look at:
-    * http://pypi.python.org/pypi/scikit-umfpack
-    * http://faculty.cse.tamu.edu/davis/suitesparse.html
+The following functions are provided directly
 
-Modules
--------
-.. toctree::
-   :maxdepth: 2
+.. code-block:: python
 
-   main
+    welltestpy.data      # Subpackage to handle data from field campaigns
+    welltestpy.estimate  # Subpackage to estimate field parameters
+    welltestpy.process   # Subpackage to pre- and post-process data
+    welltestpy.tools     # Subpackage with miscellaneous tools
+
+
+Requirements
+============
+
+- `NumPy >= 1.13.0 <https://www.numpy.org>`_
+- `SciPy >= 0.19.1 <https://www.scipy.org>`_
+- `AnaFlow <https://github.com/GeoStat-Framework/AnaFlow>`_
+- `Matplotlib <https://matplotlib.org>`_
+
+
+License
+=======
+
+`GPL <https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE>`_ © 2019

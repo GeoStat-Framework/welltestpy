@@ -1,10 +1,11 @@
-tools
------
+welltestpy.tools
+================
 
 .. automodule:: welltestpy.tools
    :members:
    :undoc-members:
    :show-inheritance:
 
-   Details
-   -------
+.. raw:: latex
+
+    \clearpage

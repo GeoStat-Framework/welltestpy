@@ -1,10 +1,11 @@
-process
--------
+welltestpy.process
+==================
 
 .. automodule:: welltestpy.process
    :members:
    :undoc-members:
    :show-inheritance:
 
-   Details
-   -------
+.. raw:: latex
+
+    \clearpage

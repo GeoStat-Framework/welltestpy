@@ -1,18 +1,17 @@
-estimate
---------
+welltestpy.estimate
+===================
 
 .. automodule:: welltestpy.estimate
    :members:
    :undoc-members:
    :show-inheritance:
 
-   .. only:: html
+.. raw:: latex
 
-      .. toctree::
-         :maxdepth: 1
+    \clearpage
 
-         estimatelib.rst
-         spotpy_classes.rst
+.. toctree::
+   :hidden:
 
-   Details
-   -------
+   estimate.estimatelib.rst
+   estimate.spotpy_classes.rst

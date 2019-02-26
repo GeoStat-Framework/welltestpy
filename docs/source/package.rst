@@ -1,7 +1,15 @@
+==============
+WellTestPy API
+==============
+
 .. automodule:: welltestpy
 
+.. raw:: latex
+
+    \clearpage
+
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
    data.rst
    estimate.rst

@@ -1,0 +1,6 @@
+#required for readthedocs.org
+numpy>=1.13.0
+scipy>=0.19.1
+anaflow
+matplotlib
+numpydoc
