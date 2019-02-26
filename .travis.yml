@@ -29,7 +29,7 @@ env:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get build-dep python-matplotlib
+  - sudo apt-get install libfreetype6-dev libpng-dev
 
 script:
   # create wheels
