@@ -19,7 +19,7 @@ You can install the latest version with the following command:
     pip install welltestpy
 
 
-## Documentation for AnaFlow
+## Documentation for WellTestPy
 
 You can find the documentation under [geostat-framework.readthedocs.io][doc_link].
 
@@ -159,6 +159,7 @@ welltestpy.tools     # Subpackage with miscellaneous tools
 - [SciPy >= 0.19.1](https://www.scipy.org)
 - [AnaFlow](https://github.com/GeoStat-Framework/AnaFlow)
 - [Matplotlib](https://matplotlib.org/)
+- [Pandas](https://pandas.pydata.org/)
 
 
 ## Contact

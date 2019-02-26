@@ -41,6 +41,7 @@ Requirements
 - `SciPy >= 0.19.1 <https://www.scipy.org>`_
 - `AnaFlow <https://github.com/GeoStat-Framework/AnaFlow>`_
 - `Matplotlib <https://matplotlib.org>`_
+- `Pandas <https://pandas.pydata.org>`_
 
 
 License
