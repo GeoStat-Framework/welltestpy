@@ -58,36 +58,23 @@ class Variable(object):
 
     It has a name, a value, a symbol, a unit and a descrition string.
 
-    Attributes
+    Parameters
     ----------
     name : :class:`str`
         Name of the Variable.
-    symbole : :class:`str`
-        Name of the Variable.
-    units : :class:`str`
-        Units of the Variable.
-    description : :class:`str`
-        Description of the Variable.
+    value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        Value of the Variable.
+    symbole : :class:`str`, optional
+        Name of the Variable. Default: ``"x"``
+    units : :class:`str`, optional
+        Units of the Variable. Default: ``"-"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"no description"``
     """
 
     def __init__(
         self, name, value, symbol="x", units="-", description="no description"
     ):
-        """Variable initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the Variable.
-        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-            Value of the Variable.
-        symbole : :class:`str`, optional
-            Name of the Variable. Default: ``"x"``
-        units : :class:`str`, optional
-            Units of the Variable. Default: ``"-"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"no description"``
-        """
         self.name = _formstr(name)
         self.__value = None
         self.value = value
@@ -236,8 +223,19 @@ class Variable(object):
 class TimeVar(Variable):
     """Variable class special for time series.
 
-    Note
-    ----
+    Parameters
+    ----------
+    value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        Value of the Variable.
+    symbole : :class:`str`, optional
+        Name of the Variable. Default: ``"t"``
+    units : :class:`str`, optional
+        Units of the Variable. Default: ``"s"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"time given in seconds"``
+
+    Notes
+    -----
     Here the variable should be at most 1 dimensional and the name is fix set
     to ``"time"``.
     """
@@ -245,19 +243,6 @@ class TimeVar(Variable):
     def __init__(
         self, value, symbol="t", units="s", description="time given in seconds"
     ):
-        """Time variable initialisation.
-
-        Parameters
-        ----------
-        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-            Value of the Variable.
-        symbole : :class:`str`, optional
-            Name of the Variable. Default: ``"t"``
-        units : :class:`str`, optional
-            Units of the Variable. Default: ``"s"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"time given in seconds"``
-        """
         super(TimeVar, self).__init__(
             "time", value, symbol, units, description
         )
@@ -268,47 +253,45 @@ class TimeVar(Variable):
 
 
 class HeadVar(Variable):
-    """Variable class special for groundwater head.
+    """
+    Variable class special for groundwater head.
 
-    Note
-    ----
+    Parameters
+    ----------
+    value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        Value of the Variable.
+    symbole : :class:`str`, optional
+        Name of the Variable. Default: ``"h"``
+    units : :class:`str`, optional
+        Units of the Variable. Default: ``"m"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"head given in meters"``
+
+    Notes
+    -----
     Here the variable name is fix set to ``"head"``.
     """
 
     def __init__(
         self, value, symbol="h", units="m", description="head given in meters"
     ):
-        """Head variable initialisation.
-
-        Parameters
-        ----------
-        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-            Value of the Variable.
-        symbole : :class:`str`, optional
-            Name of the Variable. Default: ``"h"``
-        units : :class:`str`, optional
-            Units of the Variable. Default: ``"m"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"head given in meters"``
-        """
         super(HeadVar, self).__init__(
             "head", value, symbol, units, description
         )
 
 
 class TemporalVar(Variable):
-    """Variable class for a temporal variable.
+    """
+    Variable class for a temporal variable.
+
+    Parameters
+    ----------
+    value : :class:`int` or :class:`float` or :class:`numpy.ndarray`,
+    optional
+        Value of the Variable. Default: ``0.0``
     """
 
     def __init__(self, value=0.0):
-        """Temporal variable initialisation.
-
-        Parameters
-        ----------
-        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`,
-        optional
-            Value of the Variable. Default: ``0.0``
-        """
         super(TemporalVar, self).__init__(
             "temporal", value, description="temporal variable"
         )
@@ -317,8 +300,22 @@ class TemporalVar(Variable):
 class CoordinatesVar(Variable):
     """Variable class special for coordinates.
 
-    Note
-    ----
+    Parameters
+    ----------
+    lat : :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        Lateral values of the coordinates.
+    lon : :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        Longitutional values of the coordinates.
+    symbole : :class:`str`, optional
+        Name of the Variable. Default: ``"[Lat,Lon]"``
+    units : :class:`str`, optional
+        Units of the Variable. Default: ``"[deg,deg]"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Coordinates given in
+        degree-North and degree-East"``
+
+    Notes
+    -----
     Here the variable name is fix set to ``"coordinates"``.
 
     ``lat`` and ``lon`` should have the same shape.
@@ -332,22 +329,6 @@ class CoordinatesVar(Variable):
         units="[deg,deg]",
         description="Coordinates given in " + "degree-North and degree-East",
     ):
-        """Coordinate variable initialisation.
-
-        Parameters
-        ----------
-        lat : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-            Lateral values of the coordinates.
-        lon : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-            Longitutional values of the coordinates.
-        symbole : :class:`str`, optional
-            Name of the Variable. Default: ``"[Lat,Lon]"``
-        units : :class:`str`, optional
-            Units of the Variable. Default: ``"[deg,deg]"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"Coordinates given in
-            degree-North and degree-East"``
-        """
         ilat = np.array(np.squeeze(lat), ndmin=1)
         ilon = np.array(np.squeeze(lon), ndmin=1)
 
@@ -369,34 +350,25 @@ class CoordinatesVar(Variable):
 
 
 class Observation(object):
-    """Class for a observation.
+    """
+    Class for a observation.
 
     This is a class for time-dependent observations.
-
     It has a name and a descrition.
 
-    Attributes
+    Parameters
     ----------
     name : :class:`str`
-        Name of the Observation.
-    description : :class:`str`
-        Description of the Variable.
+        Name of the Variable.
+    time : :class:`Variable`
+        Value of the Variable.
+    observation : :class:`Variable`
+        Name of the Variable. Default: ``"x"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Observation"``
     """
 
     def __init__(self, name, time, observation, description="Observation"):
-        """Observation initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the Variable.
-        time : :class:`Variable`
-            Value of the Variable.
-        observation : :class:`Variable`
-            Name of the Variable. Default: ``"x"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"Observation"``
-        """
         self.__it = None
         self.__itfinished = None
         self.name = _formstr(name)
@@ -736,21 +708,20 @@ class Observation(object):
 
 
 class StdyObs(Observation):
-    """Observation class special for steady observations.
+    """
+    Observation class special for steady observations.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Variable.
+    observation : :class:`Variable`
+        Name of the Variable. Default: ``"x"``
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Steady observation"``
     """
 
     def __init__(self, name, observation, description="Steady observation"):
-        """Steady observation initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the Variable.
-        observation : :class:`Variable`
-            Name of the Variable. Default: ``"x"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"Steady observation"``
-        """
         super(StdyObs, self).__init__(name, None, observation, description)
 
     def _settime(self, time):
@@ -761,25 +732,24 @@ class StdyObs(Observation):
 
 
 class DrawdownObs(Observation):
-    """Observation class special for drawdown observations.
+    """
+    Observation class special for drawdown observations.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Variable.
+    time : :class:`Variable`
+        Time points of observation.
+    observation : :class:`Variable`
+        Observation.
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Drawdown observation"``
     """
 
     def __init__(
         self, name, time, observation, description="Drawdown observation"
     ):
-        """Steady observation initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the Variable.
-        observation : :class:`Variable`
-            Name of the Variable. Default: ``"x"``
-        observation : :class:`Variable`
-            Name of the Variable. Default: ``"x"``
-        description : :class:`str`, optional
-            Description of the Variable. Default: ``"Steady observation"``
-        """
         if not isinstance(time, Variable):
             time = TimeVar(time)
         if not isinstance(observation, Variable):
@@ -788,7 +758,17 @@ class DrawdownObs(Observation):
 
 
 class StdyHeadObs(Observation):
-    """Observation class special for steady drawdown observations.
+    """
+    Observation class special for steady drawdown observations.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Variable.
+    observation : :class:`Variable`
+        Observation.
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Steady observation"``
     """
 
     def __init__(
@@ -815,13 +795,21 @@ class Well(object):
 
     It has a name, a radius, coordinates and a depth.
 
-    Attributes
+    Parameters
     ----------
     name : :class:`str`
-        Name of the well.
+        Name of the Variable.
+    radius : :class:`Variable` or :class:`float`
+        Value of the Variable.
+    coordinates : :class:`Variable` or :class:`numpy.ndarray`
+        Value of the Variable.
+    welldepth : :class:`Variable` or :class:`float`, optional
+        Depth of the well. Default: 1.0
+    aquiferdepth : :class:`Variable` or :class:`float`, optional
+        Depth of the aquifer at the well. Default: ``"None"``
 
-    Note
-    ----
+    Notes
+    -----
     You can calculate the distance between two wells ``w1`` and ``w2`` by
     simply calculating the difference ``w1 - w2``.
     """
@@ -829,21 +817,6 @@ class Well(object):
     def __init__(
         self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
     ):
-        """Well initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the Variable.
-        radius : :class:`Variable` or :class:`float`
-            Value of the Variable.
-        coordinates : :class:`Variable` or :class:`numpy.ndarray`
-            Value of the Variable.
-        welldepth : :class:`Variable` or :class:`float`, optional
-            Depth of the well. Default: 1.0
-        aquiferdepth : :class:`Variable` or :class:`float`, optional
-            Depth of the aquifer at the well. Default: ``"None"``
-        """
         self.name = _formstr(name)
 
         if isinstance(radius, Variable):
