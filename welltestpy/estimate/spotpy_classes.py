@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing classes for Spotpy classes for the
 estimation library
@@ -26,6 +27,15 @@ __all__ = ["ext_theis2D", "theis", "Stat2Dsetup", "Theissetup"]
 
 
 # functions for fitting
+
+
+def ranges(val_min, val_max, guess=None, stepsize=None):
+    """Create sampling ranges fram value bounds"""
+    if guess is None:
+        guess = (val_max + val_min) / 2.0
+    if stepsize is None:
+        stepsize = (val_max - val_min) / 10.0
+    return (val_min, val_max, stepsize, guess, val_min, val_max)
 
 
 def ext_theis2D(rad, time, Qw=-0.0001, rwell=0.0, rinf=np.inf):
@@ -184,10 +194,10 @@ class Stat2Dsetup(object):
         sig2=None,
         corr=None,
         lnS=None,
-        murange=None,
-        sig2range=None,
-        corrrange=None,
-        lnSrange=None,
+        murange=(-16.0, -2.0),
+        sig2range=(0.1, 10.0),
+        corrrange=(1.0, 50.0),
+        lnSrange=(-13.0, -1.0),
         rwell=0.0,
         rinf=np.inf,
     ):
@@ -268,22 +278,27 @@ class Stat2Dsetup(object):
         self.data = dcopy(rtdata)
         self.Qw = Qw
 
-        if murange is None:
-            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
-        else:
-            self.ranges["mu"] = murange
-        if sig2range is None:
-            self.ranges["sig2"] = (0.01, 6.0, 0.5, 2.55, 0.01, 6.0)
-        else:
-            self.ranges["sig2"] = sig2range
-        if corrrange is None:
-            self.ranges["corr"] = (0.5, 40.0, 2.0, 18.0, 0.5, 40.0)
-        else:
-            self.ranges["corr"] = corrrange
-        if lnSrange is None:
-            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
-        else:
-            self.ranges["lnS"] = lnSrange
+#        if murange is None:
+#            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
+#        else:
+#            self.ranges["mu"] = murange
+#        if sig2range is None:
+#            self.ranges["sig2"] = (0.01, 6.0, 0.5, 2.55, 0.01, 6.0)
+#        else:
+#            self.ranges["sig2"] = sig2range
+#        if corrrange is None:
+#            self.ranges["corr"] = (0.5, 40.0, 2.0, 18.0, 0.5, 40.0)
+#        else:
+#            self.ranges["corr"] = corrrange
+#        if lnSrange is None:
+#            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
+#        else:
+#            self.ranges["lnS"] = lnSrange
+
+        self.ranges["mu"] = ranges(*murange)
+        self.ranges["sig2"] = ranges(*sig2range)
+        self.ranges["corr"] = ranges(*corrrange)
+        self.ranges["lnS"] = ranges(*lnSrange)
 
         if self.mu is None:
             self.params.append(

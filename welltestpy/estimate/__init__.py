@@ -1,24 +1,27 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing routines to estimate subsurface parameters
 from test data.
 
 .. currentmodule:: welltestpy.estimate
 
-Included classes
-----------------
-The following classes are provided
-
-.. autosummary::
-    Stat2Dest
-    Theisest
-
 Subpackages
------------
+^^^^^^^^^^^
+
 The following subpackages are provided
 
 .. autosummary::
     estimatelib
     spotpy_classes
+
+Included classes
+^^^^^^^^^^^^^^^^
+
+The following classes are provided
+
+.. autosummary::
+    Stat2Dest
+    Theisest
 """
 from __future__ import absolute_import
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing routines for triangulation.
 
@@ -32,7 +33,6 @@ def triangulate(distances, prec, all_pos=False):
 
     Parameters
     ----------
-
     distances : :class:`numpy.ndarray`
         Given distances among the point to be triangulated.
         It hat to be a symmetric matrix with a vanishing diagonal and

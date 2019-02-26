@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing flow datastructures for tests on a fieldsite.
 
@@ -25,6 +26,8 @@ from welltestpy.tools._extimport import BytIO
 from welltestpy.data.varlib import (
     Variable,
     Observation,
+    StdyHeadObs,
+    DrawdownObs,
     load_var,
     load_obs,
     _nextr,
@@ -41,30 +44,19 @@ class Test(object):
     This is a class for a well based test on a field site.
     It has a name, a descrition and a timeframe string.
 
-    Attributes
+    Parameters
     ----------
     name : :class:`str`
         Name of the test.
-    description : :class:`str`
+    description : :class:`str`, optional
         Description of the test.
-    timeframe : :class:`str`
+        Default: ``"no description"``
+    timeframe : :class:`str`, optional
         Timeframe of the test.
+        Default: ``None``
     """
 
     def __init__(self, name, description="no description", timeframe=None):
-        """Test initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the test.
-        description : :class:`str`, optional
-            Description of the test.
-            Default: ``"no description"``
-        timeframe : :class:`str`, optional
-            Timeframe of the test.
-            Default: ``None``
-        """
         self.name = _formstr(name)
         self.description = str(description)
         self.timeframe = str(timeframe)
@@ -87,16 +79,34 @@ class PumpingTest(Test):
     This is a class for a pumping test on a field site.
     It has a name, a descrition, a timeframe and a pumpingwell string.
 
-    Attributes
+    Parameters
     ----------
     name : :class:`str`
         Name of the test.
-    description : :class:`str`
-        Description of the test.
-    timeframe : :class:`str`
-        Timeframe of the test.
     pumpingwell : :class:`str`
         Pumping well of the test.
+    pumpingrate : :class:`float` or :class:`Variable`
+        Pumping rate of at the pumping well. If a `float` is given,
+        it is assumed to be given in ``m^3/s``.
+    observations : :class:`dict`, optional
+        Observations made within the pumping test. The dict-keys are the
+        well names of the observation wells or the pumpingwell. Values
+        need to be an instance of :class:`Observation`
+        Default: ``None``
+    aquiferdepth : :class:`float` or :class:`Variable`, optional
+        Aquifer depth at the field site. If a `float` is given,
+        it is assumed to be given in ``m``.
+        Default: ``1.0``
+    aquiferradius : :class:`float` or :class:`Variable`, optional
+        Aquifer radius ot the field site. If a `float` is given,
+        it is assumed to be given in ``m``.
+        Default: ``inf``
+    description : :class:`str`, optional
+        Description of the test.
+        Default: ``"Pumpingtest"``
+    timeframe : :class:`str`, optional
+        Timeframe of the test.
+        Default: ``None``
     """
 
     def __init__(
@@ -110,37 +120,6 @@ class PumpingTest(Test):
         description="Pumpingtest",
         timeframe=None,
     ):
-        """Pumping test initialisation.
-
-        Parameters
-        ----------
-        name : :class:`str`
-            Name of the test.
-        pumpingwell : :class:`str`
-            Pumping well of the test.
-        pumpingrate : :class:`float` or :class:`Variable`
-            Pumping rate of at the pumping well. If a `float` is given,
-            it is assumed to be given in ``m^3/s``.
-        observations : :class:`dict`, optional
-            Observations made within the pumping test. The dict-keys are the
-            well names of the observation wells or the pumpingwell. Values
-            need to be an instance of :class:`Observation`
-            Default: ``None``
-        aquiferdepth : :class:`float` or :class:`Variable`, optional
-            Aquifer depth at the field site. If a `float` is given,
-            it is assumed to be given in ``m``.
-            Default: ``1.0``
-        aquiferradius : :class:`float` or :class:`Variable`, optional
-            Aquifer radius ot the field site. If a `float` is given,
-            it is assumed to be given in ``m``.
-            Default: ``inf``
-        description : :class:`str`, optional
-            Description of the test.
-            Default: ``"Pumpingtest"``
-        timeframe : :class:`str`, optional
-            Timeframe of the test.
-            Default: ``None``
-        """
         super(PumpingTest, self).__init__(name, description, timeframe)
 
         self._testtype = "PumpingTest"
@@ -284,6 +263,51 @@ class PumpingTest(Test):
         else:
             self.__observations = {}
 
+    def add_steady_obs(
+        self,
+        well,
+        observation,
+        description="Steady State Drawdown observation",
+    ):
+        """
+        Add steady drawdown observations.
+
+        Parameters
+        ----------
+        well : :class:`str`
+            well where the observation is made.
+        observation : :class:`Variable`
+            Observation.
+        description : :class:`str`, optional
+            Description of the Variable. Default: ``"Steady observation"``
+        """
+        obs = StdyHeadObs(well, observation, description)
+        self.addobservations(obs)
+
+    def add_transient_obs(
+        self,
+        well,
+        time,
+        observation,
+        description="Transient Drawdown observation",
+    ):
+        """
+        Add transient drawdown observations.
+
+        Parameters
+        ----------
+        well : :class:`str`
+            well where the observation is made.
+        time : :class:`Variable`
+            Time points of observation.
+        observation : :class:`Variable`
+            Observation.
+        description : :class:`str`, optional
+            Description of the Variable. Default: ``"Drawdown observation"``
+        """
+        obs = DrawdownObs(well, time, observation, description)
+        self.addobservations(obs)
+
     def addobservations(self, obs):
         """Add some specified observations.
 
@@ -309,6 +333,13 @@ class PumpingTest(Test):
                     )
             for k in obs:
                 self.__observations[k] = dcopy(obs[k])
+        elif isinstance(obs, Observation):
+            if obs in self.observations:
+                raise ValueError(
+                    "PumpingTest_addobservations: "
+                    + "'observation' are already present"
+                )
+            self.__observations[obs.name] = dcopy(obs)
         else:
             raise ValueError(
                 "PumpingTest_addobservations: 'observations' "
@@ -349,8 +380,8 @@ class PumpingTest(Test):
             List of wells that should be excluded from the plot.
             Default: ``None``
 
-        Note
-        ----
+        Notes
+        -----
         This will be used by the Campaign class.
         """
         if exclude is None:
@@ -394,8 +425,8 @@ class PumpingTest(Test):
             Name of the file. If ``None``, the name will be generated by
             ``"Test_"+name``. Default: ``None``
 
-        Note
-        ----
+        Notes
+        -----
         The file will get the suffix ``".tst"``.
         """
         # ensure that 'path' is a string [ needed ?! ]

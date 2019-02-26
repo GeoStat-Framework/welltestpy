@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing classes for parameter estimation.
 
@@ -121,7 +122,7 @@ class Stat2Dest(object):
             normpumptest(self.campaign.tests[test], pumpingrate=prate)
         self.prate = prate
 
-    def settime(self, time=None, tmin=-np.inf, tmax=np.inf):
+    def settime(self, time=None, tmin=10.0, tmax=np.inf, typ="quad", steps=10):
         """Set the uniform time points at which the observations should be
         evaluated.
 
@@ -133,10 +134,22 @@ class Stat2Dest(object):
             Default: ``None``
         tmin : :class:`float`, optional
             Minimal time value. It will set a minimal value of 10s.
-            Default: ``-inf``
+            Default: ``10``
         tmax : :class:`float`, optional
             Maximal time value.
             Default: ``inf``
+        typ : :class:`str`, optional
+            Typ of the time selection. You can select from:
+
+                * ``quad``: Quadratically increasing time steps
+                * ``geom``: Geometrically increasing time steps
+                * ``exp``: Exponentially increasing time steps
+                * ``lin``: Linear time steps
+
+            Default: "quad"
+
+        steps : :class:`int`, optional
+            Number of generated time steps. Default: 10
         """
         if time is None:
             for test in self.testinclude:
@@ -145,19 +158,19 @@ class Stat2Dest(object):
                     tmin = max(tmin, temptime.min())
                     tmax = min(tmax, temptime.max())
 
-            # set the first timepoint to at least 10s
-            tmin = max(tmin, 10)
-
-            #            time = np.expm1(np.linspace(np.log1p(tmin),
-            #                                        np.log1p(tmax), 10))
-            time = (
-                np.power(
-                    np.linspace(np.sqrt(tmin + 1.0), np.sqrt(tmax + 1.0), 10)
-                    + 1.0,
-                    2,
+            if typ == "exp":
+                time = np.expm1(
+                    np.linspace(np.log1p(tmin), np.log1p(tmax), 10)
                 )
-                - 1.0
-            )
+            elif typ == "geom":
+                time = np.geomspace(tmin, tmax, 10)
+            elif typ == "quad":
+                time = np.power(
+                    np.linspace(np.sqrt(tmin), np.sqrt(tmax), 10), 2
+                )
+            else:
+                time = np.linspace(tmin, tmax, 10)
+
         for test in self.testinclude:
             for obs in self.testinclude[test]:
                 filterdrawdown(
@@ -216,15 +229,16 @@ class Stat2Dest(object):
         plotname1=None,
         plotname2=None,
         plotname3=None,
+        estname=None,
         mu=None,
         sig2=None,
         corr=None,
         lnS=None,
-        murange=None,
-        sig2range=None,
-        corrrange=None,
-        lnSrange=None,
-        rwell=None,
+        murange=(-16.0, -2.0),
+        sig2range=(0.1, 10.0),
+        corrrange=(1.0, 50.0),
+        lnSrange=(-13.0, -1.0),
+        rwell=0.0,
         rinf=None,
     ):
         """Run the estimation.
@@ -268,6 +282,11 @@ class Stat2Dest(object):
             of the spotpy estimation.
             If ``None``, it will be the actual time +
             ``"_stat2D_plot_parainteract.pdf"``.
+            Default: ``None``
+        estname : :class:`str`, optional
+            File-name of the results of the spotpy estimation.
+            If ``None``, it will be the actual time +
+            ``"_Theis_estimate"``.
             Default: ``None``
         mu : :class:`float`, optional
             Here you can fix the value for mean log-transmissivity ``mu``.
@@ -324,8 +343,7 @@ class Stat2Dest(object):
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
-        if not os.path.exists(dire):
-            os.makedirs(dire)
+        os.makedirs(dire, exist_ok=True)
 
         if dbname is None:
             dbname = folder + act_time + "_stat2D_db"
@@ -343,7 +361,10 @@ class Stat2Dest(object):
             plotname3 = folder + act_time + "_stat2D_plot_parainteract.pdf"
         else:
             plotname3 = folder + plotname3
-        paraname = folder + act_time + "_estimate.txt"
+        if estname is None:
+            paraname = folder + act_time + "_estimate.txt"
+        else:
+            paraname = folder + estname
 
         # generate the parameter-names for plotting
         paralabels = []
@@ -392,9 +413,10 @@ class Stat2Dest(object):
                 dbformat="csv",
                 parallel=parallel,
                 save_sim=False,
+#                alt_objfun=None,  # use -rmse for fitting
             )
             # start the estimation with the sce-ua algorithm
-            sampler.sample(rep, ngs=20, kstop=100, pcento=1e-4, peps=1e-3)
+            sampler.sample(rep, ngs=10, kstop=100, pcento=1e-4, peps=1e-3)
             # save best parameter-set
             self.para = sampler.status.params
             np.savetxt(paraname, self.para)
@@ -438,7 +460,7 @@ class Stat2Dest(object):
         sig2range=None,
         corrrange=None,
         lnSrange=None,
-        rwell=None,
+        rwell=0.0,
         rinf=None,
     ):
         """Run the sensitivity analysis.
@@ -529,8 +551,7 @@ class Stat2Dest(object):
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
-        if not os.path.exists(dire):
-            os.makedirs(dire)
+        os.makedirs(dire, exist_ok=True)
 
         if dbname is None:
             dbname = folder + act_time + "_sensitivity_db"
@@ -701,7 +722,7 @@ class Theisest(object):
             normpumptest(self.campaign.tests[test], pumpingrate=prate)
         self.prate = prate
 
-    def settime(self, time=None, tmin=-np.inf, tmax=np.inf):
+    def settime(self, time=None, tmin=10, tmax=np.inf):
         """Set the uniform time points at which the observations should be
         evaluated.
 
@@ -725,19 +746,8 @@ class Theisest(object):
                     tmin = max(tmin, temptime.min())
                     tmax = min(tmax, temptime.max())
 
-            # set the first timepoint to at least 10s
-            tmin = max(tmin, 10)
+            time = np.power(np.linspace(np.sqrt(tmin), np.sqrt(tmax), 10), 2)
 
-            #            time = np.expm1(np.linspace(np.log1p(tmin),
-            #                                        np.log1p(tmax), 10))
-            time = (
-                np.power(
-                    np.linspace(np.sqrt(tmin + 1.0), np.sqrt(tmax + 1.0), 10)
-                    + 1.0,
-                    2,
-                )
-                - 1.0
-            )
         for test in self.testinclude:
             for obs in self.testinclude[test]:
                 filterdrawdown(
@@ -796,6 +806,7 @@ class Theisest(object):
         plotname1=None,
         plotname2=None,
         plotname3=None,
+        estname=None,
         mu=None,
         lnS=None,
         murange=None,
@@ -843,6 +854,11 @@ class Theisest(object):
             If ``None``, it will be the actual time +
             ``"_Theis_plot_parainteract.pdf"``.
             Default: ``None``
+        estname : :class:`str`, optional
+            File-name of the results of the spotpy estimation.
+            If ``None``, it will be the actual time +
+            ``"_Theis_estimate"``.
+            Default: ``None``
         mu : :class:`float`, optional
             Here you can fix the value for mean log-transmissivity ``mu``.
             Default: ``None``
@@ -860,10 +876,6 @@ class Theisest(object):
                 ``(min, max, step, start-value, min-value, max-value)``
 
             Default: ``None``
-        rwell : :class:`float`, optional
-            Inner radius of the pumping-well. Default: ``0.0``
-        rinf : :class:`float`, optional
-            Radius of the outer boundary of the aquifer. Default: ``np.inf``
         """
         act_time = timemodule.strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -873,8 +885,7 @@ class Theisest(object):
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
-        if not os.path.exists(dire):
-            os.makedirs(dire)
+        os.makedirs(dire, exist_ok=True)
 
         if dbname is None:
             dbname = folder + act_time + "_Theis_db"
@@ -892,7 +903,10 @@ class Theisest(object):
             plotname3 = folder + act_time + "_Theis_plot_parainteract.pdf"
         else:
             plotname3 = folder + plotname3
-        paraname = folder + act_time + "_Theis_estimate.txt"
+        if estname is None:
+            paraname = folder + act_time + "_Theis_estimate.txt"
+        else:
+            paraname = folder + estname
 
         # generate the parameter-names for plotting
         paralabels = []
@@ -923,9 +937,10 @@ class Theisest(object):
                 dbformat="csv",
                 parallel=parallel,
                 save_sim=False,
+#                alt_objfun=None,  # use -rmse for fitting
             )
             # start the estimation with the sce-ua algorithm
-            sampler.sample(rep, ngs=20, kstop=100, pcento=1e-4, peps=1e-3)
+            sampler.sample(rep, ngs=10, kstop=100, pcento=1e-4, peps=1e-3)
             # save best parameter-set
             self.para = sampler.status.params
             np.savetxt(paraname, self.para)
@@ -1020,8 +1035,7 @@ class Theisest(object):
         elif folder[-1] != "/":
             folder += "/"
         dire = os.path.dirname(folder)
-        if not os.path.exists(dire):
-            os.makedirs(dire)
+        os.makedirs(dire, exist_ok=True)
 
         if dbname is None:
             dbname = folder + act_time + "_Theis_sensitivity_db"

@@ -1,11 +1,45 @@
+# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing datastructures.
 
+Subpackages
+^^^^^^^^^^^
+
 .. currentmodule:: welltestpy.data
 
-Included classes
-----------------
-The following classes are provided
+.. autosummary::
+    varlib
+    testslib
+    campaignlib
+
+Classes
+^^^^^^^
+
+Campaign classes
+~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.campaignlib
+
+The following classes can be used to handle field campaigns.
+
+.. autosummary::
+    Campaign
+    FieldSite
+
+Field Test classes
+~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.testslib
+
+The following classes can be used to handle field test within a campaign.
+
+.. autosummary::
+    PumpingTest
+
+Variable classes
+~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.varlib
 
 .. autosummary::
     Variable
@@ -18,30 +52,36 @@ The following classes are provided
     DrawdownObs
     StdyHeadObs
     Well
-    PumpingTest
-    FieldSite
-    Campaign
 
-Included functions
-------------------
-The following functions are provided
+Routines
+^^^^^^^^
+
+Loading routines
+~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.campaignlib
+
+Campaign related loading routines
+
+.. autosummary::
+    load_campaign
+    load_fieldsite
+
+.. currentmodule:: welltestpy.data.testslib
+
+Field test related loading routines
+
+.. autosummary::
+    load_test
+
+.. currentmodule:: welltestpy.data.varlib
+
+Variable related loading routines
 
 .. autosummary::
     load_var
     load_obs
     load_well
-    load_test
-    load_fieldsite
-    load_campaign
-
-Subpackages
------------
-The following subpackages are provided
-
-.. autosummary::
-    varlib
-    testslib
-    campaignlib
 """
 from __future__ import absolute_import
 

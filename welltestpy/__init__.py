@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Purpose
 =======
@@ -17,5 +18,7 @@ Subpackages
 from __future__ import absolute_import
 
 from welltestpy._version import __version__
+from welltestpy import data, estimate, process, tools
 
 __all__ = ["__version__"]
+__all__ += ["data", "estimate", "process", "tools"]
