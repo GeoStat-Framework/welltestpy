@@ -28,6 +28,7 @@ env:
     - CIBW_BEFORE_BUILD="pip install numpy==1.13.0 scipy==0.19.1 spotpy anaflow && pip install pandas matplotlib"
 
 before_install:
+  - sudo apt-get update
   - sudo apt-get build-dep python-matplotlib
 
 script:
