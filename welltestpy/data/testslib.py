@@ -472,7 +472,7 @@ class PumpingTest(Test):
                 writer.writerow([k, obsname[k]])
                 self.observations[k].save(patht, obsname[k])
         # compress everything to one zip-file
-        with zipfile.ZipFile(path + name, "w") as zfile:
+        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             zfile.write(os.path.join(patht, pumprname), pumprname)
             zfile.write(os.path.join(patht, aquidname), aquidname)
