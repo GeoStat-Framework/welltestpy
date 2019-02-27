@@ -413,7 +413,7 @@ class Stat2Dest(object):
                 dbformat="csv",
                 parallel=parallel,
                 save_sim=False,
-#                alt_objfun=None,  # use -rmse for fitting
+                #                alt_objfun=None,  # use -rmse for fitting
             )
             # start the estimation with the sce-ua algorithm
             sampler.sample(rep, ngs=10, kstop=100, pcento=1e-4, peps=1e-3)
@@ -937,7 +937,7 @@ class Theisest(object):
                 dbformat="csv",
                 parallel=parallel,
                 save_sim=False,
-#                alt_objfun=None,  # use -rmse for fitting
+                #                alt_objfun=None,  # use -rmse for fitting
             )
             # start the estimation with the sce-ua algorithm
             sampler.sample(rep, ngs=10, kstop=100, pcento=1e-4, peps=1e-3)

@@ -272,7 +272,9 @@ class Campaign(object):
             self.__wells = {}
         self.__updatewells()
 
-    def add_well(self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None):
+    def add_well(
+        self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
+    ):
         """Add a single well to the campaign.
 
         Parameters

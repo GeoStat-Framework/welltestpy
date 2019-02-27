@@ -278,22 +278,22 @@ class Stat2Dsetup(object):
         self.data = dcopy(rtdata)
         self.Qw = Qw
 
-#        if murange is None:
-#            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
-#        else:
-#            self.ranges["mu"] = murange
-#        if sig2range is None:
-#            self.ranges["sig2"] = (0.01, 6.0, 0.5, 2.55, 0.01, 6.0)
-#        else:
-#            self.ranges["sig2"] = sig2range
-#        if corrrange is None:
-#            self.ranges["corr"] = (0.5, 40.0, 2.0, 18.0, 0.5, 40.0)
-#        else:
-#            self.ranges["corr"] = corrrange
-#        if lnSrange is None:
-#            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
-#        else:
-#            self.ranges["lnS"] = lnSrange
+        #        if murange is None:
+        #            self.ranges["mu"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
+        #        else:
+        #            self.ranges["mu"] = murange
+        #        if sig2range is None:
+        #            self.ranges["sig2"] = (0.01, 6.0, 0.5, 2.55, 0.01, 6.0)
+        #        else:
+        #            self.ranges["sig2"] = sig2range
+        #        if corrrange is None:
+        #            self.ranges["corr"] = (0.5, 40.0, 2.0, 18.0, 0.5, 40.0)
+        #        else:
+        #            self.ranges["corr"] = corrrange
+        #        if lnSrange is None:
+        #            self.ranges["lnS"] = (-16.0, -1.0, 1.0, -9.0, -16.0, -1.0)
+        #        else:
+        #            self.ranges["lnS"] = lnSrange
 
         self.ranges["mu"] = ranges(*murange)
         self.ranges["sig2"] = ranges(*sig2range)
