@@ -75,9 +75,9 @@ setup(
     install_requires=[
         "numpy>=1.13.0",
         "scipy>=0.19.1",
-        "pandas>=0.23.0",
+        "pandas>=0.20.3",
+        "matplotlib>=2.0.2",
         "anaflow",
-        "matplotlib",
         "spotpy",
     ],
     packages=find_packages(exclude=["tests*", "docs*"]),
