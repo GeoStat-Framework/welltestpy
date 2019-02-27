@@ -339,32 +339,34 @@ class Stat2Dest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd() + "/"
-        elif folder[-1] != "/":
-            folder += "/"
-        dire = os.path.dirname(folder)
-        os.makedirs(dire, exist_ok=True)
+            folder = os.getcwd()
+        folder = os.path.normpath(folder)
+        os.makedirs(folder, exist_ok=True)
 
         if dbname is None:
-            dbname = folder + act_time + "_stat2D_db"
+            dbname = os.path.join(folder, act_time + "_stat2D_db")
         else:
-            dbname = folder + dbname
+            dbname = os.path.join(folder, dbname)
         if plotname1 is None:
-            plotname1 = folder + act_time + "_stat2D_plot_paratrace.pdf"
+            plotname1 = os.path.join(
+                folder, act_time + "_stat2D_plot_paratrace.pdf"
+            )
         else:
-            plotname1 = folder + plotname1
+            plotname1 = os.path.join(folder, plotname1)
         if plotname2 is None:
-            plotname2 = folder + act_time + "_stat2D_plot_fit.pdf"
+            plotname2 = os.path.join(folder, act_time + "_stat2D_plot_fit.pdf")
         else:
-            plotname2 = folder + plotname2
+            plotname2 = os.path.join(folder, plotname2)
         if plotname3 is None:
-            plotname3 = folder + act_time + "_stat2D_plot_parainteract.pdf"
+            plotname3 = os.path.join(
+                folder, act_time + "_stat2D_plot_parainteract.pdf"
+            )
         else:
-            plotname3 = folder + plotname3
+            plotname3 = os.path.join(folder, plotname3)
         if estname is None:
-            paraname = folder + act_time + "_estimate.txt"
+            paraname = os.path.join(folder, act_time + "_estimate.txt")
         else:
-            paraname = folder + estname
+            paraname = os.path.join(folder, estname)
 
         # generate the parameter-names for plotting
         paralabels = []
@@ -547,25 +549,27 @@ class Stat2Dest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd() + "/"
-        elif folder[-1] != "/":
-            folder += "/"
-        dire = os.path.dirname(folder)
-        os.makedirs(dire, exist_ok=True)
+            folder = os.getcwd()
+        folder = os.path.normpath(folder)
+        os.makedirs(folder, exist_ok=True)
 
         if dbname is None:
-            dbname = folder + act_time + "_sensitivity_db"
+            dbname = os.path.join(folder, act_time + "_sensitivity_db")
         else:
-            dbname = folder + dbname
+            dbname = os.path.join(folder, dbname)
         if plotname is None:
-            plotname = folder + act_time + "_stat2D_plot_sensitivity.pdf"
+            plotname = os.path.join(
+                folder, act_time + "_stat2D_plot_sensitivity.pdf"
+            )
         else:
-            plotname = folder + plotname
+            plotname = os.path.join(folder, plotname)
         if plotname1 is None:
-            plotname1 = folder + act_time + "_stat2D_plot_senstrace.pdf"
+            plotname1 = os.path.join(
+                folder, act_time + "_stat2D_plot_senstrace.pdf"
+            )
         else:
-            plotname1 = folder + plotname1
-        sensname = folder + act_time + "_FAST_estimate.txt"
+            plotname1 = os.path.join(folder, plotname1)
+        sensname = os.path.join(folder, act_time + "_FAST_estimate.txt")
 
         # generate the parameter-names for plotting
         paralabels = []
@@ -881,32 +885,34 @@ class Theisest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd() + "/"
-        elif folder[-1] != "/":
-            folder += "/"
-        dire = os.path.dirname(folder)
-        os.makedirs(dire, exist_ok=True)
+            folder = os.getcwd()
+        folder = os.path.normpath(folder)
+        os.makedirs(folder, exist_ok=True)
 
         if dbname is None:
-            dbname = folder + act_time + "_Theis_db"
+            dbname = os.path.join(folder, act_time + "_Theis_db")
         else:
-            dbname = folder + dbname
+            dbname = os.path.join(folder, dbname)
         if plotname1 is None:
-            plotname1 = folder + act_time + "_Theis_plot_paratrace.pdf"
+            plotname1 = os.path.join(
+                folder, act_time + "_Theis_plot_paratrace.pdf"
+            )
         else:
-            plotname1 = folder + plotname1
+            plotname1 = os.path.join(folder, plotname1)
         if plotname2 is None:
-            plotname2 = folder + act_time + "_Theis_plot_fit.pdf"
+            plotname2 = os.path.join(folder, act_time + "_Theis_plot_fit.pdf")
         else:
-            plotname2 = folder + plotname2
+            plotname2 = os.path.join(folder, plotname2)
         if plotname3 is None:
-            plotname3 = folder + act_time + "_Theis_plot_parainteract.pdf"
+            plotname3 = os.path.join(
+                folder, act_time + "_Theis_plot_parainteract.pdf"
+            )
         else:
-            plotname3 = folder + plotname3
+            plotname3 = os.path.join(folder, plotname3)
         if estname is None:
-            paraname = folder + act_time + "_Theis_estimate.txt"
+            paraname = os.path.join(folder, act_time + "_Theis_estimate.txt")
         else:
-            paraname = folder + estname
+            paraname = os.path.join(folder, estname)
 
         # generate the parameter-names for plotting
         paralabels = []
@@ -1031,21 +1037,21 @@ class Theisest(object):
 
         # generate the filenames
         if folder is None:
-            folder = os.getcwd() + "/"
-        elif folder[-1] != "/":
-            folder += "/"
-        dire = os.path.dirname(folder)
-        os.makedirs(dire, exist_ok=True)
+            folder = os.getcwd()
+        folder = os.path.normpath(folder)
+        os.makedirs(folder, exist_ok=True)
 
         if dbname is None:
-            dbname = folder + act_time + "_Theis_sensitivity_db"
+            dbname = os.path.join(folder, act_time + "_Theis_sensitivity_db")
         else:
-            dbname = folder + dbname
+            dbname = os.path.join(folder, dbname)
         if plotname is None:
-            plotname = folder + act_time + "_Theis_plot_sensitivity.pdf"
+            plotname = os.path.join(
+                folder, act_time + "_Theis_plot_sensitivity.pdf"
+            )
         else:
-            plotname = folder + plotname
-        sensname = folder + act_time + "_Theis_FAST_estimate.txt"
+            plotname = os.path.join(folder, plotname)
+        sensname = os.path.join(folder, act_time + "_Theis_FAST_estimate.txt")
 
         # generate the parameter-names for plotting
         paralabels = []
