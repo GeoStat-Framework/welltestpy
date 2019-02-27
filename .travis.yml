@@ -21,7 +21,7 @@ matrix:
         - PIP=pip
         - CIBW_BUILD="cp36-*"
         - COVER="on"
-        - CIBW_BEFORE_BUILD="sudo apt-get install python3-matplotlib"
+        - CIBW_BEFORE_BUILD="apt-get install python3-matplotlib"
 #        - CIBW_BEFORE_BUILD="pip install numpy==1.13.0 scipy==0.19.1 spotpy anaflow && yum install -y freetype-devel libpng-devel pkg-config && pip install pandas==0.23.0 matplotlib==2.0"
 
 env:
