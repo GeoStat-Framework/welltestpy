@@ -67,7 +67,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Sebastian Mueller",
     author_email="sebastian.mueller@ufz.de",
-    url="https://github.com/MuellerSeb/welltestpy",
+    url="https://github.com/GeoStat-Framework/welltestpy",
     license="GPL -  see LICENSE",
     classifiers=[_f for _f in CLASSIFIERS.split("\n") if _f],
     platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],

@@ -1,6 +1,9 @@
 # Welcome to WellTestPy
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1229051.svg)](https://doi.org/10.5281/zenodo.1229051)
+[![PyPI version](https://badge.fury.io/py/welltestpy.svg)](https://badge.fury.io/py/welltestpy)
+[![Build Status](https://travis-ci.org/GeoStat-Framework/welltestpy.svg?branch=master)](https://travis-ci.org/GeoStat-Framework/welltestpy)
+[![Documentation Status](https://readthedocs.org/projects/welltestpy/badge/?version=latest)](https://geostat-framework.readthedocs.io/projects/welltestpy/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 <p align="center">
@@ -157,9 +160,9 @@ welltestpy.tools     # Subpackage with miscellaneous tools
 
 - [NumPy >= 1.13.0](https://www.numpy.org)
 - [SciPy >= 0.19.1](https://www.scipy.org)
+- [Pandas >= 0.23.0](https://pandas.pydata.org)
+- [Matplotlib >= 2.2.0](https://matplotlib.org)
 - [AnaFlow](https://github.com/GeoStat-Framework/AnaFlow)
-- [Matplotlib](https://matplotlib.org)
-- [Pandas](https://pandas.pydata.org)
 - [SpotPy](https://github.com/thouska/spotpy)
 
 
