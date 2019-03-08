@@ -104,8 +104,6 @@ def ext_theis2D(rad, time, Qw=-0.0001, rwell=0.0, rinf=np.inf):
             Qw=Qw,
             rwell=rwell,
             rinf=rinf,
-            parts=25,
-            stehfestn=12,
         )
 
     return function
@@ -167,7 +165,6 @@ def theis(rad, time, Qw=-0.0001, rwell=0.0, rinf=np.inf):
             Qw=Qw,
             rwell=rwell,
             rinf=rinf,
-            stehfestn=12,
         )
 
     return function
