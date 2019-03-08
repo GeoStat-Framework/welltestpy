@@ -603,8 +603,8 @@ def plotfitting3D(
         r11 = re * r_gen1
 
         h = ana.ext_theis2D(
-            re,
-            time,
+            time=time,
+            rad=re,
             TG=np.exp(para[0]),
             sig2=para[1],
             corr=para[2],
@@ -615,8 +615,8 @@ def plotfitting3D(
         ).reshape(-1)
         h1 = data[:, ri]
         h2 = ana.ext_theis2D(
-            re,
-            timarr,
+            time=timarr,
+            rad=re,
             TG=np.exp(para[0]),
             sig2=para[1],
             corr=para[2],
@@ -652,8 +652,8 @@ def plotfitting3D(
     for te in time:
         t11 = te * t_gen
         h = ana.ext_theis2D(
-            radarr,
-            te,
+            time=te,
+            rad=radarr,
             TG=np.exp(para[0]),
             sig2=para[1],
             corr=para[2],
@@ -693,11 +693,11 @@ def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
         r11 = re * r_gen1
 
         h = ana.theis(
-            re, time, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
+            time=time, rad=re, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
         ).reshape(-1)
         h1 = data[:, ri]
         h2 = ana.theis(
-            re, timarr, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
+            time=timarr, rad=re, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
         ).reshape(-1)
 
         zord = 1000 * (len(rad) - ri)
@@ -726,7 +726,7 @@ def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
     for te in time:
         t11 = te * t_gen
         h = ana.theis(
-            radarr, te, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
+            time=te, rad=radarr, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
         ).reshape(-1)
         ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
 
