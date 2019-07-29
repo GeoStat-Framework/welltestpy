@@ -431,7 +431,8 @@ class PumpingTest(Test):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Test_" + self.name

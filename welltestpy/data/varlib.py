@@ -90,7 +90,7 @@ class Variable(object):
 
         Parameters
         ----------
-        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`,\
+        value : :class:`int` or :class:`float` or :class:`numpy.ndarray`,
         optional
             Value of the Variable. Default: ``None``
 
@@ -131,8 +131,7 @@ class Variable(object):
 
     @property
     def value(self):
-        """:class:`int` or :class:`float` or :class:`numpy.ndarray`:
-        Value of the Variable."""
+        """:class:`int` or :class:`float` or :class:`numpy.ndarray`: Value."""
         return self.__value
 
     @value.setter
@@ -151,6 +150,7 @@ class Variable(object):
             raise ValueError("Variable: 'value' is neither integer nor float")
 
     def __repr__(self):
+        """Representation."""
         return (
             str(self.name)
             + " "
@@ -162,6 +162,7 @@ class Variable(object):
         )
 
     def __str__(self):
+        """Representation."""
         return str(self.name) + " " + self.label
 
     def save(self, path="", name=None):
@@ -183,7 +184,8 @@ class Variable(object):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Var_" + self.name
@@ -395,26 +397,26 @@ class Observation(object):
 
         Parameters
         ----------
-        in1 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or \
+        in1 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
         :class:`Variable`, optional
-            New Value for time (if transient) / observation (if steady).
+            New Value for time (if transient) or observation (if steady).
             Default: ``"None"``
-        in2 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or \
+        in2 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
         :class:`Variable`, optional
             New Value for observation (if transient).
             Default: ``"None"``
-        time : :class:`int` or :class:`float` or :class:`numpy.ndarray` or \
+        time : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
         :class:`Variable`, optional
             New Value for time.
             Default: ``"None"``
-        observation : :class:`int` or :class:`float` or :class:`numpy.ndarray`\
+        observation : :class:`int` or :class:`float` or :class:`numpy.ndarray`
         or :class:`Variable`, optional
             New Value for observation.
             Default: ``"None"``
 
         Returns
         -------
-        [:class:`tuple` of] :class:`int` or :class:`float`\
+        [:class:`tuple` of] :class:`int` or :class:`float`
         or :class:`numpy.ndarray`
             ``(time, observation)`` or ``observation``.
         """
@@ -444,23 +446,23 @@ class Observation(object):
             return self.observation
 
     def __repr__(self):
+        """Represenetation."""
         return "Observation '" + str(self.name) + "' " + str(self.label)
 
     def __str__(self):
+        """Represenetation."""
         return self.__repr__()
 
     @property
     def labels(self):
-        """[:class:`tuple` of] :class:`str`:
-        String containing: ``symbol in units``."""
+        """[:class:`tuple` of] :class:`str`: ``symbol in units``."""
         if self.state == "transient":
             return self._time.label, self._observation.label
         return self._observation.label
 
     @property
     def label(self):
-        """[:class:`tuple` of] :class:`str`:
-        String containing: ``symbol in units``."""
+        """[:class:`tuple` of] :class:`str`: ``symbol in units``."""
         return self.labels
 
     @property
@@ -492,42 +494,53 @@ class Observation(object):
 
     @property
     def value(self):
-        """[:class:`tuple` of] :class:`int` or :class:`float`
-        or :class:`numpy.ndarray`:
-        Value of the Observation."""
+        """
+        Value of the Observation.
+
+        [:class:`tuple` of] :class:`int` or :class:`float`
+        or :class:`numpy.ndarray`
+        """
         if self.state == "transient":
             return self.time, self.observation
         return self.observation
 
     @property
     def state(self):
-        """:class:`str`: String containing state of the observation.
-        Either ``"steady"`` or ``"transient"``."""
+        """
+        :class:`str`: String containing state of the observation.
+
+        Either ``"steady"`` or ``"transient"``.
+        """
         return self.__state
 
     @property
     def kind(self):
-        """:class:`str`: name of the observation variable"""
+        """:class:`str`: name of the observation variable."""
         return self._observation.name
 
     @property
     def time(self):
-        """:class:`int` or :class:`float` or :class:`numpy.ndarray`:
-        time values of the observation"""
+        """
+        Time values of the observation.
+
+        :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        """
         if self.state == "transient":
             return self._time.value
         return None
 
     @property
     def observation(self):
-        """:class:`int` or :class:`float` or :class:`numpy.ndarray`:
-        observed values of the observation"""
+        """
+        Observed values of the observation.
+
+        :class:`int` or :class:`float` or :class:`numpy.ndarray`
+        """
         return self._observation.value
 
     @property
     def units(self):
-        """[:class:`tuple` of] :class:`str`:
-        String containing the units of the observation"""
+        """[:class:`tuple` of] :class:`str`: units of the observation."""
         if self.state == "steady":
             return self._observation.units
         return self._time.units + "," + self._observation.units
@@ -602,6 +615,7 @@ class Observation(object):
         return True
 
     def __iter__(self):
+        """Iterate over Observations."""
         if self.state == "transient":
             self.__it = np.nditer(self.time, flags=["multi_index"])
         else:
@@ -609,7 +623,7 @@ class Observation(object):
         return self
 
     def next(self):
-        """Iterate through observations"""
+        """Iterate through observations."""
         if self.state == "transient":
             if self.__it.finished:
                 raise StopIteration
@@ -652,7 +666,8 @@ class Observation(object):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Obs_" + self.name
@@ -712,7 +727,7 @@ class StdyObs(Observation):
         super(StdyObs, self).__init__(name, None, observation, description)
 
     def _settime(self, time):
-        """For steady observations, this raises a ``ValueError``"""
+        """For steady observations, this raises a ``ValueError``."""
         raise ValueError(
             "Observation: " + "'time' not allowed in steady-state"
         )
@@ -769,7 +784,7 @@ class StdyHeadObs(Observation):
         super(StdyHeadObs, self).__init__(name, None, observation, description)
 
     def _settime(self, time):
-        """For steady observations, this raises a ``ValueError``"""
+        """For steady observations, this raises a ``ValueError``."""
         raise ValueError(
             "Observation: " + "'time' not allowed in steady-state"
         )
@@ -905,7 +920,7 @@ class Well(object):
 
     @property
     def radius(self):
-        """:class:`float`: Radius of the well"""
+        """:class:`float`: Radius of the well."""
         return self._radius.value
 
     @radius.setter
@@ -924,7 +939,7 @@ class Well(object):
 
     @property
     def coordinates(self):
-        """:class:`numpy.ndarray`: Coordinates of the well"""
+        """:class:`numpy.ndarray`: Coordinates of the well."""
         return self._coordinates.value
 
     @coordinates.setter
@@ -945,7 +960,7 @@ class Well(object):
 
     @property
     def welldepth(self):
-        """:class:`float`: Depth of the well"""
+        """:class:`float`: Depth of the well."""
         return self._welldepth.value
 
     @welldepth.setter
@@ -964,7 +979,7 @@ class Well(object):
 
     @property
     def aquiferdepth(self):
-        """:class:`float`: Aquifer depth at the well"""
+        """:class:`float`: Aquifer depth at the well."""
         return self._aquiferdepth.value
 
     @aquiferdepth.setter
@@ -991,19 +1006,19 @@ class Well(object):
         """
         if isinstance(well, Well):
             return np.linalg.norm(self.coordinates - well.coordinates)
-        else:
-            try:
-                return np.linalg.norm(self.coordinates - well)
-            except ValueError:
-                raise ValueError(
-                    "Well: the distant-well needs to be an "
-                    + "instance of Well-class "
-                    + "or a tupel of x-y coordinates "
-                    + "or a single distance value "
-                    + "and of same coordinates-type."
-                )
+        try:
+            return np.linalg.norm(self.coordinates - well)
+        except ValueError:
+            raise ValueError(
+                "Well: the distant-well needs to be an "
+                + "instance of Well-class "
+                + "or a tupel of x-y coordinates "
+                + "or a single distance value "
+                + "and of same coordinates-type."
+            )
 
     def __repr__(self):
+        """Represenetation."""
         return (
             str(self.name)
             + " r="
@@ -1013,24 +1028,31 @@ class Well(object):
         )
 
     def __sub__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __add__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __and__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __rsub__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __radd__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __rand__(self, well):
+        """Distance between wells."""
         return self.distance(well)
 
     def __abs__(self):
+        """Distance to origin."""
         return np.linalg.norm(self.coordinates)
 
     def save(self, path="", name=None):
@@ -1052,7 +1074,8 @@ class Well(object):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Well_" + self.name

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing flow datastructures for campaigns
-on a fieldsite.
+"""Welltestpy subpackage providing flow datastructures for field-campaigns.
 
 .. currentmodule:: welltestpy.data.campaignlib
 
@@ -105,6 +103,7 @@ class FieldSite(object):
             self._coordinates = None
 
     def __repr__(self):
+        """Representation."""
         return self.name
 
     def save(self, path="", name=None):
@@ -126,7 +125,8 @@ class FieldSite(object):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Field_" + self.name
@@ -228,7 +228,7 @@ class Campaign(object):
 
     @property
     def wells(self):
-        """:class:`dict`: Wells within the campaign"""
+        """:class:`dict`: Wells within the campaign."""
         return self.__wells
 
     @wells.setter
@@ -357,7 +357,7 @@ class Campaign(object):
 
     @property
     def tests(self):
-        """:class:`dict`: Tests within the campaign"""
+        """:class:`dict`: Tests within the campaign."""
         return self.__tests
 
     @tests.setter
@@ -515,7 +515,8 @@ class Campaign(object):
         """
         path = os.path.normpath(path)
         # create the path if not existing
-        os.makedirs(path, exist_ok=True)
+        if not os.path.exists(path):
+            os.makedirs(path)
         # create a standard name if None is given
         if name is None:
             name = "Cmp_" + self.name
