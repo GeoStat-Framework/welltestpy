@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-welltestpy subpackage providing routines to estimate subsurface parameters
-from test data.
+welltestpy subpackage providing routines to estimate pump test parameters.
 
 .. currentmodule:: welltestpy.estimate
 
@@ -20,13 +19,30 @@ Included classes
 The following classes are provided
 
 .. autosummary::
-    Stat2Dest
-    Theisest
+    TransientPumping
+    ExtTheis3D
+    ExtTheis2D
+    Theis
+    TypeCurve
 """
 from __future__ import absolute_import
 
 from welltestpy.estimate import estimatelib, spotpy_classes
 
-from welltestpy.estimate.estimatelib import Stat2Dest, Theisest
+from welltestpy.estimate.estimatelib import (
+    TransientPumping,
+    ExtTheis3D,
+    ExtTheis2D,
+    Theis,
+)
+from welltestpy.estimate.spotpy_classes import TypeCurve
 
-__all__ = ["Stat2Dest", "Theisest", "estimatelib", "spotpy_classes"]
+__all__ = [
+    "TransientPumping",
+    "ExtTheis3D",
+    "ExtTheis2D",
+    "Theis",
+    "TypeCurve",
+    "estimatelib",
+    "spotpy_classes",
+]
