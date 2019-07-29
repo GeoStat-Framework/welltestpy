@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""External Imports for welltestpy.
-"""
+"""External Imports for welltestpy."""
 
 from __future__ import absolute_import, division, print_function
 

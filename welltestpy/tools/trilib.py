@@ -9,6 +9,7 @@ The following functions are provided
 .. autosummary::
    triangulate
 """
+# pylint: disable=C0103
 from __future__ import absolute_import, division, print_function
 
 from copy import deepcopy as dcopy
@@ -23,7 +24,7 @@ __all__ = ["triangulate"]
 
 
 def triangulate(distances, prec, all_pos=False):
-    """Triangulate points by given distances
+    """Triangulate points by given distances.
 
     try to triangulate points by given distances within a symmetric matrix
     'distances' with ``distances[i,j] = |pi-pj|``
@@ -90,12 +91,11 @@ def triangulate(distances, prec, all_pos=False):
 
 def _triangulatesgl(distances, sp1, sp2, prec):
     """
-    try to triangulate points, with startingpoints sp1 and sp2
-    and a given precicion
+    Try to triangulate points.
 
-    thereby sp1 will be at the origin (0,0) and sp2 will be at (|sp2-sp1|,0)
+    With startingpoints sp1 and sp2 and a given precicion.
+    Thereby sp1 will be at the origin (0,0) and sp2 will be at (|sp2-sp1|,0).
     """
-
     res = []
 
     if distances[sp1, sp2] < -0.5:
@@ -131,13 +131,13 @@ def _triangulatesgl(distances, sp1, sp2, prec):
 
 def _addpoints(sol, distances, prec):
     """
-    tries for each point to add it to a given solution-approach
+    Tries for each point to add it to a given solution-approach.
+
     gives all possibilties and a status about the solution:
         state = 0: possibilities found
         state = 1: no possibilities
         state = 2: solution-approach has a contradiction with a point
     """
-
     res = []
 
     posfound = False
@@ -170,13 +170,13 @@ def _addpoints(sol, distances, prec):
 
 def _addpoint(sol, i, distances, prec):
     """
-    tries to add point i to a given solution-approach
+    Tries to add point i to a given solution-approach.
+
     gives all possibilties and a status about the solution:
         state = 0: possibilities found
         state = 1: no possibilities but no contradiction
         state = 2: solution-approach has a contradiction with point i
     """
-
     res = []
 
     # if i is already part of the solution return it
@@ -215,10 +215,10 @@ def _addpoint(sol, i, distances, prec):
 
 def _pntcoord(sol, i, n, m, distances, prec):
     """
-    generate coordinates for point i in constellation to points m and n
-    check if these coordinates are valid with all other points in the solution
-    """
+    Generate coordinates for point i in constellation to points m and n.
 
+    Check if these coordinates are valid with all other points in the solution.
+    """
     tmppnt = []
 
     state = 1
@@ -271,10 +271,10 @@ def _pntcoord(sol, i, n, m, distances, prec):
 
 def _solequal(sol1, sol2, prec):
     """
-    compare two different solutions with a given precicion and return True
-    if they equal
-    """
+    Compare two different solutions with a given precicion.
 
+    Return True if they equal.
+    """
     res = True
 
     for sol_1, sol_2 in zip(sol1, sol2):
@@ -290,10 +290,10 @@ def _solequal(sol1, sol2, prec):
 
 def _distvalid(dis, err=0.0, verbose=True):
     """
-    check if the given distances between the points are valid, i.e. if they
-    fullfill the triangle-equation
-    """
+    Check if the given distances between the points are valid.
 
+    I.e. if they fullfill the triangle-equation.
+    """
     valid = True
     valid &= np.all(dis == dis.T)
     valid &= np.all(dis.diagonal() == 0.0)
@@ -320,23 +320,23 @@ def _distvalid(dis, err=0.0, verbose=True):
 
 def _xvalue(a, b, c):
     """
-    defines the x-value for the upper point of a triangle,
+    Defines the x-value for the upper point of a triangle.
+
     where c is the length of the down side starting in the origin and
     lying on the x-axes, a is the distance of the unknown point to the origen
     and b is the distance of the unknown point to the righter given point
     """
-
     return (a ** 2 + c ** 2 - b ** 2) / (2 * c)
 
 
 def _yvalue(b, a, c):
     """
-    defines the two possible y-values for the upper point of a triangle,
+    Defines the two possible y-values for the upper point of a triangle.
+
     where c is the length of the down side starting in the origin and
     lying on the x-axes, a is the distance of the unknown point to the origen
     and b is the distance of the unknown point to the righter given point
     """
-
     # ckeck flatness to eliminate numerical errors when the triangle is flat
     if a + b <= c or a + c <= b or b + c <= a:
         return 0.0, -0.0
@@ -352,10 +352,10 @@ def _yvalue(b, a, c):
 
 def _rotate(res):
     """
-    rotate all solutions in res so that p0 is at the origin and p1 is on
-    the positive x-axes
-    """
+    Rotate all solutions in res.
 
+    So that p0 is at the origin and p1 is on the positive x-axes.
+    """
     rotres = dcopy(res)
 
     for rot_i, rot_e in enumerate(rotres):
@@ -368,8 +368,10 @@ def _rotate(res):
 
 def _tranmat(a, b):
     """
-    defines the coefficents for the affine-linear function f(x)=Ax+s which
-    fullfills that A is a rotation-matrix, f(a) = [0,0] and f(b) = [|b-a|,0]
+    Defines the coefficents for the affine-linear function f(x)=Ax+s.
+
+    Which fullfills that A is a rotation-matrix,
+    f(a) = [0,0] and f(b) = [|b-a|,0].
     """
     A = np.zeros((2, 2))
     A[0, 0] = b[0] - a[0]
@@ -383,8 +385,9 @@ def _tranmat(a, b):
 
 def _invtranmat(A, s):
     """
-    defines the coefficents for the affine-linear function g(x)=Bx+t which
-    is inverse to f(x)=Ax+s
+    Defines the coefficents for the affine-linear function g(x)=Bx+t.
+
+    which is inverse to f(x)=Ax+s
     """
     B = np.linalg.inv(A)
     t = -np.dot(B, s)
@@ -392,14 +395,9 @@ def _invtranmat(A, s):
 
 
 def _affinef(A, s):
-    """
-    gives an affine-linear function f(x) = Ax+s
-    """
-
+    """Gives an affine-linear function f(x) = Ax+s."""
     def func(x):
-        """
-        affine-linear function func(x) = Ax+s
-        """
+        """Affine-linear function func(x) = Ax+s."""
         return np.dot(A, x) + s
 
     return func
@@ -407,7 +405,8 @@ def _affinef(A, s):
 
 def _affinef_pnt(a1, a2, b1, b2, prec=0.01):
     """
-    gives an affine-linear function that maps f(ai) = bi
+    Gives an affine-linear function that maps f(ai) = bi.
+
     if |a2-a1| == |b2-b1| with respect to the given precision
     """
     if not abs(_dist(a1, a2) - _dist(b1, b2)) < prec:
@@ -417,35 +416,24 @@ def _affinef_pnt(a1, a2, b1, b2, prec=0.01):
     func_b = _affinef(*_invtranmat(*_tranmat(b1, b2)))
 
     def func(x):
-        """
-        affine-linear function func(ai) = bi
-        """
+        """Affine-linear function func(ai) = bi."""
         return func_b(func_a(x))
 
     return func
 
 
 def _dist(v, w):
-    """
-    gives the distance between two given point vectors v and w
-    """
-
+    """Gives the distance between two given point vectors v and w."""
     return np.linalg.norm(np.array(v) - np.array(w))
 
 
 def _sym(A):
-    """
-    gives the symmetrized version of a lower or upper triangle-matrix A
-    """
-
+    """Gives the symmetrized version of a lower or upper triangle-matrix A."""
     return A + A.T - np.diag(A.diagonal())
 
 
 def _plotres(res, names=None, filename=None):
-    """
-    plots all solutions in res and labels the points with the names in names
-    """
-
+    """Plots all solutions in res and labels the points with names."""
     # calculate Column- and Row-count for quadratic shape of the plot
     # total number of plots
     Tot = len(res)

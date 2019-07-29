@@ -12,6 +12,7 @@ The following classes and functions are provided
    fadeline
    plotres
    WellPlot
+   plotfit_transient
    plotfitting3D
    plotfitting3Dtheis
    plotparainteract
@@ -19,6 +20,8 @@ The following classes and functions are provided
    plotsensitivity
 """
 from __future__ import absolute_import, division, print_function
+
+import functools as ft
 
 import numpy as np
 import anaflow as ana
@@ -37,7 +40,7 @@ plt.style.use("ggplot")
 
 
 class Editor(object):
-    """A 2D line editor
+    """A 2D line editor.
 
     Mouse-bindings
     --------------
@@ -79,14 +82,13 @@ class Editor(object):
         *observ
             list of observations of type :class:`welltestpy.data.Observation`
         """
-
         self.fig, self.ax = plt.subplots()
         self.ax.set_xlabel(observ[0].labels[0])
         self.ax.set_ylabel(observ[0].labels[1])
-        #        plt.subplots_adjust(bottom=0.2)
-        #        self.axbox = plt.axes([0.1, 0.05, 0.8, 0.075])
-        #        self.text_box = TextBox(self.axbox, 'save-path', initial="observ")
-        #        self.text_box.on_submit(self.submit)
+        # plt.subplots_adjust(bottom=0.2)
+        # self.axbox = plt.axes([0.1, 0.05, 0.8, 0.075])
+        # self.text_box = TextBox(self.axbox, 'save-path', initial="observ")
+        # self.text_box.on_submit(self.submit)
         # self.linesave = []
 
         self.linesave = observ
@@ -145,7 +147,7 @@ class Editor(object):
         plt.show()
 
     def submit(self, text):
-        """submit action for the text-box"""
+        """Submit action for the text-box."""
         if self._indl is not None:
             self.save_xy()
             self.linesave[self._indl].save(name=text)
@@ -154,21 +156,21 @@ class Editor(object):
             print("no observation selected")
 
     def save_xy(self):
-        """save the actual data"""
+        """Save the actual data."""
         print("saving...")
         for i, obs in enumerate(self.linesave):
             obs.time = self.lines[i]._x
             obs.observation = self.lines[i]._y
 
     def draw_callback(self, event):
-        """draw everything"""
+        """Draw everything."""
         self.background = self.canvas.copy_from_bbox(self.ax.bbox)
         for line in self.lines:
             self.ax.draw_artist(line)
         self.ax.draw_artist(self.selector)
 
     def key_press_callback(self, event):
-        """whenever a key is pressed"""
+        """Whenever a key is pressed."""
         # save all
         if event.key == "s":
             self.save_xy()
@@ -292,8 +294,11 @@ class Editor(object):
                 self.canvas.draw()
 
     def get_ind_under_point(self, event):
-        """get the index of the vertex under
-        point if within epsilon tolerance"""
+        """
+        Get the index of the vertex.
+
+        under point if within epsilon tolerance
+        """
         xy = []
         xyt = []
         xt = []
@@ -324,7 +329,7 @@ class Editor(object):
         return indl, indv
 
     def button_press_callback(self, event):
-        """whenever a mouse button is pressed"""
+        """Whenever a mouse button is pressed."""
         if event.inaxes is None:
             return
         if event.button != 1 and event.button != 3:
@@ -348,11 +353,11 @@ class Editor(object):
                 self.canvas.draw()
 
     def button_release_callback(self, event):
-        """whenever a mouse button is released"""
+        """Whenever a mouse button is released."""
         return
 
     def motion_notify_callback(self, event):
-        """on mouse movement"""
+        """On mouse movement."""
         if self._indv is None:
             return
         if event.inaxes is None:
@@ -395,7 +400,7 @@ class Editor(object):
 
 
 def CampaignPlot(campaign, select_test=None, **kwargs):
-    """plotting an overview of the tests within the campaign"""
+    """Plotting an overview of the tests within the campaign."""
     if select_test is None:
         tests = list(campaign.tests.keys())
     else:
@@ -422,7 +427,7 @@ def CampaignPlot(campaign, select_test=None, **kwargs):
 
 
 def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
-    """Fading line for matplotlib
+    """Fading line for matplotlib.
 
     This is a workaround to produce a fading line.
 
@@ -464,10 +469,7 @@ def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
 
 
 def plotres(res, names=None, title="", filename=None):
-    """
-    plots all solutions in res and label the points with the names in names
-    """
-
+    """Plots all solutions in res and label the points with the names."""
     # calculate Column- and Row-count for quadratic shape of the plot
     # total number of plots
     Tot = len(res)
@@ -531,7 +533,7 @@ def plotres(res, names=None, title="", filename=None):
 
 
 def WellPlot(campaign, plot_tests=True):
-    """Plotting of the wellconstellation within the campaign"""
+    """Plotting of the wellconstellation within the campaign."""
     res0 = []
     names = []
 
@@ -581,10 +583,79 @@ def WellPlot(campaign, plot_tests=True):
 # Estimation plotting
 
 
+def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
+    """Plot of transient estimation fitting."""
+    val_fix = setup.val_fix
+    for kwarg in ["time", "rad"]:
+        val_fix.pop(extra[kwarg], None)
+
+    para_kw = setup.get_sim_kwargs(para)
+    val_fix.update(para_kw)
+
+    plot_f = ft.partial(setup.func, **val_fix)
+
+    radarr = np.linspace(rad.min(), rad.max(), 100)
+    timarr = np.linspace(time.min(), time.max(), 100)
+
+    plt.style.use("default")
+
+    t_gen = np.ones_like(radarr)
+    r_gen = np.ones_like(time)
+    r_gen1 = np.ones_like(timarr)
+    xydir = np.zeros_like(time)
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.gca(projection=Axes3D.name)
+
+    for ri, re in enumerate(rad):
+        r1 = re * r_gen
+        r11 = re * r_gen1
+
+        h = plot_f(**{extra["time"]: time, extra["rad"]: re}).reshape(-1)
+        h1 = data[:, ri]
+        h2 = plot_f(**{extra["time"]: timarr, extra["rad"]: re}).reshape(-1)
+
+        zord = 1000 * (len(rad) - ri)
+
+        ax.plot(
+            r11,
+            timarr,
+            h2,
+            label=radnames[ri] + " r={:04.2f}".format(re),
+            zorder=zord,
+        )
+        ax.quiver(
+            r1,
+            time,
+            h,
+            xydir,
+            xydir,
+            h1 - h,
+            alpha=0.5,
+            arrow_length_ratio=0.0,
+            color="C" + str(ri % 10),
+            zorder=zord,
+        )
+        ax.scatter(r1, time, h1, depthshade=False, zorder=zord)
+
+    for te in time:
+        t11 = te * t_gen
+        h = plot_f(**{extra["time"]: te, extra["rad"]: radarr}).reshape(-1)
+        ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
+
+    ax.view_init(elev=45, azim=155)
+    ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
+    ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
+    ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
+    ax.legend(loc="lower left", fontsize='x-small')
+    plt.tight_layout()
+    plt.savefig(plotname, format="pdf")
+
+
 def plotfitting3D(
     data, para, rad, time, radnames, prate, plotname, rwell=0.0, rinf=np.inf
 ):
-    """plot of estimation fitting"""
+    """Plot of estimation fitting."""
     radarr = np.linspace(rad.min(), rad.max(), 100)
     timarr = np.linspace(time.min(), time.max(), 100)
 
@@ -668,13 +739,13 @@ def plotfitting3D(
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
     ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
     ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    #    ax.legend(loc="lower left", fontsize='x-small')
+    ax.legend(loc="lower left", fontsize='x-small')
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
 
 
 def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
-    """plot of estimation fitting with theis"""
+    """Plot of estimation fitting with theis."""
     radarr = np.linspace(rad.min(), rad.max(), 100)
     timarr = np.linspace(time.min(), time.max(), 100)
 
@@ -740,7 +811,7 @@ def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
 
 
 def plotparainteract(result, paranames, plotname):
-    """plot of parameter interaction"""
+    """Plot of parameter interaction."""
     import pandas as pd
 
     fields = [word for word in result.dtype.names if word.startswith("par")]
@@ -760,7 +831,7 @@ def plotparatrace(
     stdvalues=None,
     filename="test.pdf",
 ):
-    """plot of parameter trace"""
+    """Plot of parameter trace."""
     rep = len(result)
     rows = len(parameternames)
     fig = plt.figure(figsize=(15, 3 * rows))
@@ -769,12 +840,16 @@ def plotparatrace(
         ax = plt.subplot(rows, 1, 1 + j)
         data = result["par" + parameternames[j]]
 
-        ax.plot(data, "-")
+        ax.plot(data, "-", color="C0")
 
-        if stdvalues is None:
-            ax.plot([1] * rep, "--")
-        else:
-            ax.plot([stdvalues[j]] * rep, "--")
+        if stdvalues is not None:
+            ax.plot(
+                [stdvalues[j]] * rep,
+                "--",
+                label="best value: {:04.2f}".format(stdvalues[j]),
+                color="C1",
+            )
+            ax.legend()
 
         if xticks is None:
             xticks = np.linspace(0, 1, 11) * len(data)
@@ -792,7 +867,7 @@ def plotparatrace(
 
 
 def plotsensitivity(paralabels, sensitivities, plotname):
-    """plot of sensitivity results"""
+    """Plot of sensitivity results."""
     __, ax = plt.subplots()
     ax.bar(
         range(len(paralabels)),
