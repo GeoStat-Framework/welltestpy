@@ -396,6 +396,7 @@ def _invtranmat(A, s):
 
 def _affinef(A, s):
     """Gives an affine-linear function f(x) = Ax+s."""
+
     def func(x):
         """Affine-linear function func(x) = Ax+s."""
         return np.dot(A, x) + s

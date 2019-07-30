@@ -102,7 +102,7 @@ class TypeCurve(object):
         assert self.val_ranges, "No ranges given"
         self.val_fix = {} if val_fix is None else val_fix
         # if values haven given ranges but should be fixed, remove ranges
-        for inter in (set(self.val_ranges) & set(self.val_fix)):
+        for inter in set(self.val_ranges) & set(self.val_fix):
             del self.val_ranges[inter]
 
         self.fit_type = {} if fit_type is None else fit_type

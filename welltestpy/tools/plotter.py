@@ -647,7 +647,7 @@ def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
     ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
     ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left", fontsize='x-small')
+    ax.legend(loc="lower left", fontsize="x-small")
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
 
@@ -739,7 +739,7 @@ def plotfitting3D(
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
     ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
     ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left", fontsize='x-small')
+    ax.legend(loc="lower left", fontsize="x-small")
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
 

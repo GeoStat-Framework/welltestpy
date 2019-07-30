@@ -312,11 +312,7 @@ class TransientPumping(object):
             Keyword name for the time in the used type curve.
             Default: "time"
         """
-        self.extra_kw_names = {
-            "Qw": prate_kw,
-            "rad": rad_kw,
-            "time": time_kw,
-        }
+        self.extra_kw_names = {"Qw": prate_kw, "rad": rad_kw, "time": time_kw}
         self.setup_kw["val_fix"].setdefault(prate_kw, self.prate)
         self.setup_kw["val_fix"].setdefault(rad_kw, self.rad)
         self.setup_kw["val_fix"].setdefault(time_kw, self.time)
@@ -420,6 +416,7 @@ class TransientPumping(object):
         if parallel == "mpi":
             # send the dbname of rank0
             from mpi4py import MPI
+
             comm = MPI.COMM_WORLD
             rank = comm.Get_rank()
             size = comm.Get_size()
@@ -563,6 +560,7 @@ class TransientPumping(object):
         if parallel == "mpi":
             # send the dbname of rank0
             from mpi4py import MPI
+
             comm = MPI.COMM_WORLD
             rank = comm.Get_rank()
             size = comm.Get_size()
@@ -685,6 +683,7 @@ class ExtTheis3D(TransientPumping):
             testinclude=testinclude,
             generate=generate,
         )
+
 
 # ext_theis_2D
 
@@ -809,19 +808,13 @@ class Theis(TransientPumping):
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {
-            "mu": (-16, -2),
-            "lnS": (-13, -1),
-        }
+        def_ranges = {"mu": (-16, -2), "lnS": (-13, -1)}
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
         fit_type = {"mu": "log", "lnS": "log"}
         val_kw_names = {"mu": "T", "lnS": "S"}
-        val_plot_names = {
-            "mu": r"$\mu$",
-            "lnS": r"$\ln(S)$",
-        }
+        val_plot_names = {"mu": r"$\mu$", "lnS": r"$\ln(S)$"}
         super(Theis, self).__init__(
             name=name,
             campaign=campaign,
