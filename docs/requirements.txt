@@ -1,8 +1,8 @@
 #required for readthedocs.org
-numpy>=1.13.0
-scipy>=0.19.1
-pandas>=0.20.3
+numpy>=1.14.5
+scipy>=1.1.0
+pandas>=0.23.0
 matplotlib>=2.0.2
+spotpy>=1.5.0
 anaflow
-spotpy
 numpydoc
