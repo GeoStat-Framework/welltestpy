@@ -92,9 +92,9 @@ class TransientPumping(object):
     val_plot_names : :class:`dict` or :any:`None`
         Dictionary containing keyword names in the type-curve for each value.
 
-            {value-name: kwargs-name in type_curve}
+            {value-name: string for plot legend}
 
-        This is usefull if fitting is not done by linear values.
+        This is usefull to get better plots.
         By default, parameter names will be value names.
         Default: None
     testinclude : :class:`dict`, optional
@@ -240,11 +240,7 @@ class TransientPumping(object):
                     tmax = min(tmax, temptime.max())
                     tmin = tmax if tmin > tmax else tmin
 
-            if typ == "exp":
-                time = np.expm1(
-                    np.linspace(np.log1p(tmin), np.log1p(tmax), steps)
-                )
-            elif typ == "geom":
+            if typ in ["geom", "exp", "exponential"]:
                 time = np.geomspace(tmin, tmax, steps)
             elif typ == "quad":
                 time = np.power(
