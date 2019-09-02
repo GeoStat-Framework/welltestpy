@@ -10,6 +10,7 @@ The following classes are provided
    TransientPumping
    ExtTheis3D
    ExtTheis2D
+   Neuman2004
    Theis
 """
 from __future__ import absolute_import, division, print_function
@@ -31,7 +32,13 @@ from welltestpy.tools.plotter import (
     plotsensitivity,
 )
 
-__all__ = ["TransientPumping", "ExtTheis3D", "ExtTheis2D", "Theis"]
+__all__ = [
+    "TransientPumping",
+    "ExtTheis3D",
+    "ExtTheis2D",
+    "Neuman2004",
+    "Theis",
+]
 
 
 def fast_rep(para_no, infer_fac=4, freq_step=2):
@@ -297,7 +304,9 @@ class TransientPumping(object):
         self.data = data[:, idx]
         self.radnames = radnames[idx]
 
-    def gen_setup(self, prate_kw="rate", rad_kw="rad", time_kw="time"):
+    def gen_setup(
+        self, prate_kw="rate", rad_kw="rad", time_kw="time", dummy=False
+    ):
         """Generate the Spotpy Setup.
 
         Parameters
@@ -311,12 +320,17 @@ class TransientPumping(object):
         prate_kw : :class:`str`, optional
             Keyword name for the time in the used type curve.
             Default: "time"
+        dummy : :class:`bool`, optional
+            Add a dummy parameter to the model. This could be used to equalize
+            sensitivity analysis.
+            Default: False
         """
         self.extra_kw_names = {"Qw": prate_kw, "rad": rad_kw, "time": time_kw}
         self.setup_kw["val_fix"].setdefault(prate_kw, self.prate)
         self.setup_kw["val_fix"].setdefault(rad_kw, self.rad)
         self.setup_kw["val_fix"].setdefault(time_kw, self.time)
         self.setup_kw.setdefault("data", self.data)
+        self.setup_kw["dummy"] = dummy
         self.setup = TypeCurve(**self.setup_kw)
 
     def run(
@@ -379,6 +393,11 @@ class TransientPumping(object):
             ``"_estimate"``.
             Default: ``None``
         """
+        if self.setup.dummy:
+            raise ValueError(
+                "Estimate: for parameter estimation"
+                + " you can't use a dummy paramter."
+            )
         act_time = timemodule.strftime("%Y-%m-%d_%H-%M-%S")
 
         # generate the filenames
@@ -559,6 +578,10 @@ class TransientPumping(object):
         # generate the parameter-names for plotting
         paranames = self.setup.para_names
         paralabels = [self.setup.val_plot_names[name] for name in paranames]
+
+        if self.setup.dummy:
+            paranames.append("dummy")
+            paralabels.append("dummy")
 
         if parallel == "mpi":
             # send the dbname of rank0

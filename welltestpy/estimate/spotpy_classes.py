@@ -84,6 +84,10 @@ class TypeCurve(object):
             {value-name: plotting-string}
 
         Default: None
+    dummy : :class:`bool`, optional
+        Add a dummy parameter to the model. This could be used to equalize
+        sensitivity analysis.
+        Default: False
     """
 
     def __init__(
@@ -95,6 +99,7 @@ class TypeCurve(object):
         fit_type=None,
         val_kw_names=None,
         val_plot_names=None,
+        dummy=False,
     ):
         self.func = type_curve
         assert callable(self.func), "type_curve not callable"
@@ -129,10 +134,15 @@ class TypeCurve(object):
             self.val_kw_names.setdefault(val, val)
             self.val_plot_names.setdefault(val, val)
 
+        self.dummy = dummy
+        if self.dummy:
+            self.para_dist.append(spotpy.parameter.Uniform("dummy", 0, 1))
+
         self.sim = ft.partial(self.func, **self.val_fix_kw)
 
     def get_sim_kwargs(self, vector):
         """Generate keyword-args for simulation."""
+        # if there is a dummy parameter it will be skipped automatically
         for i, para in enumerate(self.para_names):
             self.sim_kwargs[self.val_kw_names[para]] = self.fit_func[para](
                 vector[i]
