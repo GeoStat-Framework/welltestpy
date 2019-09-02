@@ -833,7 +833,7 @@ class Well(object):
             )
         if not self._radius.scalar:
             raise ValueError("Well: 'radius' needs to be scalar")
-        if self.radius <= 0.0:
+        if self.radius < 0.0:
             raise ValueError("Well: 'radius' needs to be positiv")
 
         if isinstance(coordinates, Variable):

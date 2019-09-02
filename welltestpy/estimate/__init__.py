@@ -13,15 +13,16 @@ The following subpackages are provided
     estimatelib
     spotpy_classes
 
-Included classes
-^^^^^^^^^^^^^^^^
+Estimation classes
+^^^^^^^^^^^^^^^^^^
 
-The following classes are provided
+The following estimation classes are provided
 
 .. autosummary::
     TransientPumping
     ExtTheis3D
     ExtTheis2D
+    Neuman2004
     Theis
     TypeCurve
 """
@@ -33,6 +34,7 @@ from welltestpy.estimate.estimatelib import (
     TransientPumping,
     ExtTheis3D,
     ExtTheis2D,
+    Neuman2004,
     Theis,
 )
 from welltestpy.estimate.spotpy_classes import TypeCurve
@@ -41,6 +43,7 @@ __all__ = [
     "TransientPumping",
     "ExtTheis3D",
     "ExtTheis2D",
+    "Neuman2004",
     "Theis",
     "TypeCurve",
     "estimatelib",

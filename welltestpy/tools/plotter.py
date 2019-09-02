@@ -468,7 +468,7 @@ def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
         )
 
 
-def plotres(res, names=None, title="", filename=None):
+def plotres(res, names=None, title="", filename=None, plot_well_names=True):
     """Plots all solutions in res and label the points with the names."""
     # calculate Column- and Row-count for quadratic shape of the plot
     # total number of plots
@@ -504,7 +504,7 @@ def plotres(res, names=None, title="", filename=None):
     xspace = yspace = space
 
     fig = plt.figure(dpi=75, figsize=[9 * Cols, 5 * Rows])
-    fig.suptitle("well locations and pumping tests at " + title, fontsize=18)
+    # fig.suptitle("well locations and pumping tests at " + title, fontsize=18)
 
     for i, result in enumerate(res):
         ax = fig.add_subplot(Rows, Cols, Pos[i])
@@ -514,7 +514,8 @@ def plotres(res, names=None, title="", filename=None):
 
         for j, name in enumerate(names):
             ax.scatter(result[j][0], result[j][1], color="k", zorder=10)
-            ax.annotate("  " + name, (result[j][0], result[j][1]))
+            if plot_well_names:
+                ax.annotate("  " + name, (result[j][0], result[j][1]))
 
         ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
         ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
@@ -532,7 +533,7 @@ def plotres(res, names=None, title="", filename=None):
 ######
 
 
-def WellPlot(campaign, plot_tests=True):
+def WellPlot(campaign, plot_tests=True, plot_well_names=True):
     """Plotting of the wellconstellation within the campaign."""
     res0 = []
     names = []
@@ -547,7 +548,9 @@ def WellPlot(campaign, plot_tests=True):
         names.append(w)
     res = [res0]
 
-    __, ax = plotres(res, names, campaign.name)
+    fig, ax = plotres(
+        res, names, campaign.name, plot_well_names=plot_well_names
+    )
 
     if plot_tests:
         testlist = list(campaign.tests.keys())
@@ -578,6 +581,7 @@ def WellPlot(campaign, plot_tests=True):
     ax.axis("equal")
     ax.legend()
     plt.show()
+    return fig, ax
 
 
 # Estimation plotting

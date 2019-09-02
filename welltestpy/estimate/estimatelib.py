@@ -297,7 +297,7 @@ class TransientPumping(object):
         self.data = data[:, idx]
         self.radnames = radnames[idx]
 
-    def gen_setup(self, prate_kw="Qw", rad_kw="rad", time_kw="time"):
+    def gen_setup(self, prate_kw="rate", rad_kw="rad", time_kw="time"):
         """Generate the Spotpy Setup.
 
         Parameters
@@ -653,28 +653,28 @@ class ExtTheis3D(TransientPumping):
     ):
         def_ranges = {
             "mu": (-16, -2),
-            "sig2": (0, 10),
-            "corr": (1, 50),
+            "var": (0, 10),
+            "len_scale": (1, 50),
             "lnS": (-13, -1),
-            "e": (0, 1),
+            "anis": (0, 1),
         }
         val_ranges = {} if val_ranges is None else val_ranges
-        val_fix = {"L": 1.0} if val_fix is None else val_fix
+        val_fix = {"lat_ext": 1.0} if val_fix is None else val_fix
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
         fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "KG", "lnS": "S"}
+        val_kw_names = {"mu": "cond_gmean", "lnS": "storage"}
         val_plot_names = {
             "mu": r"$\mu$",
-            "sig2": r"$\sigma^2$",
-            "corr": r"$\ell$",
+            "var": r"$\sigma^2$",
+            "len_scale": r"$\ell$",
             "lnS": r"$\ln(S)$",
-            "e": "$e$",
+            "anis": "$e$",
         }
         super(ExtTheis3D, self).__init__(
             name=name,
             campaign=campaign,
-            type_curve=ana.ext_theis3D,
+            type_curve=ana.ext_theis_3d,
             val_ranges=val_ranges,
             val_fix=val_fix,
             fit_type=fit_type,
@@ -734,25 +734,103 @@ class ExtTheis2D(TransientPumping):
     ):
         def_ranges = {
             "mu": (-16, -2),
-            "sig2": (0, 10),
-            "corr": (1, 50),
+            "var": (0, 10),
+            "len_scale": (1, 50),
             "lnS": (-13, -1),
         }
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
         fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "TG", "lnS": "S"}
+        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
         val_plot_names = {
             "mu": r"$\mu$",
-            "sig2": r"$\sigma^2$",
-            "corr": r"$\ell$",
+            "var": r"$\sigma^2$",
+            "len_scale": r"$\ell$",
             "lnS": r"$\ln(S)$",
         }
         super(ExtTheis2D, self).__init__(
             name=name,
             campaign=campaign,
-            type_curve=ana.ext_theis2D,
+            type_curve=ana.ext_theis_2d,
+            val_ranges=val_ranges,
+            val_fix=val_fix,
+            fit_type=fit_type,
+            val_kw_names=val_kw_names,
+            val_plot_names=val_plot_names,
+            testinclude=testinclude,
+            generate=generate,
+        )
+
+
+# neuman 2004
+
+
+class Neuman2004(TransientPumping):
+    """Class for an estimation of stochastic subsurface parameters.
+
+    With this class you can run an estimation of statistical subsurface
+    parameters. It utilizes the apparent Transmissivity from Neuman 2004
+    which assumes a log-normal distributed transmissivity field
+    with an exponential correlation function.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Estimation.
+    campaign : :class:`welltestpy.data.Campaign`
+        The pumping test campaign which should be used to estimate the
+        paramters
+    val_ranges : :class:`dict`
+        Dictionary containing the fit-ranges for each value in the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Ranges should be a tuple containing min and max value.
+    val_fix : :class:`dict` or :any:`None`
+        Dictionary containing fixed values for the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Default: None
+    testinclude : :class:`dict`, optional
+        dictonary of which tests should be included. If ``None`` is given,
+        all available tests are included.
+        Default: ``None``
+    generate : :class:`bool`, optional
+        State if time stepping, processed observation data and estimation
+        setup should be generated with default values.
+        Default: ``False``
+    """
+
+    def __init__(
+        self,
+        name,
+        campaign,
+        val_ranges=None,
+        val_fix=None,
+        testinclude=None,
+        generate=False,
+    ):
+        def_ranges = {
+            "mu": (-16, -2),
+            "var": (0, 10),
+            "len_scale": (1, 50),
+            "lnS": (-13, -1),
+        }
+        val_ranges = {} if val_ranges is None else val_ranges
+        for def_name, def_val in def_ranges.items():
+            val_ranges.setdefault(def_name, def_val)
+        fit_type = {"mu": "log", "lnS": "log"}
+        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
+        val_plot_names = {
+            "mu": r"$\mu$",
+            "var": r"$\sigma^2$",
+            "len_scale": r"$\ell$",
+            "lnS": r"$\ln(S)$",
+        }
+        super(Neuman2004, self).__init__(
+            name=name,
+            campaign=campaign,
+            type_curve=ana.neuman2004,
             val_ranges=val_ranges,
             val_fix=val_fix,
             fit_type=fit_type,
@@ -813,8 +891,8 @@ class Theis(TransientPumping):
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
         fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "T", "lnS": "S"}
-        val_plot_names = {"mu": r"$\mu$", "lnS": r"$\ln(S)$"}
+        val_kw_names = {"mu": "transmissivity", "lnS": "storage"}
+        val_plot_names = {"mu": r"$\ln(T)$", "lnS": r"$\ln(S)$"}
         super(Theis, self).__init__(
             name=name,
             campaign=campaign,

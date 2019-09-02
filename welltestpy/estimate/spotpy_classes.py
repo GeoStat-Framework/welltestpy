@@ -28,7 +28,7 @@ FIT = {
     "log": np.exp,
     "exponential": np.log,
     "exp": np.log,
-    "sqareroot": lambda x: np.power(x, 2),
+    "squareroot": lambda x: np.power(x, 2),
     "sqrt": lambda x: np.power(x, 2),
     "quadratic": lambda x: np.sqrt(x),
     "quad": lambda x: np.sqrt(x),
@@ -98,16 +98,21 @@ class TypeCurve(object):
     ):
         self.func = type_curve
         assert callable(self.func), "type_curve not callable"
-        self.val_ranges = val_ranges
-        assert self.val_ranges, "No ranges given"
-        self.val_fix = {} if val_fix is None else val_fix
-        # if values haven given ranges but should be fixed, remove ranges
-        for inter in set(self.val_ranges) & set(self.val_fix):
-            del self.val_ranges[inter]
-
         self.fit_type = {} if fit_type is None else fit_type
         self.val_kw_names = {} if val_kw_names is None else val_kw_names
         self.val_plot_names = {} if val_plot_names is None else val_plot_names
+        self.val_ranges = val_ranges
+        assert self.val_ranges, "No ranges given"
+        self.val_fix = {} if val_fix is None else val_fix
+        self.val_fix_kw = {}
+        for fix in self.val_fix:
+            name = self.val_kw_names.get(fix, fix)
+            fit_fix = self.fit_type.get(fix, "lin")
+            fit_fix = fit_fix if callable(fit_fix) else FIT[fit_fix]
+            self.val_fix_kw[name] = fit_fix(self.val_fix[fix])
+        # if values haven given ranges but should be fixed, remove ranges
+        for inter in set(self.val_ranges) & set(self.val_fix):
+            del self.val_ranges[inter]
 
         self.para_names = list(val_ranges)
         self.para_dist = []
@@ -124,7 +129,7 @@ class TypeCurve(object):
             self.val_kw_names.setdefault(val, val)
             self.val_plot_names.setdefault(val, val)
 
-        self.sim = ft.partial(self.func, **self.val_fix)
+        self.sim = ft.partial(self.func, **self.val_fix_kw)
 
     def get_sim_kwargs(self, vector):
         """Generate keyword-args for simulation."""

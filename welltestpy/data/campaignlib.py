@@ -494,7 +494,7 @@ class Campaign(object):
         **kwargs
             Keyword-arguments forwarded to :any:`WellPlot`.
         """
-        WellPlot(self, **kwargs)
+        return WellPlot(self, **kwargs)
 
     def save(self, path="", name=None):
         """Save the campaign to file.
