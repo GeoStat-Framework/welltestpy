@@ -156,7 +156,7 @@ class Editor(object):
             print("no observation selected")
 
     def save_xy(self):
-        """Save the actual data."""
+        """Save the current data."""
         print("saving...")
         for i, obs in enumerate(self.linesave):
             obs.time = self.lines[i]._x
@@ -315,7 +315,7 @@ class Editor(object):
             d.append(
                 np.sqrt((xt[-1] - event.x) ** 2 + (yt[-1] - event.y) ** 2)
             )
-            # select the first nearest vertex of the actual line
+            # select the first nearest vertex of the current line
             indseq.append(np.nonzero(np.equal(d[-1], np.amin(d[-1])))[0])
             ind.append(indseq[-1][0])
             if d[-1][ind[-1]] >= self.epsilon:
@@ -369,7 +369,7 @@ class Editor(object):
             self.lines[self._indl]._y[self._indv] = y
             self.selector.set_ydata([y])
 
-            # erase actual picture
+            # erase current picture
             self.canvas.restore_region(self.background)
             # draw the updated line
             for line in self.lines:
@@ -386,7 +386,7 @@ class Editor(object):
             self.selector.set_xdata([x])
             self.selector.set_ydata([y])
 
-            # erase actual picture
+            # erase current picture
             self.canvas.restore_region(self.background)
             # draw the updated line
             for line in self.lines:

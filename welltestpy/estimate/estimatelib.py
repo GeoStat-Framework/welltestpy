@@ -368,28 +368,28 @@ class TransientPumping(object):
             Default: ``None``
         dbname : :class:`str`, optional
             File-name of the database of the spotpy estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_db"``.
             Default: ``None``
         traceplotname : :class:`str`, optional
             File-name of the parameter trace plot of the spotpy estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_paratrace.pdf"``.
             Default: ``None``
         fittingplotname : :class:`str`, optional
             File-name of the fitting plot of the estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_fit.pdf"``.
             Default: ``None``
         interactplotname : :class:`str`, optional
             File-name of the parameter interaction plot
             of the spotpy estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_parainteract.pdf"``.
             Default: ``None``
         estname : :class:`str`, optional
             File-name of the results of the spotpy estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_estimate"``.
             Default: ``None``
         """
@@ -524,23 +524,23 @@ class TransientPumping(object):
             Default: ``None``
         dbname : :class:`str`, optional
             File-name of the database of the spotpy estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_sensitivity_db"``.
             Default: ``None``
         plotname : :class:`str`, optional
             File-name of the result plot of the sensitivity analysis.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_sensitivity.pdf"``.
             Default: ``None``
         traceplotname : :class:`str`, optional
             File-name of the parameter trace plot of the spotpy sensitivity
             analysis.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_senstrace.pdf"``.
             Default: ``None``
         sensname : :class:`str`, optional
             File-name of the results of the FAST estimation.
-            If ``None``, it will be the actual time +
+            If ``None``, it will be the current time +
             ``"_estimate"``.
             Default: ``None``
         """
