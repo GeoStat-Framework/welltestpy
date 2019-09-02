@@ -553,6 +553,9 @@ class TransientPumping(object):
         elif not os.path.isabs(sensname):
             sensname = os.path.join(folder, sensname)
 
+        sens_base, sens_ext = os.path.splitext(sensname)
+        sensname1 = sens_base + "_S1" + sens_ext
+
         # generate the parameter-names for plotting
         paranames = self.setup.para_names
         paralabels = [self.setup.val_plot_names[name] for name in paranames]
@@ -594,6 +597,7 @@ class TransientPumping(object):
                 bounds, np.nan_to_num(data["like1"]), len(paranames), paranames
             )
             np.savetxt(sensname, self.sens["ST"])
+            np.savetxt(sensname1, self.sens["S1"])
             plotsensitivity(paralabels, self.sens, plotname)
             plotparatrace(
                 data,

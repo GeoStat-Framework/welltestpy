@@ -884,3 +884,4 @@ def plotsensitivity(paralabels, sensitivities, plotname):
     plt.xticks(range(len(paralabels)), paralabels)
     plt.title("Sensitivity", fontsize=16)
     plt.savefig(plotname, format="pdf")
+    return ax
