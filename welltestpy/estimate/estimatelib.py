@@ -545,7 +545,7 @@ class TransientPumping(object):
             Default: ``None``
         """
         if rep is None:
-            rep = fast_rep(len(self.setup.para_names))
+            rep = fast_rep(len(self.setup.para_names) + int(self.setup.dummy))
 
         act_time = timemodule.strftime("%Y-%m-%d_%H-%M-%S")
         # generate the filenames
