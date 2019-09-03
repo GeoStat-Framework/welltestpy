@@ -429,7 +429,7 @@ class TransientPumping(object):
             paraname = os.path.join(folder, estname)
 
         # generate the parameter-names for plotting
-        paranames = self.setup.para_names
+        paranames = dcopy(self.setup.para_names)
         paralabels = [self.setup.val_plot_names[name] for name in paranames]
 
         if parallel == "mpi":
@@ -576,7 +576,7 @@ class TransientPumping(object):
         sensname1 = sens_base + "_S1" + sens_ext
 
         # generate the parameter-names for plotting
-        paranames = self.setup.para_names
+        paranames = dcopy(self.setup.para_names)
         paralabels = [self.setup.val_plot_names[name] for name in paranames]
 
         if self.setup.dummy:
