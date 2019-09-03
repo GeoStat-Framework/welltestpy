@@ -881,6 +881,7 @@ def plotsensitivity(paralabels, sensitivities, plotname):
         align="center",
     )
     ax.set_ylabel(r"FAST total-sensitivity")
+    ax.set_ylim([-0.1, 1.1])
     plt.xticks(range(len(paralabels)), paralabels)
     plt.title("Sensitivity", fontsize=16)
     plt.savefig(plotname, format="pdf")
