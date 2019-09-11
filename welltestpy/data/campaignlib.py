@@ -142,7 +142,7 @@ class FieldSite(object):
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator='\n')
             writer.writerow(["Fieldsite"])
             writer.writerow(["name", self.name])
             writer.writerow(["description", self.description])
@@ -532,7 +532,7 @@ class Campaign(object):
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator='\n')
             writer.writerow(["Campaign"])
             writer.writerow(["name", self.name])
             writer.writerow(["description", self.description])
