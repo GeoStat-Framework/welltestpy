@@ -14,7 +14,7 @@ campaign.add_well(name="well_2", radius=0.1, coordinates=(2., 2.))
 campaign.add_well(name="well_3", radius=0.1, coordinates=(-2., -1.))
 
 ### generate artificial drawdown data with the Theis solution
-prate = -1e-4
+rate = -1e-4
 time = np.geomspace(10, 7200, 10)
 transmissivity = 1e-4
 storage = 1e-4
@@ -27,16 +27,16 @@ rad = [
 drawdown = ana.theis(
     rad=rad,
     time=time,
-    T=transmissivity,
-    S=storage,
-    Qw=prate,
+    transmissivity=transmissivity,
+    storage=storage,
+    rate=rate,
 )
 
 ### create a pumping test at well_0
 pumptest = wtp.data.PumpingTest(
     name="well_0",
     pumpingwell="well_0",
-    pumpingrate=prate,
+    pumpingrate=rate,
     description="Artificial pump test with Theis",
 )
 
