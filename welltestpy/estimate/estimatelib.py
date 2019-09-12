@@ -23,6 +23,7 @@ import numpy as np
 import spotpy
 import anaflow as ana
 
+from welltestpy.data.testslib import PumpingTest
 from welltestpy.process.processlib import normpumptest, filterdrawdown
 from welltestpy.estimate.spotpy_classes import TypeCurve
 from welltestpy.tools.plotter import (
@@ -180,6 +181,17 @@ class TransientPumping(object):
             self.testinclude = pumpdict
         else:
             self.testinclude = testinclude
+
+        for test in self.testinclude:
+            if not isinstance(self.campaign.tests[test], PumpingTest):
+                raise ValueError(test + " is not a pumping test.")
+            if (
+                not self.campaign.tests[test].state(
+                    wells=self.testinclude[test]
+                )
+                == "transient"
+            ):
+                raise ValueError(test + ": selection is not transient.")
 
         rwell_list = []
         rinf_list = []
