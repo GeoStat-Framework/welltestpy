@@ -34,6 +34,8 @@ from welltestpy.data.varlib import (
     _formstr,
     _formname,
 )
+import welltestpy as wtp
+
 
 __all__ = ["Test", "PumpingTest", "load_test"]
 
@@ -63,13 +65,14 @@ class Test(object):
         self._testtype = "Test"
 
     def __repr__(self):
+        """Representation."""
         return (
             self.testtype + " '" + self.name + "', Info: " + self.description
         )
 
     @property
     def testtype(self):
-        """:class:`str`: String containing the test type"""
+        """:class:`str`: String containing the test type."""
         return self._testtype
 
 
@@ -176,16 +179,68 @@ class PumpingTest(Test):
         else:
             self.observations = observations
 
+    def make_steady(self, time="latest"):
+        """
+        Convert the pumping test to a steady state test.
+
+        Parameters
+        ----------
+        time : :class:`str` or :class:`float`, optional
+            Selected time point for steady state.
+            If "latest", the latest common time point is used.
+            If None, it takes the last observation per well.
+            If float, it will be interpolated.
+            Default: "latest"
+        """
+        if time == "latest":
+            tout = np.inf
+            for obs in self.observations:
+                if self.observations[obs].state == "transient":
+                    tout = min(tout, np.max(self.observations[obs].time))
+        elif time is None:
+            tout = 0.0
+            for obs in self.observations:
+                if self.observations[obs].state == "transient":
+                    tout = max(tout, np.max(self.observations[obs].time))
+        else:
+            tout = float(time)
+        for obs in self.observations:
+            if self.observations[obs].state == "transient":
+                wtp.process.filterdrawdown(self.observations[obs], tout=tout)
+                del self.observations[obs].time
+
+    def state(self, wells=None):
+        """
+        :class:`str`: either None, steady, transient or mixed.
+
+        Parameters
+        ----------
+        wells : :class:`list`, optional
+            List of wells, to check the observation state at.
+            Default: all
+        """
+        wells = self.wells if wells is None else list(wells)
+        states = set()
+        for obs in wells:
+            if obs not in self.observations:
+                raise ValueError(obs + " is an unknown well.")
+            states.add(self.observations[obs].state)
+        if len(states) == 1:
+            return states.pop()
+        if len(states) > 1:
+            return "mixed"
+        return None
+
     @property
     def wells(self):
-        """:class:`tuple` of :class:`str`: all well names"""
+        """:class:`tuple` of :class:`str`: all well names."""
         tmp = list(self.__observations.keys())
         tmp.append(self.pumpingwell)
         return tuple(set(tmp))
 
     @property
     def pumpingrate(self):
-        """:class:`float`: pumping rate at the pumping well"""
+        """:class:`float`: pumping rate at the pumping well."""
         return self._pumpingrate.value
 
     @pumpingrate.setter
@@ -201,7 +256,7 @@ class PumpingTest(Test):
 
     @property
     def aquiferdepth(self):
-        """:class:`float`: aquifer depth at the field site"""
+        """:class:`float`: aquifer depth at the field site."""
         return self._aquiferdepth.value
 
     @aquiferdepth.setter
@@ -220,7 +275,7 @@ class PumpingTest(Test):
 
     @property
     def aquiferradius(self):
-        """:class:`float`: aquifer radius at the field site"""
+        """:class:`float`: aquifer radius at the field site."""
         return self._aquiferradius.value
 
     @aquiferradius.setter
@@ -241,7 +296,7 @@ class PumpingTest(Test):
 
     @property
     def observations(self):
-        """:class:`dict`: observations made at the field site"""
+        """:class:`dict`: observations made at the field site."""
         return self.__observations
 
     @observations.setter
@@ -384,33 +439,69 @@ class PumpingTest(Test):
         -----
         This will be used by the Campaign class.
         """
-        if exclude is None:
-            exclude = []
-        for k in self.observations:
-            if k in exclude:
-                continue
+        exclude = set() if exclude is None else set(exclude)
+        well_set = set(wells)
+        test_wells = set(self.wells)
+        plot_wells = list((well_set & test_wells) - exclude)
+        plot_wells.sort()  # sort by name
+        state = self.state(wells=plot_wells)
+        steady_guide_x = []
+        steady_guide_y = []
+        if state == "mixed":
+            ax1 = plt_ax
+            ax2 = ax1.twiny()
+        elif state == "transient":
+            ax1 = plt_ax
+            ax2 = None
+        elif state == "steady":
+            ax1 = None
+            ax2 = plt_ax
+        else:
+            return
+        for i, k in enumerate(plot_wells):
             if k != self.pumpingwell:
                 dist = wells[k] - wells[self.pumpingwell]
             else:
                 dist = wells[self.pumpingwell].radius
-            if self.pumpingrate > 0:
-                displace = np.maximum(self.observations[k].value[1], 0.0)
+            if self.observations[k].state == "transient":
+                if self.pumpingrate > 0:
+                    displace = np.maximum(self.observations[k].value[1], 0.0)
+                else:
+                    displace = np.minimum(self.observations[k].value[1], 0.0)
+                ax1.plot(
+                    self.observations[k].value[0],
+                    displace,
+                    linewidth=2,
+                    color="C{}".format(i % 10),
+                    label=(
+                        self.observations[k].name + " r={:1.2f}".format(dist)
+                    ),
+                )
+                ax1.set_xlabel(self.observations[k].labels[0])
+                ax1.set_ylabel(self.observations[k].labels[1])
             else:
-                displace = np.minimum(self.observations[k].value[1], 0.0)
+                steady_guide_x.append(dist)
+                steady_guide_y.append(self.observations[k].value)
+                label = self.observations[k].name + " r={:1.2f}".format(dist)
+                color = "C{}".format(i % 10)
+                ax2.scatter(
+                    dist, self.observations[k].value, color=color, label=label
+                )
+                ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
+                ax2.set_ylabel(self.observations[k].labels)
 
-            plt_ax.plot(
-                self.observations[k].value[0],
-                displace,
-                linewidth=2,
-                label=(self.observations[k].name + " r={:1.2f}".format(dist)),
-            )
-            plt_ax.set_xlabel(self.observations[k].labels[0])
-            plt_ax.set_ylabel(self.observations[k].labels[1])
+        if state != "transient":
+            steady_guide_x = np.array(steady_guide_x, dtype=float)
+            steady_guide_y = np.array(steady_guide_y, dtype=float)
+            arg = np.argsort(steady_guide_x)
+            steady_guide_x = steady_guide_x[arg]
+            steady_guide_y = steady_guide_y[arg]
+            ax2.plot(steady_guide_x, steady_guide_y, color="k", alpha=0.1)
 
         plt_ax.set_title(repr(self))
         plt_ax.legend(loc="center right", fancybox=True, framealpha=0.75)
-
-    #        plt_ax.legend(loc='best', fancybox=True, framealpha=0.75)
+        if state == "mixed":  # add a second legend
+            ax2.legend(loc="center left", fancybox=True, framealpha=0.75)
 
     def save(self, path="", name=None):
         """Save a pumping test to file.
@@ -454,10 +545,10 @@ class PumpingTest(Test):
             writer.writerow(["description", self.description])
             writer.writerow(["timeframe", self.timeframe])
             writer.writerow(["pumpingwell", self.pumpingwell])
-            # define names for the variable-files
-            pumprname = name[:-4] + "_PprVar.var"
-            aquidname = name[:-4] + "_AqdVar.var"
-            aquirname = name[:-4] + "_AqrVar.var"
+            # define names for the variable-files (file extension added autom.)
+            pumprname = name[:-4] + "_PprVar"
+            aquidname = name[:-4] + "_AqdVar"
+            aquirname = name[:-4] + "_AqrVar"
             # save variable-files
             writer.writerow(["pumpingrate", pumprname])
             self._pumpingrate.save(patht, pumprname)
@@ -531,7 +622,11 @@ def _load_pumping_test(tstfile):
             description = next(data)[1]
             timeframe = next(data)[1]
             pumpingwell = next(data)[1]
-            pumpingrate = load_var(TxtIO(zfile.open(next(data)[1])))
+            rate_raw = TxtIO(zfile.open(next(data)[1]))
+            try:
+                pumpingrate = load_var(rate_raw)
+            except Exception:
+                pumpingrate = load_obs(rate_raw)
             aquiferdepth = load_var(TxtIO(zfile.open(next(data)[1])))
             aquiferradius = load_var(TxtIO(zfile.open(next(data)[1])))
             obscnt = np.int(next(data)[1])
