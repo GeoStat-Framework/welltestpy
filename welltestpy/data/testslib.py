@@ -144,9 +144,12 @@ class PumpingTest(Test):
             )
         if isinstance(self._pumpingrate, Variable) and not self.constant_rate:
             raise ValueError("PumpingTest: 'pumpingrate' not scalar")
-        if isinstance(self._pumpingrate, Observation):
-            if self._pumpingrate.state == "steady" and not self.constant_rate:
-                raise ValueError("PumpingTest: 'pumpingrate' not scalar")
+        if (
+            isinstance(self._pumpingrate, Observation)
+            and self._pumpingrate.state == "steady"
+            and not self.constant_rate
+        ):
+            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
 
         if isinstance(aquiferdepth, Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
@@ -214,16 +217,23 @@ class PumpingTest(Test):
             if self.observations[obs].state == "transient":
                 wtp.process.filterdrawdown(self.observations[obs], tout=tout)
                 del self.observations[obs].time
+        if (
+            isinstance(self._pumpingrate, Observation)
+            and self._pumpingrate.state == "transient"
+        ):
+            wtp.process.filterdrawdown(self._pumpingrate, tout=tout)
+            del self._pumpingrate.time
 
     def state(self, wells=None):
         """
-        :class:`str`: either None, steady, transient or mixed.
+        Get the state of observation.
+
+        Either None, "steady", "transient" or "mixed".
 
         Parameters
         ----------
         wells : :class:`list`, optional
-            List of wells, to check the observation state at.
-            Default: all
+            List of wells, to check the observation state at. Default: all
         """
         wells = self.wells if wells is None else list(wells)
         states = set()
