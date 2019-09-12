@@ -7,7 +7,6 @@ welltestpy subpackage providing plotting routines.
 The following classes and functions are provided
 
 .. autosummary::
-   Editor
    CampaignPlot
    fadeline
    plotres

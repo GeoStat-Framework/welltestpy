@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from welltestpy.tools.trilib import triangulate, sym
-from welltestpy.tools.plotter import plotres
+from welltestpy.tools import triangulate, sym, plotres
 
 dist_mat = np.zeros((4, 4), dtype=float)
 dist_mat[0, 1] = 3  # distance between well 0 and 1

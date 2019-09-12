@@ -20,6 +20,7 @@ The following classes and functions are provided
 
 .. autosummary::
    triangulate
+   sym
    CampaignPlot
    fadeline
    plotres
@@ -34,7 +35,7 @@ from __future__ import absolute_import
 
 from welltestpy.tools import plotter, trilib
 
-from welltestpy.tools.trilib import triangulate
+from welltestpy.tools.trilib import triangulate, sym
 
 from welltestpy.tools.plotter import (
     CampaignPlot,
@@ -50,6 +51,7 @@ from welltestpy.tools.plotter import (
 
 __all__ = [
     "triangulate",
+    "sym",
     "CampaignPlot",
     "fadeline",
     "plotres",
