@@ -155,6 +155,8 @@ def plotres(res, names=None, title="", filename=None, plot_well_names=True):
         ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
         ax.set_xlabel("x distance in $[m]$")  # , fontsize=16)
         ax.set_ylabel("y distance in $[m]$")  # , fontsize=16)
+        if Tot > 1:
+            ax.set_title("Result {}".format(i))
 
     # fig.tight_layout(rect=[0, 0, 1, 0.95])
 

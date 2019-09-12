@@ -8,6 +8,7 @@ The following functions are provided
 
 .. autosummary::
    triangulate
+   sym
 """
 # pylint: disable=C0103
 from __future__ import absolute_import, division, print_function
@@ -20,7 +21,7 @@ import matplotlib.pyplot as plt
 # use the ggplot style like R
 plt.style.use("ggplot")
 
-__all__ = ["triangulate"]
+__all__ = ["triangulate", "sym"]
 
 
 def triangulate(distances, prec, all_pos=False):
@@ -428,61 +429,6 @@ def _dist(v, w):
     return np.linalg.norm(np.array(v) - np.array(w))
 
 
-def _sym(A):
+def sym(A):
     """Gives the symmetrized version of a lower or upper triangle-matrix A."""
     return A + A.T - np.diag(A.diagonal())
-
-
-def _plotres(res, names=None, filename=None):
-    """Plots all solutions in res and labels the points with names."""
-    # calculate Column- and Row-count for quadratic shape of the plot
-    # total number of plots
-    Tot = len(res)
-    # columns near the square-root but tendentially wider than tall
-    Cols = int(np.ceil(np.sqrt(Tot)))
-    # enough rows to catch all plots
-    Rows = int(np.ceil(Tot / Cols))
-    # Possition numbers as array
-    Pos = np.arange(1, Tot + 1)
-
-    # generate names for points if undefined
-    if names is None:
-        names = []
-        for i in range(len(res[0])):
-            names.append("p" + str(i))
-
-    # genearte commen borders for all plots
-    xmax = 0.0
-    xmin = 0.0
-    ymax = 0.0
-    ymin = 0.0
-
-    for i in res:
-        for j in i:
-            xmax = max(j[0], xmax)
-            xmin = min(j[0], xmin)
-            ymax = max(j[1], ymax)
-            ymin = min(j[1], ymin)
-
-    # add some space around the points in the plot
-    space = 0.2 * max(abs(xmax - xmin), abs(ymax - ymin))
-
-    fig = plt.figure(dpi=75, figsize=[3 * Cols, 3 * Rows])
-    fig.suptitle("Possible Well-constellations", fontsize=18)
-
-    for i, result in enumerate(res):
-        ax = fig.add_subplot(Rows, Cols, Pos[i])  # , sharex=True, sharey=True)
-        ax.set_title("Result nr.: {}".format(i))
-        ax.set_xlim([xmin - space, xmax + space])
-        ax.set_ylim([ymin - space, ymax + space])
-        ax.set_aspect("equal")
-        for j, name in enumerate(names):
-            ax.scatter(result[j][0], result[j][1], color="C1")
-            ax.annotate(" " + name, (result[j][0], result[j][1]))
-
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-
-    if filename is not None:
-        plt.savefig(filename, format="pdf")
-
-    plt.show()
