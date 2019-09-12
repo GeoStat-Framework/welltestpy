@@ -24,8 +24,8 @@ The following classes and functions are provided
    fadeline
    plotres
    WellPlot
-   plotfitting3D
-   plotfitting3Dtheis
+   plotfit_transient
+   plotfit_steady
    plotparainteract
    plotparatrace
    plotsensitivity
@@ -41,8 +41,8 @@ from welltestpy.tools.plotter import (
     fadeline,
     plotres,
     WellPlot,
-    plotfitting3D,
-    plotfitting3Dtheis,
+    plotfit_transient,
+    plotfit_steady,
     plotparainteract,
     plotparatrace,
     plotsensitivity,
@@ -54,8 +54,8 @@ __all__ = [
     "fadeline",
     "plotres",
     "WellPlot",
-    "plotfitting3D",
-    "plotfitting3Dtheis",
+    "plotfit_transient",
+    "plotfit_steady",
     "plotparainteract",
     "plotparatrace",
     "plotsensitivity",

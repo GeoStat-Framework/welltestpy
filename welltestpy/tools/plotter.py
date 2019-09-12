@@ -13,8 +13,7 @@ The following classes and functions are provided
    plotres
    WellPlot
    plotfit_transient
-   plotfitting3D
-   plotfitting3Dtheis
+   plotfit_steady
    plotparainteract
    plotparatrace
    plotsensitivity
@@ -24,7 +23,6 @@ from __future__ import absolute_import, division, print_function
 import functools as ft
 
 import numpy as np
-import anaflow as ana
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -225,6 +223,7 @@ def WellPlot(campaign, plot_tests=True, plot_well_names=True):
 
 def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
     """Plot of transient estimation fitting."""
+    plt.style.use("default")
     val_fix = setup.val_fix
     for kwarg in ["time", "rad"]:
         val_fix.pop(extra[kwarg], None)
@@ -236,8 +235,6 @@ def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
 
     radarr = np.linspace(rad.min(), rad.max(), 100)
     timarr = np.linspace(time.min(), time.max(), 100)
-
-    plt.style.use("default")
 
     t_gen = np.ones_like(radarr)
     r_gen = np.ones_like(time)
@@ -290,170 +287,41 @@ def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
     ax.legend(loc="lower left", fontsize="x-small")
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
+    plt.style.use("ggplot")
 
 
-def plotfitting3D(
-    data, para, rad, time, radnames, prate, plotname, rwell=0.0, rinf=np.inf
-):
-    """Plot of estimation fitting."""
-    radarr = np.linspace(rad.min(), rad.max(), 100)
-    timarr = np.linspace(time.min(), time.max(), 100)
-
+def plotfit_steady(setup, data, para, rad, radnames, plotname, extra):
+    """Plot of steady estimation fitting."""
     plt.style.use("default")
+    val_fix = setup.val_fix
+    val_fix.pop(extra["rad"], None)
 
-    t_gen = np.ones_like(radarr)
-    r_gen = np.ones_like(time)
-    r_gen1 = np.ones_like(timarr)
-    xydir = np.zeros_like(time)
+    para_kw = setup.get_sim_kwargs(para)
+    val_fix.update(para_kw)
 
-    fig = plt.figure(figsize=(12, 8))
-    ax = fig.gca(projection=Axes3D.name)
+    plot_f = ft.partial(setup.func, **val_fix)
+    radarr = np.linspace(rad.min(), rad.max(), 100)
+
+    fig = plt.figure(figsize=(9, 6))
+    ax = fig.gca()
 
     for ri, re in enumerate(rad):
-        r1 = re * r_gen
-        r11 = re * r_gen1
+        ax.scatter(re, data[ri], label=radnames[ri])
+    ax.plot(radarr, plot_f(**{extra["rad"]: radarr}), color="k")
 
-        h = ana.ext_theis2D(
-            time=time,
-            rad=re,
-            TG=np.exp(para[0]),
-            sig2=para[1],
-            corr=para[2],
-            S=np.exp(para[3]),
-            Qw=prate,
-            rwell=rwell,
-            rinf=rinf,
-        ).reshape(-1)
-        h1 = data[:, ri]
-        h2 = ana.ext_theis2D(
-            time=timarr,
-            rad=re,
-            TG=np.exp(para[0]),
-            sig2=para[1],
-            corr=para[2],
-            S=np.exp(para[3]),
-            Qw=prate,
-            rwell=rwell,
-            rinf=rinf,
-        ).reshape(-1)
-
-        zord = 1000 * (len(rad) - ri)
-
-        ax.plot(
-            r11,
-            timarr,
-            h2,
-            label=radnames[ri] + " r={:04.2f}".format(re),
-            zorder=zord,
-        )
-        ax.quiver(
-            r1,
-            time,
-            h,
-            xydir,
-            xydir,
-            h1 - h,
-            alpha=0.5,
-            arrow_length_ratio=0.0,
-            color="C" + str(ri % 10),
-            zorder=zord,
-        )
-        ax.scatter(r1, time, h1, depthshade=False, zorder=zord)
-
-    for te in time:
-        t11 = te * t_gen
-        h = ana.ext_theis2D(
-            time=te,
-            rad=radarr,
-            TG=np.exp(para[0]),
-            sig2=para[1],
-            corr=para[2],
-            S=np.exp(para[3]),
-            Qw=prate,
-            rwell=rwell,
-            rinf=rinf,
-        ).reshape(-1)
-        ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
-
-    ax.view_init(elev=45, azim=155)
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
-    ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
-    ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left", fontsize="x-small")
+    ax.set_ylabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
+    ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
-
-
-def plotfitting3Dtheis(data, para, rad, time, radnames, prate, plotname):
-    """Plot of estimation fitting with theis."""
-    radarr = np.linspace(rad.min(), rad.max(), 100)
-    timarr = np.linspace(time.min(), time.max(), 100)
-
-    plt.style.use("default")
-
-    t_gen = np.ones_like(radarr)
-    r_gen = np.ones_like(time)
-    r_gen1 = np.ones_like(timarr)
-    xydir = np.zeros_like(time)
-
-    fig = plt.figure(figsize=(12, 8))
-    ax = fig.gca(projection="3d")
-
-    for ri, re in enumerate(rad):
-        r1 = re * r_gen
-        r11 = re * r_gen1
-
-        h = ana.theis(
-            time=time, rad=re, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
-        ).reshape(-1)
-        h1 = data[:, ri]
-        h2 = ana.theis(
-            time=timarr, rad=re, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
-        ).reshape(-1)
-
-        zord = 1000 * (len(rad) - ri)
-
-        ax.plot(
-            r11,
-            timarr,
-            h2,
-            label=radnames[ri] + " r={:04.2f}".format(re),
-            zorder=zord,
-        )
-        ax.quiver(
-            r1,
-            time,
-            h,
-            xydir,
-            xydir,
-            h1 - h,
-            alpha=0.5,
-            arrow_length_ratio=0.0,
-            color="C" + str(ri % 10),
-            zorder=zord,
-        )
-        ax.scatter(r1, time, h1, depthshade=False, zorder=zord)
-
-    for te in time:
-        t11 = te * t_gen
-        h = ana.theis(
-            time=te, rad=radarr, T=np.exp(para[0]), S=np.exp(para[1]), Qw=prate
-        ).reshape(-1)
-        ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
-
-    ax.view_init(elev=45, azim=155)
-    ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
-    ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
-    ax.set_zlabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left")
-    #    plt.tight_layout()
-    plt.savefig(plotname, format="pdf")
+    plt.style.use("ggplot")
 
 
 def plotparainteract(result, paranames, plotname):
     """Plot of parameter interaction."""
     import pandas as pd
 
+    plt.style.use("default")
     fields = [word for word in result.dtype.names if word.startswith("par")]
     parameterdistribtion = result[fields]
     df = pd.DataFrame(
@@ -461,6 +329,7 @@ def plotparainteract(result, paranames, plotname):
     )
     pd.plotting.scatter_matrix(df, alpha=0.2, figsize=(12, 12), diagonal="kde")
     plt.savefig(plotname, format="pdf")
+    plt.style.use("ggplot")
 
 
 def plotparatrace(
