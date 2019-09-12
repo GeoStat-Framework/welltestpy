@@ -33,7 +33,6 @@ from io import TextIOWrapper as TxtIO
 
 import numpy as np
 
-from welltestpy.tools.plotter import Editor
 
 __all__ = [
     "Variable",
@@ -647,10 +646,10 @@ class Observation(object):
     # for python 2&3 compatibility overwrite "__next__" with "next"
     __next__ = next
 
-    def edit(self):
-        """Edit the observed time-series with a graphical interface."""
-        if self.state == "transient" and len(np.shape(self.time)) == 1:
-            Editor(self)
+    # def edit(self):
+    #     """Edit the observed time-series with a graphical interface."""
+    #     if self.state == "transient" and len(np.shape(self.time)) == 1:
+    #         Editor(self)
 
     def save(self, path="", name=None):
         """Save an observation to file.
