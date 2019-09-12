@@ -25,6 +25,8 @@ The following estimation classes are provided
     Neuman2004
     Theis
     Thiem
+    ExtThiem3D
+    ExtThiem2D
     TypeCurve
 """
 from __future__ import absolute_import
@@ -38,6 +40,8 @@ from welltestpy.estimate.estimatelib import (
     Neuman2004,
     Theis,
     Thiem,
+    ExtThiem3D,
+    ExtThiem2D,
 )
 from welltestpy.estimate.spotpy_classes import TypeCurve
 
@@ -48,6 +52,8 @@ __all__ = [
     "Neuman2004",
     "Theis",
     "Thiem",
+    "ExtThiem3D",
+    "ExtThiem2D",
     "TypeCurve",
     "estimatelib",
     "spotpy_classes",

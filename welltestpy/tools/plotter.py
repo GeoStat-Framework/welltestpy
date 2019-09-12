@@ -292,7 +292,6 @@ def plotfit_transient(setup, data, para, rad, time, radnames, plotname, extra):
 
 def plotfit_steady(setup, data, para, rad, radnames, plotname, extra):
     """Plot of steady estimation fitting."""
-    plt.style.use("default")
     val_fix = setup.val_fix
     val_fix.pop(extra["rad"], None)
 
@@ -307,14 +306,13 @@ def plotfit_steady(setup, data, para, rad, radnames, plotname, extra):
 
     for ri, re in enumerate(rad):
         ax.scatter(re, data[ri], label=radnames[ri])
-    ax.plot(radarr, plot_f(**{extra["rad"]: radarr}), color="k")
+    ax.plot(radarr, plot_f(**{extra["rad"]: radarr}), "--", color="k")
 
     ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
     ax.set_ylabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
     ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
     plt.tight_layout()
     plt.savefig(plotname, format="pdf")
-    plt.style.use("ggplot")
 
 
 def plotparainteract(result, paranames, plotname):
