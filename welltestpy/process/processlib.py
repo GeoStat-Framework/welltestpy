@@ -214,24 +214,28 @@ def filterdrawdown(observation, tout=None, dxscale=2):
         Default: ``2``
     """
     time, head = observation()
-    time = time.reshape(-1)
-    head = head.reshape(-1)
+    time = np.array(time, dtype=float).reshape(-1)
+    head = np.array(head, dtype=float).reshape(-1)
 
     if tout is None:
         tout = dcopy(time)
+    tout = np.array(tout, dtype=float).reshape(-1)
+
+    if len(time) == 1:
+        return observation(time=tout, observation=np.full_like(tout, head[0]))
 
     # make the data equal-spaced to use filter with
     # a fraction of the minimal timestep
     dxv = dxscale * int((time[-1] - time[0]) / max(np.diff(time).min(), 1.0))
-
     tequal = np.linspace(time[0], time[-1], dxv)
     hequal = np.interp(tequal, time, head)
-
     # size = h.max() - h.min()
 
     para1, para2 = signal.butter(1, 0.025)  # size/10.)
-    hfilt = signal.filtfilt(para1, para2, hequal, padlen=150)
+    try:
+        hfilt = signal.filtfilt(para1, para2, hequal, padlen=150)
+        hout = np.interp(tout, tequal, hfilt)
+    except ValueError:  # in this case there are to few data points
+        hout = np.interp(tout, time, head)
 
-    hout = np.interp(tout, tequal, hfilt)
-
-    observation(time=tout, observation=hout)
+    return observation(time=tout, observation=hout)
