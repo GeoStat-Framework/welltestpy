@@ -16,6 +16,7 @@ The following classes and functions are provided
    StdyObs
    DrawdownObs
    StdyHeadObs
+   TimeSeries
    Well
    load_var
    load_obs
@@ -44,6 +45,7 @@ __all__ = [
     "StdyObs",
     "DrawdownObs",
     "StdyHeadObs",
+    "TimeSeries",
     "Well",
     "load_var",
     "load_obs",
@@ -731,6 +733,30 @@ class StdyObs(Observation):
         raise ValueError(
             "Observation: " + "'time' not allowed in steady-state"
         )
+
+
+class TimeSeries(Observation):
+    """
+    Time series obeservation.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Variable.
+    time : :class:`Variable`
+        Time points of observation.
+    values : :class:`Variable`
+        Values of the time-series.
+    description : :class:`str`, optional
+        Description of the Variable. Default: ``"Timeseries"``
+    """
+
+    def __init__(self, name, time, values, description="Timeseries."):
+        if not isinstance(time, Variable):
+            time = TimeVar(time)
+        if not isinstance(values, Variable):
+            values = Variable(name, values, description=description)
+        super(TimeSeries, self).__init__(name, time, values, description)
 
 
 class DrawdownObs(Observation):
