@@ -13,6 +13,9 @@ The following classes are provided
    ExtTheis2D
    Neuman2004
    Theis
+   ExtThiem3D
+   ExtThiem2D
+   Neuman2004Steady
    Thiem
 """
 from __future__ import absolute_import, division, print_function
@@ -43,6 +46,9 @@ __all__ = [
     "ExtTheis2D",
     "Neuman2004",
     "Theis",
+    "ExtThiem3D",
+    "ExtThiem2D",
+    "Neuman2004Steady",
     "Thiem",
 ]
 
@@ -1510,79 +1516,7 @@ class Theis(TransientPumping):
         )
 
 
-# thiem
-
-
-class Thiem(SteadyPumping):
-    """Class for an estimation of homogeneous subsurface parameters.
-
-    With this class you can run an estimation of homogeneous subsurface
-    parameters. It utilizes the thiem solution.
-
-    Parameters
-    ----------
-    name : :class:`str`
-        Name of the Estimation.
-    campaign : :class:`welltestpy.data.Campaign`
-        The pumping test campaign which should be used to estimate the
-        paramters
-    make_steady : :class:`bool`, optional
-        State if the tests should be converted to steady observations.
-        See: :any:`PumpingTest.make_steady`.
-        Default: True
-    val_ranges : :class:`dict`
-        Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
-        or replaced in val_kw_names.
-        Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
-        Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
-        or replaced in val_kw_names.
-        Default: None
-    testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
-        all available tests are included.
-        Default: ``None``
-    generate : :class:`bool`, optional
-        State if time stepping, processed observation data and estimation
-        setup should be generated with default values.
-        Default: ``False``
-    """
-
-    def __init__(
-        self,
-        name,
-        campaign,
-        make_steady=True,
-        val_ranges=None,
-        val_fix=None,
-        testinclude=None,
-        generate=False,
-    ):
-        def_ranges = {"mu": (-16, -2)}
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
-            val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "transmissivity"}
-        val_plot_names = {"mu": r"$\ln(T)$"}
-        super(Thiem, self).__init__(
-            name=name,
-            campaign=campaign,
-            type_curve=ana.thiem,
-            val_ranges=val_ranges,
-            make_steady=make_steady,
-            val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
-            val_plot_names=val_plot_names,
-            testinclude=testinclude,
-            generate=generate,
-        )
-
-
-# thiem
+# ext_thiem_3d
 
 
 class ExtThiem3D(SteadyPumping):
@@ -1736,6 +1670,157 @@ class ExtThiem2D(SteadyPumping):
             make_steady=make_steady,
             type_curve=ana.ext_thiem_2d,
             val_ranges=val_ranges,
+            val_fix=val_fix,
+            fit_type=fit_type,
+            val_kw_names=val_kw_names,
+            val_plot_names=val_plot_names,
+            testinclude=testinclude,
+            generate=generate,
+        )
+
+
+# neuman 2004 steady
+
+
+class Neuman2004Steady(SteadyPumping):
+    """Class for an estimation of stochastic subsurface parameters.
+
+    With this class you can run an estimation of statistical subsurface
+    parameters from steady drawdown.
+    It utilizes the apparent Transmissivity from Neuman 2004
+    which assumes a log-normal distributed transmissivity field
+    with an exponential correlation function.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Estimation.
+    campaign : :class:`welltestpy.data.Campaign`
+        The pumping test campaign which should be used to estimate the
+        paramters
+    make_steady : :class:`bool`, optional
+        State if the tests should be converted to steady observations.
+        See: :any:`PumpingTest.make_steady`.
+        Default: True
+    val_ranges : :class:`dict`
+        Dictionary containing the fit-ranges for each value in the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Ranges should be a tuple containing min and max value.
+    val_fix : :class:`dict` or :any:`None`
+        Dictionary containing fixed values for the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Default: None
+    testinclude : :class:`dict`, optional
+        dictonary of which tests should be included. If ``None`` is given,
+        all available tests are included.
+        Default: ``None``
+    generate : :class:`bool`, optional
+        State if time stepping, processed observation data and estimation
+        setup should be generated with default values.
+        Default: ``False``
+    """
+
+    def __init__(
+        self,
+        name,
+        campaign,
+        make_steady=True,
+        val_ranges=None,
+        val_fix=None,
+        testinclude=None,
+        generate=False,
+    ):
+        def_ranges = {"mu": (-16, -2), "var": (0, 10), "len_scale": (1, 50)}
+        val_ranges = {} if val_ranges is None else val_ranges
+        for def_name, def_val in def_ranges.items():
+            val_ranges.setdefault(def_name, def_val)
+        fit_type = {"mu": "log"}
+        val_kw_names = {"mu": "trans_gmean"}
+        val_plot_names = {
+            "mu": r"$\mu$",
+            "var": r"$\sigma^2$",
+            "len_scale": r"$\ell$",
+        }
+        super(Neuman2004Steady, self).__init__(
+            name=name,
+            campaign=campaign,
+            make_steady=make_steady,
+            type_curve=ana.neuman2004_steady,
+            val_ranges=val_ranges,
+            val_fix=val_fix,
+            fit_type=fit_type,
+            val_kw_names=val_kw_names,
+            val_plot_names=val_plot_names,
+            testinclude=testinclude,
+            generate=generate,
+        )
+
+
+# thiem
+
+
+class Thiem(SteadyPumping):
+    """Class for an estimation of homogeneous subsurface parameters.
+
+    With this class you can run an estimation of homogeneous subsurface
+    parameters. It utilizes the thiem solution.
+
+    Parameters
+    ----------
+    name : :class:`str`
+        Name of the Estimation.
+    campaign : :class:`welltestpy.data.Campaign`
+        The pumping test campaign which should be used to estimate the
+        paramters
+    make_steady : :class:`bool`, optional
+        State if the tests should be converted to steady observations.
+        See: :any:`PumpingTest.make_steady`.
+        Default: True
+    val_ranges : :class:`dict`
+        Dictionary containing the fit-ranges for each value in the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Ranges should be a tuple containing min and max value.
+    val_fix : :class:`dict` or :any:`None`
+        Dictionary containing fixed values for the type-curve.
+        Names should be as in the type-curve signiture
+        or replaced in val_kw_names.
+        Default: None
+    testinclude : :class:`dict`, optional
+        dictonary of which tests should be included. If ``None`` is given,
+        all available tests are included.
+        Default: ``None``
+    generate : :class:`bool`, optional
+        State if time stepping, processed observation data and estimation
+        setup should be generated with default values.
+        Default: ``False``
+    """
+
+    def __init__(
+        self,
+        name,
+        campaign,
+        make_steady=True,
+        val_ranges=None,
+        val_fix=None,
+        testinclude=None,
+        generate=False,
+    ):
+        def_ranges = {"mu": (-16, -2)}
+        val_ranges = {} if val_ranges is None else val_ranges
+        for def_name, def_val in def_ranges.items():
+            val_ranges.setdefault(def_name, def_val)
+        fit_type = {"mu": "log"}
+        val_kw_names = {"mu": "transmissivity"}
+        val_plot_names = {"mu": r"$\ln(T)$"}
+        super(Thiem, self).__init__(
+            name=name,
+            campaign=campaign,
+            type_curve=ana.thiem,
+            val_ranges=val_ranges,
+            make_steady=make_steady,
             val_fix=val_fix,
             fit_type=fit_type,
             val_kw_names=val_kw_names,
