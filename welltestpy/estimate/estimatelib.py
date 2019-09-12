@@ -252,13 +252,17 @@ class TransientPumping(object):
         tmax : :class:`float`, optional
             Maximal time value.
             Default: ``inf``
-        typ : :class:`str`, optional
+        typ : :class:`str` or :class:`float`, optional
             Typ of the time selection. You can select from:
 
-                * ``quad``: Quadratically increasing time steps
-                * ``geom``: Geometrically increasing time steps
-                * ``exp``: Exponentially increasing time steps
-                * ``lin``: Linear time steps
+                * ``"exp"``: for exponential behavior
+                * ``"log"``: for logarithmic behavior
+                * ``"geo"``: for geometric behavior
+                * ``"lin"``: for linear behavior
+                * ``"quad"``: for quadratic behavior
+                * ``"cub"``: for cubic behavior
+                * :class:`float`: here you can specifi any exponent
+                  ("quad" would be equivalent to 2)
 
             Default: "quad"
 
@@ -272,15 +276,7 @@ class TransientPumping(object):
                     tmin = max(tmin, temptime.min())
                     tmax = min(tmax, temptime.max())
                     tmin = tmax if tmin > tmax else tmin
-
-            if typ in ["geom", "exp", "exponential"]:
-                time = np.geomspace(tmin, tmax, steps)
-            elif typ == "quad":
-                time = np.power(
-                    np.linspace(np.sqrt(tmin), np.sqrt(tmax), steps), 2
-                )
-            else:
-                time = np.linspace(tmin, tmax, steps)
+            time = ana.specialrange(tmin, tmax, steps, typ)
 
         for test in self.testinclude:
             for obs in self.testinclude[test]:
