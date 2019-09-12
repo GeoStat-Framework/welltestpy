@@ -550,12 +550,15 @@ class PumpingTest(Test):
             aquidname = name[:-4] + "_AqdVar"
             aquirname = name[:-4] + "_AqrVar"
             # save variable-files
-            writer.writerow(["pumpingrate", pumprname])
-            self._pumpingrate.save(patht, pumprname)
-            writer.writerow(["aquiferdepth", aquidname])
-            self._aquiferdepth.save(patht, aquidname)
-            writer.writerow(["aquiferradius", aquirname])
-            self._aquiferradius.save(patht, aquirname)
+            pumpr_path = self._pumpingrate.save(patht, pumprname)
+            pumpr_base = os.path.basename(pumpr_path)
+            writer.writerow(["pumpingrate", pumpr_base])
+            aquid_path = self._aquiferdepth.save(patht, aquidname)
+            aquid_base = os.path.basename(aquid_path)
+            writer.writerow(["aquiferdepth", aquid_base])
+            aquir_path = self._aquiferradius.save(patht, aquirname)
+            aquir_base = os.path.basename(aquir_path)
+            writer.writerow(["aquiferradius", aquir_base])
             okeys = tuple(self.observations.keys())
             writer.writerow(["Observations", len(okeys)])
             obsname = {}
@@ -567,9 +570,9 @@ class PumpingTest(Test):
         file_path = os.path.join(path, name)
         with zipfile.ZipFile(file_path, "w") as zfile:
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            zfile.write(os.path.join(patht, pumprname), pumprname)
-            zfile.write(os.path.join(patht, aquidname), aquidname)
-            zfile.write(os.path.join(patht, aquirname), aquirname)
+            zfile.write(pumpr_path, pumpr_base)
+            zfile.write(aquir_path, aquir_base)
+            zfile.write(aquid_path, aquid_base)
             for k in okeys:
                 zfile.write(os.path.join(patht, obsname[k]), obsname[k])
         # delete the temporary directory
