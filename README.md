@@ -94,7 +94,7 @@ campaign.plot()
 campaign.save()
 ```
 
-This will give the following plots:
+#### This will give the following plots:
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/01_wells.png" alt="Wells" width="600px"/>
@@ -120,15 +120,21 @@ estimation = wtp.estimate.Theis("Estimate_theis", campaign, generate=True)
 estimation.run()
 ```
 
-This will give the following plots:
+#### This will give the following plots:
+
+Type-Curve fitting:
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_fit.png" alt="Fit" width="600px"/>
 </p>
 
+Evolution of parameter estimation with SCE:
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_paratrace.png" alt="Trace" width="600px"/>
 </p>
+
+Scatterplot of paramter distribution during estimation:
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_parainter.png" alt="Interaction" width="600px"/>
