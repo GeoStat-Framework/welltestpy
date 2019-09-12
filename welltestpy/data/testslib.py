@@ -132,6 +132,8 @@ class PumpingTest(Test):
 
         if isinstance(pumpingrate, Variable):
             self._pumpingrate = dcopy(pumpingrate)
+        elif isinstance(pumpingrate, Observation):
+            self._pumpingrate = dcopy(pumpingrate)
         else:
             self._pumpingrate = Variable(
                 "pumpingrate",
@@ -140,8 +142,11 @@ class PumpingTest(Test):
                 "m^3/s",
                 "Pumpingrate at test '" + self.name + "'",
             )
-        if not self._pumpingrate.scalar:
-            raise ValueError("PumpingTest: 'pumpingrate' needs to be scalar")
+        if isinstance(self._pumpingrate, Variable) and not self.constant_rate:
+            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
+        if isinstance(self._pumpingrate, Observation):
+            if self._pumpingrate.state == "steady" and not self.constant_rate:
+                raise ValueError("PumpingTest: 'pumpingrate' not scalar")
 
         if isinstance(aquiferdepth, Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
@@ -237,7 +242,14 @@ class PumpingTest(Test):
         """:class:`tuple` of :class:`str`: all well names."""
         tmp = list(self.__observations.keys())
         tmp.append(self.pumpingwell)
-        return tuple(set(tmp))
+        wells = list(set(tmp))
+        wells.sort()
+        return wells
+
+    @property
+    def constant_rate(self):
+        """:class:`bool`: state if this is a constant rate test."""
+        return np.isscalar(self.pumpingrate)
 
     @property
     def pumpingrate(self):

@@ -23,7 +23,7 @@ import numpy as np
 import spotpy
 import anaflow as ana
 
-from welltestpy.data.testslib import PumpingTest
+from welltestpy.data import Variable, PumpingTest
 from welltestpy.process.processlib import normpumptest, filterdrawdown
 from welltestpy.estimate.spotpy_classes import TypeCurve
 from welltestpy.tools.plotter import (
@@ -172,19 +172,22 @@ class TransientPumping(object):
         """:class:`dict`: dictonary of which tests should be included"""
 
         if testinclude is None:
-            wells = list(self.campaign.tests.keys())
-            pumpdict = {}
-            for wel in wells:
-                pumpdict[wel] = list(
-                    self.campaign.tests[wel].observations.keys()
-                )
-            self.testinclude = pumpdict
+            tests = list(self.campaign.tests.keys())
+            self.testinclude = {}
+            for test in tests:
+                self.testinclude[test] = self.campaign.tests[test].wells
+        elif not isinstance(testinclude, dict):
+            self.testinclude = {}
+            for test in testinclude:
+                self.testinclude[test] = self.campaign.tests[test].wells
         else:
             self.testinclude = testinclude
 
         for test in self.testinclude:
             if not isinstance(self.campaign.tests[test], PumpingTest):
                 raise ValueError(test + " is not a pumping test.")
+            if not self.campaign.tests[test].constant_rate:
+                raise ValueError(test + " is not a constant rate test.")
             if (
                 not self.campaign.tests[test].state(
                     wells=self.testinclude[test]
