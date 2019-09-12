@@ -522,9 +522,14 @@ class PumpingTest(Test):
             ax2.plot(steady_guide_x, steady_guide_y, color="k", alpha=0.1)
 
         plt_ax.set_title(repr(self))
-        plt_ax.legend(loc="center right", fancybox=True, framealpha=0.75)
+        plt_ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1, 1),
+            fancybox=True,
+            framealpha=0.75,
+        )
         if state == "mixed":  # add a second legend
-            ax2.legend(loc="center left", fancybox=True, framealpha=0.75)
+            ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
 
     def save(self, path="", name=None):
         """Save a pumping test to file.

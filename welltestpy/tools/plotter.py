@@ -156,7 +156,7 @@ def plotres(res, names=None, title="", filename=None, plot_well_names=True):
         ax.set_xlabel("x distance in $[m]$")  # , fontsize=16)
         ax.set_ylabel("y distance in $[m]$")  # , fontsize=16)
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    # fig.tight_layout(rect=[0, 0, 1, 0.95])
 
     if filename is not None:
         plt.savefig(filename, format="pdf")
@@ -210,10 +210,12 @@ def WellPlot(campaign, plot_tests=True, plot_well_names=True):
                     label,
                     "C" + str((i + 2) % 10),
                     linestyle=":",
+                    linewidth=2,
                 )
     # get equal axis (for realism)
     ax.axis("equal")
-    ax.legend()
+    ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
+    fig.tight_layout()
     plt.show()
     return fig, ax
 
