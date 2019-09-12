@@ -217,6 +217,7 @@ class Variable(object):
                 writer.writerow(["values", len(tmpvalue)])
                 for val in tmpvalue:
                     writer.writerow([val])
+        return file_path
 
 
 class TimeVar(Variable):
@@ -702,13 +703,15 @@ class Observation(object):
                 self._time.save(patht, timname)
                 self._observation.save(patht, obsname)
         # compress everything to one zip-file
-        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
+        file_path = os.path.join(path, name)
+        with zipfile.ZipFile(file_path, "w") as zfile:
             # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             if self.state == "transient":
                 zfile.write(os.path.join(patht, timname), timname)
             zfile.write(os.path.join(patht, obsname), obsname)
         shutil.rmtree(patht, ignore_errors=True)
+        return file_path
 
 
 class StdyObs(Observation):
@@ -1135,7 +1138,8 @@ class Well(object):
             writer.writerow(["aquiferdepth", aquifname])
             self._aquiferdepth.save(patht, aquifname)
         # compress everything to one zip-file
-        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
+        file_path = os.path.join(path, name)
+        with zipfile.ZipFile(file_path, "w") as zfile:
             # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             zfile.write(os.path.join(patht, radiuname), radiuname)
@@ -1144,6 +1148,7 @@ class Well(object):
             zfile.write(os.path.join(patht, aquifname), aquifname)
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
+        return file_path
 
 
 # Loading routines ###

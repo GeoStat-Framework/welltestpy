@@ -155,12 +155,14 @@ class FieldSite(object):
             else:
                 writer.writerow(["coordinates", "None"])
         # compress everything to one zip-file
-        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
+        file_path = os.path.join(path, name)
+        with zipfile.ZipFile(file_path, "w") as zfile:
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             if self._coordinates is not None:
                 zfile.write(os.path.join(patht, coordname), coordname)
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
+        return file_path
 
 
 class Campaign(object):
@@ -563,7 +565,8 @@ class Campaign(object):
                 self.tests[k].save(patht, testsname[k])
 
         # compress everything to one zip-file
-        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
+        file_path = os.path.join(path, name)
+        with zipfile.ZipFile(file_path, "w") as zfile:
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             if self._fieldsite is not None:
                 zfile.write(os.path.join(patht, fieldsname), fieldsname)
@@ -573,6 +576,7 @@ class Campaign(object):
                 zfile.write(os.path.join(patht, testsname[k]), testsname[k])
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
+        return file_path
 
 
 def load_fieldsite(fdsfile):

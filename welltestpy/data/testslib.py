@@ -564,7 +564,8 @@ class PumpingTest(Test):
                 writer.writerow([k, obsname[k]])
                 self.observations[k].save(patht, obsname[k])
         # compress everything to one zip-file
-        with zipfile.ZipFile(os.path.join(path, name), "w") as zfile:
+        file_path = os.path.join(path, name)
+        with zipfile.ZipFile(file_path, "w") as zfile:
             zfile.write(os.path.join(patht, "info.csv"), "info.csv")
             zfile.write(os.path.join(patht, pumprname), pumprname)
             zfile.write(os.path.join(patht, aquidname), aquidname)
@@ -573,6 +574,7 @@ class PumpingTest(Test):
                 zfile.write(os.path.join(patht, obsname[k]), obsname[k])
         # delete the temporary directory
         shutil.rmtree(patht, ignore_errors=True)
+        return file_path
 
 
 def load_test(tstfile):
