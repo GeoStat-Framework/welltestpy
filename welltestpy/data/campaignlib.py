@@ -18,6 +18,7 @@ import os
 import csv
 import shutil
 import zipfile
+import tempfile
 from io import TextIOWrapper as TxtIO
 
 import numpy as np
@@ -135,10 +136,7 @@ class FieldSite(object):
             name += ".fds"
         name = _formname(name)
         # create temporal directory for the included files
-        patht = os.path.join(path, ".tmpfield")
-        if os.path.exists(patht):
-            shutil.rmtree(patht, ignore_errors=True)
-        os.makedirs(patht)
+        patht = tempfile.mkdtemp(dir=path)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
@@ -529,10 +527,7 @@ class Campaign(object):
             name += ".cmp"
         name = _formname(name)
         # create temporal directory for the included files
-        patht = os.path.join(path, ".tmpcmp")
-        if os.path.exists(patht):
-            shutil.rmtree(patht, ignore_errors=True)
-        os.makedirs(patht)
+        patht = tempfile.mkdtemp(dir=path)
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
