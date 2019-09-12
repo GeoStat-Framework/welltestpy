@@ -198,7 +198,9 @@ class Variable(object):
         file_path = os.path.join(path, name)
         # write the csv-file
         with open(file_path, "w") as csvf:
-            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(
+                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
+            )
             writer.writerow(["Variable"])
             writer.writerow(["name", self.name])
             writer.writerow(["symbol", self.symbol])
@@ -686,7 +688,9 @@ class Observation(object):
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(
+                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
+            )
             writer.writerow(["Observation"])
             writer.writerow(["name", self.name])
             writer.writerow(["state", self.state])
@@ -1120,7 +1124,9 @@ class Well(object):
         # write the csv-file
         # with open(patht+name[:-4]+".csv", 'w') as csvf:
         with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(csvf, quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(
+                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
+            )
             writer.writerow(["Well"])
             writer.writerow(["name", self.name])
             # define names for the variable-files
