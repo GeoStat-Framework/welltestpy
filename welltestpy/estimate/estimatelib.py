@@ -186,11 +186,15 @@ class TransientPumping(object):
             tests = list(self.campaign.tests.keys())
             self.testinclude = {}
             for test in tests:
-                self.testinclude[test] = self.campaign.tests[test].wells
+                self.testinclude[test] = self.campaign.tests[
+                    test
+                ].observationwells
         elif not isinstance(testinclude, dict):
             self.testinclude = {}
             for test in testinclude:
-                self.testinclude[test] = self.campaign.tests[test].wells
+                self.testinclude[test] = self.campaign.tests[
+                    test
+                ].observationwells
         else:
             self.testinclude = testinclude
 
@@ -209,9 +213,10 @@ class TransientPumping(object):
 
         rwell_list = []
         rinf_list = []
-        for wel in self.testinclude:
-            rwell_list.append(self.campaign.wells[wel].radius)
-            rinf_list.append(self.campaign.tests[wel].aquiferradius)
+        for test in self.testinclude:
+            pwell = self.campaign.tests[test].pumpingwell
+            rwell_list.append(self.campaign.wells[pwell].radius)
+            rinf_list.append(self.campaign.tests[test].aquiferradius)
         self.rwell = min(rwell_list)
         """:class:`float`: radius of the pumping wells"""
         self.rinf = max(rinf_list)
@@ -779,11 +784,15 @@ class SteadyPumping(object):
             tests = list(self.campaign.tests.keys())
             self.testinclude = {}
             for test in tests:
-                self.testinclude[test] = self.campaign.tests[test].wells
+                self.testinclude[test] = self.campaign.tests[
+                    test
+                ].observationwells
         elif not isinstance(testinclude, dict):
             self.testinclude = {}
             for test in testinclude:
-                self.testinclude[test] = self.campaign.tests[test].wells
+                self.testinclude[test] = self.campaign.tests[
+                    test
+                ].observationwells
         else:
             self.testinclude = testinclude
 
@@ -806,9 +815,10 @@ class SteadyPumping(object):
 
         rwell_list = []
         rinf_list = []
-        for wel in self.testinclude:
-            rwell_list.append(self.campaign.wells[wel].radius)
-            rinf_list.append(self.campaign.tests[wel].aquiferradius)
+        for test in self.testinclude:
+            pwell = self.campaign.tests[test].pumpingwell
+            rwell_list.append(self.campaign.wells[pwell].radius)
+            rinf_list.append(self.campaign.tests[test].aquiferradius)
         self.rwell = min(rwell_list)
         """:class:`float`: radius of the pumping wells"""
         self.rinf = max(rinf_list)

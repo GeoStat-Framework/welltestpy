@@ -235,7 +235,7 @@ class PumpingTest(Test):
         wells : :class:`list`, optional
             List of wells, to check the observation state at. Default: all
         """
-        wells = self.wells if wells is None else list(wells)
+        wells = self.observationwells if wells is None else list(wells)
         states = set()
         for obs in wells:
             if obs not in self.observations:
@@ -252,6 +252,14 @@ class PumpingTest(Test):
         """:class:`tuple` of :class:`str`: all well names."""
         tmp = list(self.__observations.keys())
         tmp.append(self.pumpingwell)
+        wells = list(set(tmp))
+        wells.sort()
+        return wells
+
+    @property
+    def observationwells(self):
+        """:class:`tuple` of :class:`str`: all well names."""
+        tmp = list(self.__observations.keys())
         wells = list(set(tmp))
         wells.sort()
         return wells
@@ -464,7 +472,7 @@ class PumpingTest(Test):
         """
         exclude = set() if exclude is None else set(exclude)
         well_set = set(wells)
-        test_wells = set(self.wells)
+        test_wells = set(self.observationwells)
         plot_wells = list((well_set & test_wells) - exclude)
         plot_wells.sort()  # sort by name
         state = self.state(wells=plot_wells)
