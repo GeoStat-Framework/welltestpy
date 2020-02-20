@@ -231,8 +231,8 @@ def filterdrawdown(observation, tout=None, dxscale=2):
     hequal = np.interp(tequal, time, head)
     # size = h.max() - h.min()
 
-    para1, para2 = signal.butter(1, 0.025)  # size/10.)
     try:
+        para1, para2 = signal.butter(1, 0.025)  # size/10.)
         hfilt = signal.filtfilt(para1, para2, hequal, padlen=150)
         hout = np.interp(tout, tequal, hfilt)
     except ValueError:  # in this case there are to few data points
