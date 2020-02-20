@@ -33,6 +33,15 @@ The following classes and functions are provided
 """
 from __future__ import absolute_import
 
+try:
+    import StringIO
+
+    BytIO = StringIO.StringIO
+except ImportError:
+    import io
+
+    BytIO = io.BytesIO
+
 from welltestpy.tools import plotter, trilib
 
 from welltestpy.tools.trilib import triangulate, sym
@@ -63,4 +72,5 @@ __all__ = [
     "plotsensitivity",
     "plotter",
     "trilib",
+    "BytIO",
 ]

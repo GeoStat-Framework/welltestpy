@@ -23,7 +23,7 @@ from io import TextIOWrapper as TxtIO
 
 import numpy as np
 
-from welltestpy.tools._extimport import BytIO
+from welltestpy.tools import BytIO
 from welltestpy.data.varlib import (
     Variable,
     Observation,
