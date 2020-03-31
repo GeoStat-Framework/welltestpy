@@ -24,7 +24,7 @@ from io import TextIOWrapper as TxtIO
 import numpy as np
 
 from welltestpy.tools import BytIO
-from welltestpy.tools.plotter import CampaignPlot, WellPlot
+from welltestpy.tools.plotter import campaign_plot, campaign_well_plot
 from welltestpy.data.varlib import (
     Variable,
     CoordinatesVar,
@@ -482,9 +482,9 @@ class Campaign(object):
             Tests that should be plotted. If None, all will be displayed.
             Default: ``None``
         **kwargs
-            Keyword-arguments forwarded to :any:`CampaignPlot`
+            Keyword-arguments forwarded to :any:`campaign_plot`
         """
-        CampaignPlot(self, select_tests, **kwargs)
+        campaign_plot(self, select_tests, **kwargs)
 
     def plot_wells(self, **kwargs):
         """Generate a plot of the wells within the campaign.
@@ -494,9 +494,9 @@ class Campaign(object):
         Parameters
         ----------
         **kwargs
-            Keyword-arguments forwarded to :any:`WellPlot`.
+            Keyword-arguments forwarded to :any:`campaign_well_plot`.
         """
-        return WellPlot(self, **kwargs)
+        return campaign_well_plot(self, **kwargs)
 
     def save(self, path="", name=None):
         """Save the campaign to file.

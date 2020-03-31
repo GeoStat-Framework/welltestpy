@@ -24,6 +24,7 @@ from io import TextIOWrapper as TxtIO
 import numpy as np
 
 from welltestpy.tools import BytIO
+from welltestpy.tools.plotter import plot_pump_test
 from welltestpy.data.varlib import (
     Variable,
     Observation,
@@ -451,7 +452,7 @@ class PumpingTest(Test):
             if obs in self.observations:
                 del self.__observations[obs]
 
-    def _addplot(self, plt_ax, wells, exclude=None):
+    def plot(self, wells, exclude=None, fig=None, ax=None):
         """Generate a plot of the pumping test.
 
         This will plot the pumping test on the given figure axes.
@@ -470,74 +471,9 @@ class PumpingTest(Test):
         -----
         This will be used by the Campaign class.
         """
-        exclude = set() if exclude is None else set(exclude)
-        well_set = set(wells)
-        test_wells = set(self.observationwells)
-        plot_wells = list((well_set & test_wells) - exclude)
-        plot_wells.sort()  # sort by name
-        state = self.state(wells=plot_wells)
-        steady_guide_x = []
-        steady_guide_y = []
-        if state == "mixed":
-            ax1 = plt_ax
-            ax2 = ax1.twiny()
-        elif state == "transient":
-            ax1 = plt_ax
-            ax2 = None
-        elif state == "steady":
-            ax1 = None
-            ax2 = plt_ax
-        else:
-            return
-        for i, k in enumerate(plot_wells):
-            if k != self.pumpingwell:
-                dist = wells[k] - wells[self.pumpingwell]
-            else:
-                dist = wells[self.pumpingwell].radius
-            if self.observations[k].state == "transient":
-                if self.pumpingrate > 0:
-                    displace = np.maximum(self.observations[k].value[1], 0.0)
-                else:
-                    displace = np.minimum(self.observations[k].value[1], 0.0)
-                ax1.plot(
-                    self.observations[k].value[0],
-                    displace,
-                    linewidth=2,
-                    color="C{}".format(i % 10),
-                    label=(
-                        self.observations[k].name + " r={:1.2f}".format(dist)
-                    ),
-                )
-                ax1.set_xlabel(self.observations[k].labels[0])
-                ax1.set_ylabel(self.observations[k].labels[1])
-            else:
-                steady_guide_x.append(dist)
-                steady_guide_y.append(self.observations[k].value)
-                label = self.observations[k].name + " r={:1.2f}".format(dist)
-                color = "C{}".format(i % 10)
-                ax2.scatter(
-                    dist, self.observations[k].value, color=color, label=label
-                )
-                ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
-                ax2.set_ylabel(self.observations[k].labels)
-
-        if state != "transient":
-            steady_guide_x = np.array(steady_guide_x, dtype=float)
-            steady_guide_y = np.array(steady_guide_y, dtype=float)
-            arg = np.argsort(steady_guide_x)
-            steady_guide_x = steady_guide_x[arg]
-            steady_guide_y = steady_guide_y[arg]
-            ax2.plot(steady_guide_x, steady_guide_y, color="k", alpha=0.1)
-
-        plt_ax.set_title(repr(self))
-        plt_ax.legend(
-            loc="upper left",
-            bbox_to_anchor=(1, 1),
-            fancybox=True,
-            framealpha=0.75,
+        plot_pump_test(
+            pump_test=self, wells=wells, exclude=exclude, fig=fig, ax=ax
         )
-        if state == "mixed":  # add a second legend
-            ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
 
     def save(self, path="", name=None):
         """Save a pumping test to file.

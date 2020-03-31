@@ -508,7 +508,7 @@ class TransientPumping(object):
                 parameternames=paranames,
                 parameterlabels=paralabels,
                 stdvalues=self.para,
-                filename=traceplotname,
+                plotname=traceplotname,
             )
             plotfit_transient(
                 self.setup,
@@ -517,8 +517,8 @@ class TransientPumping(object):
                 self.rad,
                 self.time,
                 self.radnames,
-                fittingplotname,
                 self.extra_kw_names,
+                fittingplotname,
             )
             plotparainteract(self.result, paralabels, interactplotname)
 
@@ -654,7 +654,7 @@ class TransientPumping(object):
                 parameternames=paranames,
                 parameterlabels=paralabels,
                 stdvalues=None,
-                filename=traceplotname,
+                plotname=traceplotname,
             )
 
 
@@ -1070,7 +1070,7 @@ class SteadyPumping(object):
                 parameternames=paranames,
                 parameterlabels=paralabels,
                 stdvalues=self.para,
-                filename=traceplotname,
+                plotname=traceplotname,
             )
             plotfit_steady(
                 self.setup,
@@ -1078,8 +1078,8 @@ class SteadyPumping(object):
                 self.para,
                 self.rad,
                 self.radnames,
-                fittingplotname,
                 self.extra_kw_names,
+                fittingplotname,
             )
             plotparainteract(self.result, paralabels, interactplotname)
 
@@ -1215,7 +1215,7 @@ class SteadyPumping(object):
                 parameternames=paranames,
                 parameterlabels=paralabels,
                 stdvalues=None,
-                filename=traceplotname,
+                plotname=traceplotname,
             )
 
 

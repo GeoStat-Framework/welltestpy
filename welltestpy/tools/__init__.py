@@ -21,10 +21,10 @@ The following classes and functions are provided
 .. autosummary::
    triangulate
    sym
-   CampaignPlot
+   campaign_plot
    fadeline
-   plotres
-   WellPlot
+   plot_well_pos
+   campaign_well_plot
    plotfit_transient
    plotfit_steady
    plotparainteract
@@ -47,10 +47,10 @@ from welltestpy.tools import plotter, trilib
 from welltestpy.tools.trilib import triangulate, sym
 
 from welltestpy.tools.plotter import (
-    CampaignPlot,
+    campaign_plot,
     fadeline,
-    plotres,
-    WellPlot,
+    plot_well_pos,
+    campaign_well_plot,
     plotfit_transient,
     plotfit_steady,
     plotparainteract,
@@ -61,10 +61,10 @@ from welltestpy.tools.plotter import (
 __all__ = [
     "triangulate",
     "sym",
-    "CampaignPlot",
+    "campaign_plot",
     "fadeline",
-    "plotres",
-    "WellPlot",
+    "plot_well_pos",
+    "campaign_well_plot",
     "plotfit_transient",
     "plotfit_steady",
     "plotparainteract",
