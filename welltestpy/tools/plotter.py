@@ -157,6 +157,7 @@ def campaign_well_plot(
     well_const = [well_const0]
 
     with plt.style.context("ggplot"):
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig = plot_well_pos(
             well_const,
             names,
@@ -183,7 +184,7 @@ def campaign_well_plot(
                         x=[x0, x1],
                         y=[y0, y1],
                         label=label,
-                        color="C" + str((i + 2) % 10),
+                        color=clrs[(i + 2) % 10],
                         linewidth=3,
                         zorder=10,
                     )
@@ -217,6 +218,7 @@ def plot_pump_test(
     This will be used by the Campaign class.
     """
     with plt.style.context("ggplot"):
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig, ax = _get_fig_ax(fig, ax)
         exclude = set() if exclude is None else set(exclude)
         well_set = set(wells)
@@ -254,7 +256,7 @@ def plot_pump_test(
                     pump_test.observations[k].value[0],
                     displace,
                     linewidth=2,
-                    color="C{}".format(i % 10),
+                    color=clrs[i % 10],
                     label=(
                         pump_test.observations[k].name
                         + " r={:1.2f}".format(dist)
@@ -610,14 +612,14 @@ def plotparatrace(
     rep = len(result)
     rows = len(parameternames)
     with plt.style.context("ggplot"):
-
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
 
         for j in range(rows):
             ax = fig.add_subplot(rows, 1, 1 + j)
             data = result["par" + parameternames[j]]
 
-            ax.plot(data, "-", color="C0")
+            ax.plot(data, "-", color=clrs[0])
 
             if stdvalues is not None:
                 ax.plot(
