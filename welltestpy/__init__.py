@@ -15,8 +15,13 @@ Subpackages
     process
     tools
 """
-from welltestpy._version import __version__
 from welltestpy import data, estimate, process, tools
+
+try:
+    from welltestpy._version import __version__
+except ImportError:  # pragma: nocover
+    # package is not installed
+    __version__ = "0.0.0.dev0"
 
 __all__ = ["__version__"]
 __all__ += ["data", "estimate", "process", "tools"]
