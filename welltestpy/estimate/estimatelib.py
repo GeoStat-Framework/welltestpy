@@ -494,9 +494,11 @@ class TransientPumping(object):
                     self.result, maximize=False
                 )
                 void_names = para_opt.dtype.names
-                self.para = []
+                self.para = np.empty(len(self.setup.para_names))
                 for name in void_names:
-                    self.para.append(para_opt[0][name])
+                    self.para[
+                        self.setup.para_names.index(name[3:])
+                    ] = para_opt[0][name]
                 np.savetxt(paraname, self.para)
 
         if rank == 0:
