@@ -54,7 +54,7 @@ __all__ = [
 
 
 def fast_rep(para_no, infer_fac=4, freq_step=2):
-    """Number of iterations needed for the FAST algorithm.
+    """Get number of iterations needed for the FAST algorithm.
 
     Parameters
     ----------
@@ -538,7 +538,7 @@ class TransientPumping(object):
         ----------
         rep : :class:`int`, optional
             The number of repetitions within the FAST algorithm in spotpy.
-            Default: ``5000``
+            Default: estimated
         parallel : :class:`str`, optional
             State if the estimation should be run in parallel or not. Options:
 
@@ -571,6 +571,11 @@ class TransientPumping(object):
             ``"_estimate"``.
             Default: ``None``
         """
+        if len(self.setup.para_names) == 1 and not self.setup.dummy:
+            raise ValueError(
+                "Sensitivity: for estimation with only one parameter"
+                + " you have to use a dummy paramter."
+            )
         if rep is None:
             rep = fast_rep(len(self.setup.para_names) + int(self.setup.dummy))
 
@@ -1099,7 +1104,7 @@ class SteadyPumping(object):
         ----------
         rep : :class:`int`, optional
             The number of repetitions within the FAST algorithm in spotpy.
-            Default: ``5000``
+            Default: estimated
         parallel : :class:`str`, optional
             State if the estimation should be run in parallel or not. Options:
 
@@ -1132,6 +1137,11 @@ class SteadyPumping(object):
             ``"_estimate"``.
             Default: ``None``
         """
+        if len(self.setup.para_names) == 1 and not self.setup.dummy:
+            raise ValueError(
+                "Sensitivity: for estimation with only one parameter"
+                + " you have to use a dummy paramter."
+            )
         if rep is None:
             rep = fast_rep(len(self.setup.para_names) + int(self.setup.dummy))
 
