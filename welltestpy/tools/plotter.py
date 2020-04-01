@@ -136,11 +136,6 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
             # call the plotting routine of the test
             campaign.tests[t].plot(wells=campaign.wells, ax=ax, **kwargs)
 
-        if "xscale" in kwargs:
-            ax.set_xscale(kwargs["xscale"])
-        if "yscale" in kwargs:
-            ax.set_yscale(kwargs["yscale"])
-
         fig.tight_layout()
         fig.show()
     return fig
@@ -184,7 +179,7 @@ def campaign_well_plot(
                     y0 = campaign.wells[p_well].coordinates[1]
                     x1 = campaign.wells[obs].coordinates[0]
                     y1 = campaign.wells[obs].coordinates[1]
-                    label = "test at " + t if j == 0 else None
+                    label = "'{}'".format(t) if j == 0 else None
                     fadeline(
                         ax=ax,
                         x=[x0, x1],
@@ -196,7 +191,7 @@ def campaign_well_plot(
                     )
         # get equal axis (for realism)
         ax.axis("equal")
-        ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
+        ax.legend(title="Tests", loc="upper left", bbox_to_anchor=(1, 1))
         fig.tight_layout()
         fig.show()
     return ax
@@ -229,10 +224,13 @@ def plot_pump_test(
         well_set = set(wells)
         test_wells = set(pump_test.observationwells)
         plot_wells = list((well_set & test_wells) - exclude)
-        plot_wells.sort()  # sort by name
+        # sort by radius
+        plot_wells.sort(key=lambda x: wells[x] - wells[pump_test.pumpingwell])
         state = pump_test.state(wells=plot_wells)
         steady_guide_x = []
         steady_guide_y = []
+        # label for absolute values
+        abslab = "abs. " if ("abs_val" in kwargs and kwargs["abs_val"]) else ""
         if state == "mixed":
             ax1 = ax
             ax2 = ax1.twiny()
@@ -250,14 +248,10 @@ def plot_pump_test(
             else:
                 dist = wells[pump_test.pumpingwell].radius
             if pump_test.observations[k].state == "transient":
-                if pump_test.pumpingrate > 0:
-                    displace = np.maximum(
-                        pump_test.observations[k].value[1], 0.0
-                    )
+                if abslab:
+                    displace = np.abs(pump_test.observations[k].value[1])
                 else:
-                    displace = np.minimum(
-                        pump_test.observations[k].value[1], 0.0
-                    )
+                    displace = pump_test.observations[k].value[1]
                 ax1.plot(
                     pump_test.observations[k].value[0],
                     displace,
@@ -269,22 +263,27 @@ def plot_pump_test(
                     ),
                 )
                 ax1.set_xlabel(pump_test.observations[k].labels[0])
-                ax1.set_ylabel(pump_test.observations[k].labels[1])
+                ax1.set_ylabel(
+                    abslab + "{}".format(pump_test.observations[k].labels[1])
+                )
             else:
+                if abslab:
+                    displace = np.abs(pump_test.observations[k].value)
+                else:
+                    displace = pump_test.observations[k].value
                 steady_guide_x.append(dist)
-                steady_guide_y.append(pump_test.observations[k].value)
+                steady_guide_y.append(displace)
                 label = pump_test.observations[k].name + " r={:1.2f}".format(
                     dist
                 )
                 color = "C{}".format(i % 10)
                 ax2.scatter(
-                    dist,
-                    pump_test.observations[k].value,
-                    color=color,
-                    label=label,
+                    dist, displace, color=color, label=label,
                 )
                 ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
-                ax2.set_ylabel(pump_test.observations[k].labels)
+                ax2.set_ylabel(
+                    abslab + "{}".format(pump_test.observations[k].labels)
+                )
 
         if state != "transient":
             steady_guide_x = np.array(steady_guide_x, dtype=float)
@@ -296,7 +295,13 @@ def plot_pump_test(
 
         if "title" not in kwargs or not kwargs["title"] is False:
             ax.set_title(repr(pump_test))
+        if "xscale" in kwargs:
+            ax.set_xscale(kwargs["xscale"])
+        if "yscale" in kwargs:
+            ax.set_yscale(kwargs["yscale"])
+
         ax.legend(
+            title="Pumping test '{}'".format(pump_test.name),
             loc="upper left",
             bbox_to_anchor=(1, 1),
             fancybox=True,
@@ -588,6 +593,7 @@ def plotparainteract(result, paranames, plotname=None, fig=None):
             else:
                 df.plot.kde(ax=ax)
         fig.tight_layout()
+        fig.subplots_adjust(hspace=0, wspace=0, bottom=0.1)
         if plotname is not None:
             fig.savefig(plotname, format="pdf")
     return fig
