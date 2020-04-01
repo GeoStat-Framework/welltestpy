@@ -48,7 +48,7 @@ pumptest.add_transient_obs("well_3", time, drawdown[:, 3])
 
 ### add the pumping test to the campaign
 campaign.addtests(pumptest)
-### optionally make the test steady
+### optionally make the test (quasi)steady
 # campaign.tests["well_0"].make_steady()
 
 ### plot the well constellation and a test overview
