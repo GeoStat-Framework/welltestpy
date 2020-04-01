@@ -30,10 +30,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-# use the ggplot style like R
-plt.style.use("ggplot")
-
-
 def _get_fig_ax(
     fig=None,
     ax=None,
@@ -52,15 +48,28 @@ def _get_fig_ax(
             fig = plt.figure(**fig_kwargs) if ax is None else ax.get_figure()
         if ax is None:
             ax = fig.add_subplot(*sub_args, **sub_kwargs)
-            assert ax.name == ax_name
-            assert ax.get_figure() is fig
-            return fig, ax
+        assert ax.name == ax_name
+        assert ax.get_figure() is fig
+        return fig, ax
     # if ax=False we only want a figure
     elif ax_case == 1:
         return plt.figure(**fig_kwargs) if fig is None else fig
     # if ax=True we want the current axis of the given figure
     assert fig is not None
     return fig, fig.gca()
+
+
+def _sort_lgd(ax, **kwargs):
+    """Show legend and sort it by names."""
+    handles, labels = ax.get_legend_handles_labels()
+    # sort both labels and handles by labels
+    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+    ax.legend(handles, labels, **kwargs)
+
+
+def dashes(i=1, max_n=12, width=1):
+    """Dashes for matplotlib."""
+    return i * [width, width] + [max_n * 2 * width - 2 * i * width, width]
 
 
 def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
@@ -71,6 +80,7 @@ def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
     Parameters
     ----------
     ax : axis
+        Axis to plot on.
     x : :class:`list`
         start and end value of x components of the line
     y : :class:`list`
@@ -118,20 +128,21 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
 
     tests.sort()
     nroftests = len(tests)
-    fig = _get_fig_ax(fig, ax=False, dpi=75, figsize=[8, 3 * nroftests])
+    with plt.style.context("ggplot"):
+        fig = _get_fig_ax(fig, ax=False, dpi=75, figsize=[8, 3 * nroftests])
 
-    for n, t in enumerate(tests):
-        ax = fig.add_subplot(nroftests, 1, n + 1)
-        # call the plotting routine of the test
-        campaign.tests[t].plot(wells=campaign.wells, ax=ax)
+        for n, t in enumerate(tests):
+            ax = fig.add_subplot(nroftests, 1, n + 1)
+            # call the plotting routine of the test
+            campaign.tests[t].plot(wells=campaign.wells, ax=ax, **kwargs)
 
-    if "xscale" in kwargs:
-        ax.set_xscale(kwargs["xscale"])
-    if "yscale" in kwargs:
-        ax.set_yscale(kwargs["yscale"])
+        if "xscale" in kwargs:
+            ax.set_xscale(kwargs["xscale"])
+        if "yscale" in kwargs:
+            ax.set_yscale(kwargs["yscale"])
 
-    fig.tight_layout()
-    fig.show()
+        fig.tight_layout()
+        fig.show()
     return fig
 
 
@@ -152,50 +163,48 @@ def campaign_well_plot(
         names.append(w)
     well_const = [well_const0]
 
-    fig = plot_well_pos(
-        well_const,
-        names,
-        campaign.name,
-        plot_well_names=plot_well_names,
-        fig=fig,
-    )
+    with plt.style.context("ggplot"):
+        fig = plot_well_pos(
+            well_const,
+            names,
+            campaign.name,
+            plot_well_names=plot_well_names,
+            fig=fig,
+        )
 
-    fig, ax = _get_fig_ax(fig, ax=True)
+        fig, ax = _get_fig_ax(fig, ax=True)
 
-    if plot_tests:
-        testlist = list(campaign.tests.keys())
-        testlist.sort()
-        for i, t in enumerate(testlist):
-            for j, obs in enumerate(campaign.tests[t].observations):
-                x0 = campaign.wells[campaign.tests[t].pumpingwell].coordinates[
-                    0
-                ]
-                y0 = campaign.wells[campaign.tests[t].pumpingwell].coordinates[
-                    1
-                ]
-                x1 = campaign.wells[obs].coordinates[0]
-                y1 = campaign.wells[obs].coordinates[1]
-                if j == 0:
-                    label = "test at " + t
-                else:
-                    label = None
-                fadeline(
-                    ax,
-                    [x0, x1],
-                    [y0, y1],
-                    label,
-                    "C" + str((i + 2) % 10),
-                    linewidth=3,
-                )
-    # get equal axis (for realism)
-    ax.axis("equal")
-    ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
-    fig.tight_layout()
-    fig.show()
+        if plot_tests:
+            testlist = list(campaign.tests.keys())
+            testlist.sort()
+            for i, t in enumerate(testlist):
+                p_well = campaign.tests[t].pumpingwell
+                for j, obs in enumerate(campaign.tests[t].observations):
+                    x0 = campaign.wells[p_well].coordinates[0]
+                    y0 = campaign.wells[p_well].coordinates[1]
+                    x1 = campaign.wells[obs].coordinates[0]
+                    y1 = campaign.wells[obs].coordinates[1]
+                    label = "test at " + t if j == 0 else None
+                    fadeline(
+                        ax=ax,
+                        x=[x0, x1],
+                        y=[y0, y1],
+                        label=label,
+                        color="C" + str((i + 2) % 10),
+                        linewidth=3,
+                        zorder=10,
+                    )
+        # get equal axis (for realism)
+        ax.axis("equal")
+        ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
+        fig.tight_layout()
+        fig.show()
     return ax
 
 
-def plot_pump_test(pump_test, wells, exclude=None, fig=None, ax=None):
+def plot_pump_test(
+    pump_test, wells, exclude=None, fig=None, ax=None, **kwargs
+):
     """Plot a pumping test.
 
     Parameters
@@ -214,75 +223,87 @@ def plot_pump_test(pump_test, wells, exclude=None, fig=None, ax=None):
     -----
     This will be used by the Campaign class.
     """
-    fig, ax = _get_fig_ax(fig, ax)
-    exclude = set() if exclude is None else set(exclude)
-    well_set = set(wells)
-    test_wells = set(pump_test.observationwells)
-    plot_wells = list((well_set & test_wells) - exclude)
-    plot_wells.sort()  # sort by name
-    state = pump_test.state(wells=plot_wells)
-    steady_guide_x = []
-    steady_guide_y = []
-    if state == "mixed":
-        ax1 = ax
-        ax2 = ax1.twiny()
-    elif state == "transient":
-        ax1 = ax
-        ax2 = None
-    elif state == "steady":
-        ax1 = None
-        ax2 = ax
-    else:
-        return
-    for i, k in enumerate(plot_wells):
-        if k != pump_test.pumpingwell:
-            dist = wells[k] - wells[pump_test.pumpingwell]
+    with plt.style.context("ggplot"):
+        fig, ax = _get_fig_ax(fig, ax)
+        exclude = set() if exclude is None else set(exclude)
+        well_set = set(wells)
+        test_wells = set(pump_test.observationwells)
+        plot_wells = list((well_set & test_wells) - exclude)
+        plot_wells.sort()  # sort by name
+        state = pump_test.state(wells=plot_wells)
+        steady_guide_x = []
+        steady_guide_y = []
+        if state == "mixed":
+            ax1 = ax
+            ax2 = ax1.twiny()
+        elif state == "transient":
+            ax1 = ax
+            ax2 = None
+        elif state == "steady":
+            ax1 = None
+            ax2 = ax
         else:
-            dist = wells[pump_test.pumpingwell].radius
-        if pump_test.observations[k].state == "transient":
-            if pump_test.pumpingrate > 0:
-                displace = np.maximum(pump_test.observations[k].value[1], 0.0)
+            return
+        for i, k in enumerate(plot_wells):
+            if k != pump_test.pumpingwell:
+                dist = wells[k] - wells[pump_test.pumpingwell]
             else:
-                displace = np.minimum(pump_test.observations[k].value[1], 0.0)
-            ax1.plot(
-                pump_test.observations[k].value[0],
-                displace,
-                linewidth=2,
-                color="C{}".format(i % 10),
-                label=(
-                    pump_test.observations[k].name + " r={:1.2f}".format(dist)
-                ),
-            )
-            ax1.set_xlabel(pump_test.observations[k].labels[0])
-            ax1.set_ylabel(pump_test.observations[k].labels[1])
-        else:
-            steady_guide_x.append(dist)
-            steady_guide_y.append(pump_test.observations[k].value)
-            label = pump_test.observations[k].name + " r={:1.2f}".format(dist)
-            color = "C{}".format(i % 10)
-            ax2.scatter(
-                dist, pump_test.observations[k].value, color=color, label=label
-            )
-            ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
-            ax2.set_ylabel(pump_test.observations[k].labels)
+                dist = wells[pump_test.pumpingwell].radius
+            if pump_test.observations[k].state == "transient":
+                if pump_test.pumpingrate > 0:
+                    displace = np.maximum(
+                        pump_test.observations[k].value[1], 0.0
+                    )
+                else:
+                    displace = np.minimum(
+                        pump_test.observations[k].value[1], 0.0
+                    )
+                ax1.plot(
+                    pump_test.observations[k].value[0],
+                    displace,
+                    linewidth=2,
+                    color="C{}".format(i % 10),
+                    label=(
+                        pump_test.observations[k].name
+                        + " r={:1.2f}".format(dist)
+                    ),
+                )
+                ax1.set_xlabel(pump_test.observations[k].labels[0])
+                ax1.set_ylabel(pump_test.observations[k].labels[1])
+            else:
+                steady_guide_x.append(dist)
+                steady_guide_y.append(pump_test.observations[k].value)
+                label = pump_test.observations[k].name + " r={:1.2f}".format(
+                    dist
+                )
+                color = "C{}".format(i % 10)
+                ax2.scatter(
+                    dist,
+                    pump_test.observations[k].value,
+                    color=color,
+                    label=label,
+                )
+                ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
+                ax2.set_ylabel(pump_test.observations[k].labels)
 
-    if state != "transient":
-        steady_guide_x = np.array(steady_guide_x, dtype=float)
-        steady_guide_y = np.array(steady_guide_y, dtype=float)
-        arg = np.argsort(steady_guide_x)
-        steady_guide_x = steady_guide_x[arg]
-        steady_guide_y = steady_guide_y[arg]
-        ax2.plot(steady_guide_x, steady_guide_y, color="k", alpha=0.1)
+        if state != "transient":
+            steady_guide_x = np.array(steady_guide_x, dtype=float)
+            steady_guide_y = np.array(steady_guide_y, dtype=float)
+            arg = np.argsort(steady_guide_x)
+            steady_guide_x = steady_guide_x[arg]
+            steady_guide_y = steady_guide_y[arg]
+            ax2.plot(steady_guide_x, steady_guide_y, color="k", alpha=0.1)
 
-    ax.set_title(repr(pump_test))
-    ax.legend(
-        loc="upper left",
-        bbox_to_anchor=(1, 1),
-        fancybox=True,
-        framealpha=0.75,
-    )
-    if state == "mixed":  # add a second legend
-        ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
+        if "title" not in kwargs or not kwargs["title"] is False:
+            ax.set_title(repr(pump_test))
+        ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1, 1),
+            fancybox=True,
+            framealpha=0.75,
+        )
+        if state == "mixed":  # add a second legend
+            ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
     return ax
 
 
@@ -331,30 +352,34 @@ def plot_well_pos(
     space = 0.1 * max(abs(xmax - xmin), abs(ymax - ymin))
     xspace = yspace = space
 
-    fig = _get_fig_ax(fig, ax=False, dpi=75, figsize=[9 * col_n, 5 * row_n])
+    with plt.style.context("ggplot"):
+        fig = _get_fig_ax(
+            fig, ax=False, dpi=100, figsize=[9 * col_n, 5 * row_n]
+        )
 
-    for i, wells in enumerate(well_const):
-        ax = fig.add_subplot(row_n, col_n, pos_tuple[i])
-        ax.set_xlim([xmin - xspace, xmax + xspace])
-        ax.set_ylim([ymin - yspace, ymax + yspace])
-        ax.set_aspect("equal")
+        for i, wells in enumerate(well_const):
+            ax = fig.add_subplot(row_n, col_n, pos_tuple[i])
+            ax.set_xlim([xmin - xspace, xmax + xspace])
+            ax.set_ylim([ymin - yspace, ymax + yspace])
+            ax.set_aspect("equal")
 
-        for j, name in enumerate(names):
-            ax.scatter(wells[j][0], wells[j][1], color="k", zorder=10)
-            if plot_well_names:
-                ax.annotate("  " + name, (wells[j][0], wells[j][1]))
+            for j, name in enumerate(names):
+                ax.scatter(wells[j][0], wells[j][1], color="k", zorder=100)
+                if plot_well_names:
+                    ax.annotate(
+                        "  " + name, (wells[j][0], wells[j][1]), zorder=100
+                    )
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
+            ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
+            ax.set_xlabel("x distance in $[m]$")  # , fontsize=16)
+            ax.set_ylabel("y distance in $[m]$")  # , fontsize=16)
+            if total_n > 1:
+                ax.set_title("Result {}".format(i))
 
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
-        ax.set_xlabel("x distance in $[m]$")  # , fontsize=16)
-        ax.set_ylabel("y distance in $[m]$")  # , fontsize=16)
-        if total_n > 1:
-            ax.set_title("Result {}".format(i))
+        fig.tight_layout(rect=[0, 0, 1, 0.95])
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-
-    if filename is not None:
-        fig.savefig(filename, format="pdf")
+        if filename is not None:
+            fig.savefig(filename, format="pdf")
 
     return fig
 
@@ -378,75 +403,108 @@ def plotfit_transient(
     ax=None,
 ):
     """Plot of transient estimation fitting."""
-    plt.style.use("default")
-    fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(12, 8))
-    val_fix = setup.val_fix
-    for kwarg in ["time", "rad"]:
-        val_fix.pop(extra[kwarg], None)
+    with plt.style.context("ggplot"):
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    with plt.style.context("default"):
+        fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(12, 8))
+        val_fix = setup.val_fix
+        for kwarg in ["time", "rad"]:
+            val_fix.pop(extra[kwarg], None)
 
-    para_kw = setup.get_sim_kwargs(para)
-    val_fix.update(para_kw)
+        para_kw = setup.get_sim_kwargs(para)
+        val_fix.update(para_kw)
 
-    plot_f = ft.partial(setup.func, **val_fix)
+        plot_f = ft.partial(setup.func, **val_fix)
 
-    radarr = np.linspace(rad.min(), rad.max(), 100)
-    timarr = np.linspace(time.min(), time.max(), 100)
+        radarr = np.linspace(rad.min(), rad.max(), 100)
+        timarr = np.linspace(time.min(), time.max(), 100)
 
-    t_gen = np.ones_like(radarr)
-    r_gen = np.ones_like(time)
-    r_gen1 = np.ones_like(timarr)
-    xydir = np.zeros_like(time)
+        t_gen = np.ones_like(radarr)
+        r_gen = np.ones_like(time)
+        r_gen1 = np.ones_like(timarr)
+        xydir = np.zeros_like(time)
+        test_name = list(np.unique(radnames[:, 0]))
+        test_name.sort()
+        rad_unique, rad_un_idx = np.unique(rad, return_index=True)
+        for ri, re in enumerate(rad):
+            r1 = re * r_gen
+            r11 = re * r_gen1
+            h = plot_f(**{extra["time"]: time, extra["rad"]: re}).reshape(-1)
+            h1 = data[:, ri]
+            h2 = plot_f(**{extra["time"]: timarr, extra["rad"]: re}).reshape(
+                -1
+            )
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            alpha = 0.3 * (1 - (re - min(rad)) / (max(rad) - min(rad))) + 0.3
+            zord = 1000 * (len(rad) - ri)
 
-    for ri, re in enumerate(rad):
-        r1 = re * r_gen
-        r11 = re * r_gen1
+            if radnames[ri, 0] == radnames[ri, 1]:
+                label = "test {}".format(radnames[ri, 0])
+                label_eff = "fitted type curve"
+            else:
+                label = None
+                label_eff = None
+            if ri in rad_un_idx:
+                ax.plot(
+                    r11,
+                    timarr,
+                    h2,
+                    zorder=zord - 1000 * max(rad),
+                    color="k",
+                    alpha=alpha,
+                    label=label_eff,
+                )
+            ax.quiver(
+                r1,
+                time,
+                h,
+                xydir,
+                xydir,
+                h1 - h,
+                alpha=0.6,
+                arrow_length_ratio=0.0,
+                color=color,
+                zorder=zord + 300,
+            )
+            ax.scatter(
+                r1,
+                time,
+                h1,
+                depthshade=False,
+                zorder=zord + 600,
+                color=color,
+                label=label,
+            )
 
-        h = plot_f(**{extra["time"]: time, extra["rad"]: re}).reshape(-1)
-        h1 = data[:, ri]
-        h2 = plot_f(**{extra["time"]: timarr, extra["rad"]: re}).reshape(-1)
+        for te in time:
+            t11 = te * t_gen
+            h = plot_f(**{extra["time"]: te, extra["rad"]: radarr}).reshape(-1)
+            ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
 
-        zord = 1000 * (len(rad) - ri)
+        # ax.view_init(elev=45, azim=155)
+        ax.view_init(elev=40, azim=125)
+        ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
+        ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
+        ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
+        _sort_lgd(ax, loc="lower left", markerscale=2)
+        fig.tight_layout()
+        if plotname is not None:
+            fig.savefig(plotname, format="pdf")
 
-        ax.plot(
-            r11,
-            timarr,
-            h2,
-            label=radnames[ri] + " r={:04.2f}".format(re),
-            zorder=zord,
-        )
-        ax.quiver(
-            r1,
-            time,
-            h,
-            xydir,
-            xydir,
-            h1 - h,
-            alpha=0.5,
-            arrow_length_ratio=0.0,
-            color="C" + str(ri % 10),
-            zorder=zord,
-        )
-        ax.scatter(r1, time, h1, depthshade=False, zorder=zord)
-
-    for te in time:
-        t11 = te * t_gen
-        h = plot_f(**{extra["time"]: te, extra["rad"]: radarr}).reshape(-1)
-        ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
-
-    ax.view_init(elev=45, azim=155)
-    ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
-    ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
-    ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="lower left", fontsize="small")
-    fig.tight_layout()
-    if plotname is not None:
-        fig.savefig(plotname, format="pdf")
-    plt.style.use("ggplot")
     return ax
 
 
 def plotfit_steady(
-    setup, data, para, rad, radnames, extra, plotname=None, fig=None, ax=None
+    setup,
+    data,
+    para,
+    rad,
+    radnames,
+    extra,
+    plotname=None,
+    ax_ins=True,
+    fig=None,
+    ax=None,
 ):
     """Plot of steady estimation fitting."""
     val_fix = setup.val_fix
@@ -458,18 +516,54 @@ def plotfit_steady(
     plot_f = ft.partial(setup.func, **val_fix)
     radarr = np.linspace(rad.min(), rad.max(), 100)
 
-    fig, ax = _get_fig_ax(fig, ax, figsize=(9, 6))
+    test_name = list(np.unique(radnames[:, 0]))
+    test_name.sort()
+    rad_unique, rad_un_idx = np.unique(rad, return_index=True)
 
-    for ri, re in enumerate(rad):
-        ax.scatter(re, data[ri], label=radnames[ri])
+    with plt.style.context("ggplot"):
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        fig, ax = _get_fig_ax(fig, ax, figsize=(9, 6))
+        if ax_ins:
+            axins = ax.inset_axes([0.4, 0.07, 0.57, 0.5])
+            axins.plot(
+                radarr,
+                plot_f(**{extra["rad"]: radarr}),
+                alpha=0.6,
+                color="k",
+                zorder=200,
+            )
+            axins.set_xscale("log")
+            axins.set_facecolor("w")
+        for ri, re in enumerate(rad):
+            h = plot_f(**{extra["rad"]: re}).reshape(-1)
+            h1 = data[ri]
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            if radnames[ri, 0] == radnames[ri, 1]:
+                label = "test {}".format(radnames[ri, 0])
+            else:
+                label = None
+            ax.plot([re, re], [h, h1], alpha=0.6, color=color, zorder=100)
+            ax.scatter(re, data[ri], color=color, label=label, zorder=300)
+            if ax_ins:
+                axins.plot(
+                    [re, re], [h, h1], alpha=0.6, color=color, zorder=100
+                )
+                axins.scatter(re, data[ri], color=color, zorder=300)
 
-    ax.plot(radarr, plot_f(**{extra["rad"]: radarr}), "--", color="k")
-    ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
-    ax.set_ylabel(r"$h/|Q|$ in $\left[\mathrm{m}\right]$")
-    ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
-    fig.tight_layout()
-    if plotname is not None:
-        fig.savefig(plotname, format="pdf")
+        ax.plot(
+            radarr,
+            plot_f(**{extra["rad"]: radarr}),
+            alpha=0.6,
+            color="k",
+            zorder=200,
+        )
+        ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
+        ax.set_ylabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
+        _sort_lgd(ax, loc="upper left", bbox_to_anchor=(1, 1), markerscale=2)
+        fig.tight_layout()
+        if plotname is not None:
+            fig.savefig(plotname, format="pdf")
+
     return ax
 
 
@@ -477,22 +571,25 @@ def plotparainteract(result, paranames, plotname=None, fig=None):
     """Plot of parameter interaction."""
     import pandas as pd
 
-    plt.style.use("default")
-    fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
-    fields = [word for word in result.dtype.names if word.startswith("par")]
-    parameterdistribtion = result[fields]
-    df = pd.DataFrame(
-        np.asarray(parameterdistribtion).T.tolist(), columns=paranames
-    )
-    with warnings.catch_warnings():
-        # We know that the fig is resetted, but we need to give ax to pass fig
-        warnings.simplefilter("ignore", UserWarning)
-        pd.plotting.scatter_matrix(df, alpha=0.2, ax=ax, diagonal="kde")
-
-    fig.tight_layout()
-    if plotname is not None:
-        fig.savefig(plotname, format="pdf")
-    plt.style.use("ggplot")
+    with plt.style.context("default"):
+        fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
+        fields = [par for par in result.dtype.names if par.startswith("par")]
+        parameterdistribtion = result[fields]
+        df = pd.DataFrame(
+            np.asarray(parameterdistribtion).T.tolist(), columns=paranames
+        )
+        with warnings.catch_warnings():
+            # We know that fig is resetted, but we need to give ax to set fig
+            warnings.simplefilter("ignore", UserWarning)
+            if len(paranames) > 1:
+                pd.plotting.scatter_matrix(
+                    df, alpha=0.2, ax=ax, diagonal="kde"
+                )
+            else:
+                df.plot.kde(ax=ax)
+        fig.tight_layout()
+        if plotname is not None:
+            fig.savefig(plotname, format="pdf")
     return fig
 
 
@@ -508,39 +605,42 @@ def plotparatrace(
     """Plot of parameter trace."""
     rep = len(result)
     rows = len(parameternames)
-    fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
+    with plt.style.context("ggplot"):
 
-    for j in range(rows):
-        ax = fig.add_subplot(rows, 1, 1 + j)
-        data = result["par" + parameternames[j]]
+        fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
 
-        ax.plot(data, "-", color="C0")
+        for j in range(rows):
+            ax = fig.add_subplot(rows, 1, 1 + j)
+            data = result["par" + parameternames[j]]
 
-        if stdvalues is not None:
-            ax.plot(
-                [stdvalues[j]] * rep,
-                "--",
-                label="best value: {:04.2f}".format(stdvalues[j]),
-                color="C1",
+            ax.plot(data, "-", color="C0")
+
+            if stdvalues is not None:
+                ax.plot(
+                    [stdvalues[j]] * rep,
+                    "--",
+                    label="best value: {:04.2f}".format(stdvalues[j]),
+                    color="k",
+                    alpha=0.7,
+                )
+                ax.legend()
+
+            if xticks is None:
+                xticks = np.linspace(0, 1, 11) * len(data)
+
+            ax.set_xlim(0, rep)
+            ax.set_ylim(
+                np.min(data) - 0.1 * np.max(abs(data)),
+                np.max(data) + 0.1 * np.max(abs(data)),
             )
-            ax.legend()
+            ax.xaxis.set_ticks(xticks)
+            ax.set_ylabel(
+                parameterlabels[j], rotation=0, fontsize="large", labelpad=10
+            )
 
-        if xticks is None:
-            xticks = np.linspace(0, 1, 11) * len(data)
-
-        ax.set_xlim(0, rep)
-        ax.set_ylim(
-            np.min(data) - 0.1 * np.max(abs(data)),
-            np.max(data) + 0.1 * np.max(abs(data)),
-        )
-        ax.xaxis.set_ticks(xticks)
-        ax.set_ylabel(
-            parameterlabels[j], rotation=0, fontsize="large", labelpad=10
-        )
-
-    fig.tight_layout()
-    if plotname is not None:
-        fig.savefig(plotname, format="pdf", bbox_inches="tight")
+        fig.tight_layout()
+        if plotname is not None:
+            fig.savefig(plotname, format="pdf", bbox_inches="tight")
     return fig
 
 
@@ -548,27 +648,28 @@ def plotsensitivity(
     paralabels, sensitivities, plotname=None, fig=None, ax=None
 ):
     """Plot of sensitivity results."""
-    plt.style.use("ggplot")
-    fig, ax = _get_fig_ax(fig, ax)
-    explode = np.full_like(sensitivities["ST"], 0.1)
-    wedges, __ = ax.pie(
-        sensitivities["ST"], explode=explode, shadow=True, startangle=90
-    )
-    lgd = ax.legend(
-        wedges,
-        paralabels,
-        title="Parameter",
-        loc="center left",
-        bbox_to_anchor=(1, 0, 0.5, 1),
-    )
-    ax.axis("equal")
-    fig.tight_layout()
-    fig.suptitle("FAST total sensitivity shares", fontsize="large")
-    if plotname is not None:
-        fig.savefig(
-            plotname,
-            format="pdf",
-            bbox_extra_artists=(lgd,),
-            bbox_inches="tight",
+    with plt.style.context("ggplot"):
+
+        fig, ax = _get_fig_ax(fig, ax)
+        w_props = {"linewidth": 1, "edgecolor": "w", "width": 0.5}
+        wedges, __ = ax.pie(
+            sensitivities["ST"], wedgeprops=w_props, startangle=90
         )
+        lgd = ax.legend(
+            wedges,
+            paralabels,
+            title="Parameters",
+            loc="center left",
+            bbox_to_anchor=(1, 0, 0.5, 1),
+        )
+        ax.axis("equal")
+        fig.suptitle("FAST total sensitivity shares", fontsize="large")
+        fig.tight_layout()
+        if plotname is not None:
+            fig.savefig(
+                plotname,
+                format="pdf",
+                bbox_extra_artists=(lgd,),
+                bbox_inches="tight",
+            )
     return ax

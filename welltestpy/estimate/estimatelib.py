@@ -300,7 +300,7 @@ class TransientPumping(object):
         rad = np.array([])
         data = None
 
-        radnames = np.array([])
+        radnames = []
 
         for test in self.testinclude:
             pwell = self.campaign.wells[self.campaign.tests[test].pumpingwell]
@@ -321,12 +321,12 @@ class TransientPumping(object):
                     temprad = pwell - owell
                 rad = np.hstack((rad, temprad))
 
-                tempname = self.campaign.tests[test].pumpingwell + "-" + obs
-                radnames = np.hstack((radnames, tempname))
+                tempname = (self.campaign.tests[test].pumpingwell, obs)
+                radnames.append(tempname)
 
         # sort everything by the radii
         idx = rad.argsort()
-
+        radnames = np.array(radnames)
         self.rad = rad[idx]
         self.data = data[:, idx]
         self.radnames = radnames[idx]
@@ -852,7 +852,7 @@ class SteadyPumping(object):
         rad = np.array([])
         data = np.array([])
 
-        radnames = np.array([])
+        radnames = []
 
         for test in self.testinclude:
             pwell = self.campaign.wells[self.campaign.tests[test].pumpingwell]
@@ -867,12 +867,12 @@ class SteadyPumping(object):
                     temprad = pwell - owell
                 rad = np.hstack((rad, temprad))
 
-                tempname = self.campaign.tests[test].pumpingwell + "-" + obs
-                radnames = np.hstack((radnames, tempname))
+                tempname = (self.campaign.tests[test].pumpingwell, obs)
+                radnames.append(tempname)
 
         # sort everything by the radii
         idx = rad.argsort()
-
+        radnames = np.array(radnames)
         self.rad = rad[idx]
         self.data = data[idx]
         self.radnames = radnames[idx]

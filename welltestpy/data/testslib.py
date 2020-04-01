@@ -452,7 +452,7 @@ class PumpingTest(Test):
             if obs in self.observations:
                 del self.__observations[obs]
 
-    def plot(self, wells, exclude=None, fig=None, ax=None):
+    def plot(self, wells, exclude=None, fig=None, ax=None, **kwargs):
         """Generate a plot of the pumping test.
 
         This will plot the pumping test on the given figure axes.
@@ -472,7 +472,12 @@ class PumpingTest(Test):
         This will be used by the Campaign class.
         """
         plot_pump_test(
-            pump_test=self, wells=wells, exclude=exclude, fig=fig, ax=ax
+            pump_test=self,
+            wells=wells,
+            exclude=exclude,
+            fig=fig,
+            ax=ax,
+            **kwargs
         )
 
     def save(self, path="", name=None):
