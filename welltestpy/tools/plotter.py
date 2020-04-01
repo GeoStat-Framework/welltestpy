@@ -416,7 +416,10 @@ def plotfit_transient(
         for kwarg in ["time", "rad"]:
             val_fix.pop(extra[kwarg], None)
 
-        para_kw = setup.get_sim_kwargs(para)
+        para_ordered = np.empty(len(setup.para_names))
+        for i, name in enumerate(setup.para_names):
+            para_ordered[i] = para[name]
+        para_kw = setup.get_sim_kwargs(para_ordered)
         val_fix.update(para_kw)
 
         plot_f = ft.partial(setup.func, **val_fix)
@@ -515,7 +518,10 @@ def plotfit_steady(
     val_fix = setup.val_fix
     val_fix.pop(extra["rad"], None)
 
-    para_kw = setup.get_sim_kwargs(para)
+    para_ordered = np.empty(len(setup.para_names))
+    for i, name in enumerate(setup.para_names):
+        para_ordered[i] = para[name]
+    para_kw = setup.get_sim_kwargs(para_ordered)
     val_fix.update(para_kw)
 
     plot_f = ft.partial(setup.func, **val_fix)
@@ -623,9 +629,11 @@ def plotparatrace(
 
             if stdvalues is not None:
                 ax.plot(
-                    [stdvalues[j]] * rep,
+                    [stdvalues[parameternames[j]]] * rep,
                     "--",
-                    label="best value: {:04.2f}".format(stdvalues[j]),
+                    label="best value: {:04.2f}".format(
+                        stdvalues[parameternames[j]]
+                    ),
                     color="k",
                     alpha=0.7,
                 )

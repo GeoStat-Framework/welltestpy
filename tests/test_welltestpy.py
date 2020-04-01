@@ -76,21 +76,21 @@ class TestWTP(unittest.TestCase):
         campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
         estimation = wtp.estimate.Theis("est_theis", campaign, generate=True)
         estimation.run()
-        res = estimation.para
+        res = estimation.estimated_para
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res[0]), self.transmissivity, 2)
-        self.assertAlmostEqual(np.exp(res[1]), self.storage, 2)
+        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        self.assertAlmostEqual(np.exp(res["lnS"]), self.storage, 2)
 
     def test_est_thiem(self):
         campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
         estimation = wtp.estimate.Thiem("est_thiem", campaign, generate=True)
         estimation.run()
-        res = estimation.para
+        res = estimation.estimated_para
         # since we only have one parameter,
         # we need a dummy parameter to estimate sensitivity
         estimation.gen_setup(dummy=True)
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res[0]), self.transmissivity, 2)
+        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
 
     def test_est_ext_thiem2D(self):
         campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -98,10 +98,10 @@ class TestWTP(unittest.TestCase):
             "est_ext_thiem2D", campaign, generate=True
         )
         estimation.run()
-        res = estimation.para
+        res = estimation.estimated_para
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res[0]), self.transmissivity, 2)
-        self.assertAlmostEqual(res[1], 0.0, 0)
+        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        self.assertAlmostEqual(res["var"], 0.0, 0)
 
     def test_est_ext_thiem3D(self):
         campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -109,10 +109,10 @@ class TestWTP(unittest.TestCase):
             "est_ext_thiem3D", campaign, generate=True
         )
         estimation.run()
-        res = estimation.para
+        res = estimation.estimated_para
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res[0]), self.transmissivity, 2)
-        self.assertAlmostEqual(res[1], 0.0, 0)
+        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        self.assertAlmostEqual(res["var"], 0.0, 0)
 
     def test_triangulate(self):
         from welltestpy.tools import triangulate, sym, plot_well_pos

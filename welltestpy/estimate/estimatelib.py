@@ -171,8 +171,8 @@ class TransientPumping(object):
         self.radnames = None
         """:class:`numpy.ndarray`: names of the radii well combination"""
 
-        self.para = None
-        """:class:`list` of :class:`float`: estimated parameters"""
+        self.estimated_para = {}
+        """:class:`dict`: estimated parameters by name"""
         self.result = None
         """:class:`list`: result of the spotpy estimation"""
         self.sens = None
@@ -494,12 +494,13 @@ class TransientPumping(object):
                     self.result, maximize=False
                 )
                 void_names = para_opt.dtype.names
-                self.para = np.empty(len(self.setup.para_names))
+                para = []
+                header = []
                 for name in void_names:
-                    self.para[
-                        self.setup.para_names.index(name[3:])
-                    ] = para_opt[0][name]
-                np.savetxt(paraname, self.para)
+                    para.append(para_opt[0][name])
+                    header.append(name[3:])
+                    self.estimated_para[header[-1]] = para[-1]
+                np.savetxt(paraname, para, header=" ".join(header))
 
         if rank == 0:
             # plot the estimation-results
@@ -507,18 +508,18 @@ class TransientPumping(object):
                 self.result,
                 parameternames=paranames,
                 parameterlabels=paralabels,
-                stdvalues=self.para,
+                stdvalues=self.estimated_para,
                 plotname=traceplotname,
             )
             plotfit_transient(
-                self.setup,
-                self.data,
-                self.para,
-                self.rad,
-                self.time,
-                self.radnames,
-                self.extra_kw_names,
-                fittingplotname,
+                setup=self.setup,
+                data=self.data,
+                para=self.estimated_para,
+                rad=self.rad,
+                time=self.time,
+                radnames=self.radnames,
+                extra=self.extra_kw_names,
+                plotname=fittingplotname,
             )
             plotparainteract(self.result, paralabels, interactplotname)
 
@@ -776,8 +777,8 @@ class SteadyPumping(object):
         self.h_ref = None
         """:class:`float`: reference head at the biggest distance"""
 
-        self.para = None
-        """:class:`list` of :class:`float`: estimated parameters"""
+        self.estimated_para = {}
+        """:class:`dict`: estimated parameters by name"""
         self.result = None
         """:class:`list`: result of the spotpy estimation"""
         self.sens = None
@@ -1063,28 +1064,31 @@ class SteadyPumping(object):
                     self.result, maximize=False
                 )
                 void_names = para_opt.dtype.names
-                self.para = []
+                para = []
+                header = []
                 for name in void_names:
-                    self.para.append(para_opt[0][name])
-                np.savetxt(paraname, self.para)
+                    para.append(para_opt[0][name])
+                    header.append(name[3:])
+                    self.estimated_para[header[-1]] = para[-1]
+                np.savetxt(paraname, para, header=" ".join(header))
 
         if rank == 0:
             # plot the estimation-results
             plotparatrace(
-                self.result,
+                result=self.result,
                 parameternames=paranames,
                 parameterlabels=paralabels,
-                stdvalues=self.para,
+                stdvalues=self.estimated_para,
                 plotname=traceplotname,
             )
             plotfit_steady(
-                self.setup,
-                self.data,
-                self.para,
-                self.rad,
-                self.radnames,
-                self.extra_kw_names,
-                fittingplotname,
+                setup=self.setup,
+                data=self.data,
+                para=self.estimated_para,
+                rad=self.rad,
+                radnames=self.radnames,
+                extra=self.extra_kw_names,
+                plotname=fittingplotname,
             )
             plotparainteract(self.result, paralabels, interactplotname)
 
