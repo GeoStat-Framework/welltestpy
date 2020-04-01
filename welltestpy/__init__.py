@@ -15,8 +15,6 @@ Subpackages
     process
     tools
 """
-from __future__ import absolute_import
-
 from welltestpy._version import __version__
 from welltestpy import data, estimate, process, tools
 

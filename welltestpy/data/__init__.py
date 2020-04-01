@@ -83,8 +83,6 @@ Variable related loading routines
     load_obs
     load_well
 """
-from __future__ import absolute_import
-
 from welltestpy.data import varlib, testslib, campaignlib
 
 from welltestpy.data.varlib import (

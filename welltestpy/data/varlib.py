@@ -22,8 +22,6 @@ The following classes and functions are provided
    load_obs
    load_well
 """
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
 import os
 import csv

@@ -18,8 +18,6 @@ The following classes and functions are provided
    plotparatrace
    plotsensitivity
 """
-from __future__ import absolute_import, division, print_function
-
 import warnings
 import functools as ft
 

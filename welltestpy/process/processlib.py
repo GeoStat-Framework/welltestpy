@@ -11,8 +11,6 @@ The following classes are provided
    combinepumptest
    filterdrawdown
 """
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
 import numpy as np
 from scipy import signal

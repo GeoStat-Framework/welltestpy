@@ -30,8 +30,6 @@ The following estimation classes are provided
     Thiem
     TypeCurve
 """
-from __future__ import absolute_import
-
 from welltestpy.estimate import estimatelib, spotpy_classes
 
 from welltestpy.estimate.estimatelib import (

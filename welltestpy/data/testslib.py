@@ -11,19 +11,16 @@ The following classes and functions are provided
    PumpingTest
    load_test
 """
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
 import os
 import csv
 import shutil
 import zipfile
 import tempfile
-from io import TextIOWrapper as TxtIO
+from io import TextIOWrapper as TxtIO, BytesIO as BytIO
 
 import numpy as np
 
-from welltestpy.tools import BytIO
 from welltestpy.tools.plotter import plot_pump_test
 from welltestpy.data.varlib import (
     Variable,

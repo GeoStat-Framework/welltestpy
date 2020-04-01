@@ -18,8 +18,6 @@ The following classes are provided
    Neuman2004Steady
    Thiem
 """
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
 import os
 import time as timemodule

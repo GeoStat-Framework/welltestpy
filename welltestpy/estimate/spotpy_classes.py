@@ -9,8 +9,6 @@ The following functions and classes are provided
 .. autosummary::
    TypeCurve
 """
-from __future__ import absolute_import, division, print_function
-
 import functools as ft
 
 import numpy as np
