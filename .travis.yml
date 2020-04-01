@@ -10,6 +10,7 @@ env:
     # Note: TWINE_PASSWORD is set in Travis settings
     - TWINE_USERNAME=geostatframework
     - CIBW_BUILD="cp35-* cp36-* cp37-* cp38-*"
+    - CIBW_SKIP="*_i686"  # skip linux 32bit for matplotlib
     # update setuptools to latest version
     - CIBW_BEFORE_BUILD="pip install -U setuptools"
     # testing with cibuildwheel
