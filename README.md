@@ -28,7 +28,7 @@ You can install the latest version with the following command:
 You can find the documentation under [geostat-framework.readthedocs.io][doc_link].
 
 
-### Example 1: Create a Campaign containing a pumping test
+### Example 1: A campaign containing a pumping test
 
 In the following, we will take a look at an artificial pumping test campaign,
 that is stored in a file called `Cmp_UFZ-campaign.cmp`.
