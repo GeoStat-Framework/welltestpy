@@ -37,16 +37,15 @@ The following functions are provided directly
 Requirements
 ============
 
-- `NumPy >= 1.13.0 <https://www.numpy.org>`_
-- `SciPy >= 0.19.1 <https://www.scipy.org>`_
-- `AnaFlow <https://github.com/GeoStat-Framework/AnaFlow>`_
-- `Matplotlib <https://matplotlib.org>`_
-- `Pandas <https://pandas.pydata.org>`_
-- `SpotPy <https://github.com/thouska/spotpy>`_
-
+- `NumPy >= 1.14.5 <https://www.numpy.org>`_
+- `SciPy >= 1.1.0 <https://www.scipy.org>`_
+- `Pandas >= 0.23.2 <https://pandas.pydata.org>`_
+- `AnaFlow >= 1.0.0 <https://github.com/GeoStat-Framework/AnaFlow>`_
+- `SpotPy >= 1.5.0 <https://github.com/thouska/spotpy>`_
+- `Matplotlib >= 3.0.0 <https://matplotlib.org>`_
 
 
 License
 =======
 
-`GPL <https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE>`_ © 2019
+`MIT <https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE>`_
