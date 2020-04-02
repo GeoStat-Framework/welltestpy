@@ -1,19 +1,33 @@
-# -*- coding: utf-8 -*-
+"""
+Creating a pumping test campaign
+--------------------------------
+
+In the following we are going to create an artificial pumping test campaign
+on a field site.
+"""
+
 import numpy as np
 import welltestpy as wtp
 import anaflow as ana
 
-### create the field-site and the campaign
+
+###############################################################################
+# Create the field-site and the campaign
+
 field = wtp.FieldSite(name="UFZ", coordinates=[51.353839, 12.431385])
 campaign = wtp.Campaign(name="UFZ-campaign", fieldsite=field)
 
-### add 4 wells to the campaign
+###############################################################################
+# Add 4 wells to the campaign
+
 campaign.add_well(name="well_0", radius=0.1, coordinates=(0.0, 0.0))
 campaign.add_well(name="well_1", radius=0.1, coordinates=(1.0, -1.0))
 campaign.add_well(name="well_2", radius=0.1, coordinates=(2.0, 2.0))
 campaign.add_well(name="well_3", radius=0.1, coordinates=(-2.0, -1.0))
 
-### generate artificial drawdown data with the Theis solution
+###############################################################################
+# Generate artificial drawdown data with the Theis solution
+
 rate = -1e-4
 time = np.geomspace(10, 7200, 10)
 transmissivity = 1e-4
@@ -32,7 +46,9 @@ drawdown = ana.theis(
     rate=rate,
 )
 
-### create a pumping test at well_0
+###############################################################################
+# Create a pumping test at well_0
+
 pumptest = wtp.PumpingTest(
     name="well_0",
     pumpingwell="well_0",
@@ -40,20 +56,27 @@ pumptest = wtp.PumpingTest(
     description="Artificial pump test with Theis",
 )
 
-### add the drawdown observation at the 4 wells
+###############################################################################
+# Add the drawdown observation at the 4 wells
+
 pumptest.add_transient_obs("well_0", time, drawdown[:, 0])
 pumptest.add_transient_obs("well_1", time, drawdown[:, 1])
 pumptest.add_transient_obs("well_2", time, drawdown[:, 2])
 pumptest.add_transient_obs("well_3", time, drawdown[:, 3])
 
-### add the pumping test to the campaign
+###############################################################################
+# Add the pumping test to the campaign
+
 campaign.addtests(pumptest)
-### optionally make the test (quasi)steady
+# optionally make the test (quasi)steady
 # campaign.tests["well_0"].make_steady()
 
-### plot the well constellation and a test overview
+###############################################################################
+# Plot the well constellation and a test overview
 campaign.plot_wells()
 campaign.plot()
 
-### save the whole campaign
+###############################################################################
+# Save the whole campaign to a file
+
 campaign.save()

@@ -350,20 +350,16 @@ class Observation(object):
 
         Parameters
         ----------
-        in1 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
-        :class:`Variable`, optional
+        in1 : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
             New Value for time (if transient) or observation (if steady).
             Default: ``"None"``
-        in2 : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
-        :class:`Variable`, optional
+        in2 : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
             New Value for observation (if transient).
             Default: ``"None"``
-        time : :class:`int` or :class:`float` or :class:`numpy.ndarray` or
-        :class:`Variable`, optional
+        time : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
             New Value for time.
             Default: ``"None"``
-        observation : :class:`int` or :class:`float` or :class:`numpy.ndarray`
-        or :class:`Variable`, optional
+        observation : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
             New Value for observation.
             Default: ``"None"``
 

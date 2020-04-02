@@ -9,9 +9,3 @@ welltestpy.estimate
 .. raw:: latex
 
     \clearpage
-
-.. toctree::
-   :hidden:
-
-   estimate.estimatelib.rst
-   estimate.spotpy_classes.rst

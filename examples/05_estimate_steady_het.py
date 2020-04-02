@@ -1,4 +1,12 @@
-# -*- coding: utf-8 -*-
+"""
+Estimate steady heterogeneous parameters
+----------------------------------------
+
+Here we demonstrate how to estimate parameters of heterogeneity, namely
+mean, variance and correlation length of log-transmissivity,
+with the aid the the extended Thiem solution in 2D.
+"""
+
 import welltestpy as wtp
 
 campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")

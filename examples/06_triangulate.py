@@ -1,4 +1,14 @@
-# -*- coding: utf-8 -*-
+"""
+Point triangulation
+-------------------
+
+Often, we only know the distances between wells within a well base field campaign.
+To retrieve their spatial positions, we provide a routine, that triangulates
+their positions from a given distance matrix.
+
+If the solution is not unique, all possible constellations will be returned.
+"""
+
 import numpy as np
 from welltestpy.tools import triangulate, sym, plot_well_pos
 
@@ -12,5 +22,7 @@ dist_mat[2, 3] = -1  # unknown distance between well 2 and 3
 dist_mat = sym(dist_mat)  # make the distance matrix symmetric
 well_const = triangulate(dist_mat, prec=0.1)
 
-# plot all possible well constellations
+###############################################################################
+# Now we can plot all possible well constellations
+
 plot_well_pos(well_const)
