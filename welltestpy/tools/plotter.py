@@ -444,20 +444,22 @@ def plotfit_transient(
             )
             color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
             alpha = 0.3 * (1 - (re - min(rad)) / (max(rad) - min(rad))) + 0.3
-            zord = 1000 * (len(rad) - ri)
+            zord = 100 * (len(rad) - ri)
 
             if radnames[ri, 0] == radnames[ri, 1]:
                 label = "test {}".format(radnames[ri, 0])
                 label_eff = "fitted type curve"
+                eff_zord = zord + 100  # first line should be on top
             else:
                 label = None
                 label_eff = None
+                eff_zord = 1
             if ri in rad_un_idx:
                 ax.plot(
                     r11,
                     timarr,
                     h2,
-                    zorder=zord - 1000 * max(rad),
+                    zorder=eff_zord,
                     color="k",
                     alpha=alpha,
                     label=label_eff,
@@ -472,14 +474,14 @@ def plotfit_transient(
                 alpha=0.6,
                 arrow_length_ratio=0.0,
                 color=color,
-                zorder=zord + 300,
+                zorder=zord + 30,
             )
             ax.scatter(
                 r1,
                 time,
                 h1,
                 depthshade=False,
-                zorder=zord + 600,
+                zorder=zord + 60,
                 color=color,
                 label=label,
             )
@@ -494,7 +496,7 @@ def plotfit_transient(
         ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
         ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
         ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
-        _sort_lgd(ax, loc="lower left", markerscale=2)
+        _sort_lgd(ax, loc="upper right", markerscale=2)
         fig.tight_layout()
         if plotname is not None:
             fig.savefig(plotname, format="pdf")
@@ -545,6 +547,15 @@ def plotfit_steady(
             )
             axins.set_xscale("log")
             axins.set_facecolor("w")
+            axins.text(
+                0.975,
+                0.025,
+                "log-radius plot",
+                ha="right",
+                va="bottom",
+                bbox=dict(boxstyle="round", ec="k", fc="w"),
+                transform=axins.transAxes,
+            )
         for ri, re in enumerate(rad):
             h = plot_f(**{extra["rad"]: re}).reshape(-1)
             h1 = data[ri]
@@ -567,6 +578,7 @@ def plotfit_steady(
             alpha=0.6,
             color="k",
             zorder=200,
+            label="fitted type curve",
         )
         ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
         ax.set_ylabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
