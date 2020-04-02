@@ -112,11 +112,6 @@ class Variable(object):
         info += " -Symbol:       " + str(self.symbol) + "\n"
         info += " -Units:        " + str(self.units) + "\n"
         info += " -Description:  " + str(self.description) + "\n"
-        #        print(" Variable-name: "+str(self.name))
-        #        print(" -Value:        "+str(self.value))
-        #        print(" -Symbol:       "+str(self.symbol))
-        #        print(" -Units:        "+str(self.units))
-        #        print(" -Description:  "+str(self.description))
         return info
 
     @property
@@ -484,15 +479,6 @@ class Observation(object):
             info += self._time.info + "\n"
         info += " --- " + "\n"
         info += self._observation.info + "\n"
-        #        print("Observation-name: "+str(self.name))
-        #        print(" -Description:    "+str(self.description))
-        #        print(" -Kind:           "+str(self.kind))
-        #        print(" -State:          "+str(self.state))
-        #        if self.state == "transient":
-        #            print(" --- ")
-        #            self._time.info
-        #        print(" --- ")
-        #        self._observation.info
         return info
 
     @property
@@ -625,7 +611,7 @@ class Observation(object):
             self.__itfinished = False
         return self
 
-    def next(self):
+    def __next__(self):
         """Iterate through observations."""
         if self.state == "transient":
             if self.__it.finished:
@@ -641,14 +627,6 @@ class Observation(object):
             ret = self.observation
             self.__itfinished = True
         return ret
-
-    # for python 2&3 compatibility overwrite "__next__" with "next"
-    __next__ = next
-
-    # def edit(self):
-    #     """Edit the observed time-series with a graphical interface."""
-    #     if self.state == "transient" and len(np.shape(self.time)) == 1:
-    #         Editor(self)
 
     def save(self, path="", name=None):
         """Save an observation to file.
@@ -936,14 +914,6 @@ class Well(object):
         info += self._welldepth.info + "\n"
         info += self._aquiferdepth.info + "\n"
         info += "----" + "\n"
-        #        print("----")
-        #        print("Well-name: "+str(self.name))
-        #        print("--")
-        #        self._radius.info
-        #        self._coordinates.info
-        #        self._welldepth.info
-        #        self._aquiferdepth.info
-        #        print("----")
         return info
 
     @property
