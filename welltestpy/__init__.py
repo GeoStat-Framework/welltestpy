@@ -4,16 +4,50 @@ Purpose
 =======
 
 WellTestPy provides a framework to handle and plot data from well based
-field campaigns as well as a data interpretation module.
+field campaigns as well as a parameter estimation module.
 
 Subpackages
-===========
+^^^^^^^^^^^
 
 .. autosummary::
     data
     estimate
     process
     tools
+
+Classes
+^^^^^^^
+
+Campaign classes
+~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.campaignlib
+
+The following classes can be used to handle field campaigns.
+
+.. autosummary::
+    Campaign
+    FieldSite
+
+Field Test classes
+~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: welltestpy.data.testslib
+
+The following classes can be used to handle field test within a campaign.
+
+.. autosummary::
+    PumpingTest
+
+Loading routines
+^^^^^^^^^^^^^^^^
+
+.. currentmodule:: welltestpy.data.data_io
+
+Campaign related loading routines
+
+.. autosummary::
+    load_campaign
 """
 from . import data, estimate, process, tools
 

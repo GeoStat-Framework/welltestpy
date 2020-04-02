@@ -4,23 +4,18 @@ welltestpy subpackage providing miscellaneous tools.
 
 .. currentmodule:: welltestpy.tools
 
-Subpackages
-^^^^^^^^^^^
-
-The following subpackages are provided
-
-.. autosummary::
-    plotter
-    trilib
-
 Included functions
 ^^^^^^^^^^^^^^^^^^
 
-The following classes and functions are provided
+The following functions are provided for point triangulation
 
 .. autosummary::
    triangulate
    sym
+
+The following plotting routines are provided
+
+.. autosummary::
    campaign_plot
    fadeline
    plot_well_pos

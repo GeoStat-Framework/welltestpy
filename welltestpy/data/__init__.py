@@ -8,6 +8,7 @@ Subpackages
 .. currentmodule:: welltestpy.data
 
 .. autosummary::
+    data_io
     varlib
     testslib
     campaignlib

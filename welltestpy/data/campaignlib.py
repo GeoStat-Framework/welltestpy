@@ -8,8 +8,6 @@ The following classes and functions are provided
 .. autosummary::
    FieldSite
    Campaign
-   load_fieldsite
-   load_campaign
 """
 from copy import deepcopy as dcopy
 

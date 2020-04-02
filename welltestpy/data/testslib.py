@@ -9,7 +9,6 @@ The following classes and functions are provided
 .. autosummary::
    Test
    PumpingTest
-   load_test
 """
 from copy import deepcopy as dcopy
 
