@@ -572,7 +572,7 @@ class Observation(object):
             if self.__it.finished:
                 raise StopIteration
             ret = (
-                np.asscalar(self.__it[0]),
+                self.__it[0].item(),
                 self.observation[self.__it.multi_index],
             )
             self.__it.iternext()
