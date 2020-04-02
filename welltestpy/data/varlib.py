@@ -18,19 +18,12 @@ The following classes and functions are provided
    StdyHeadObs
    TimeSeries
    Well
-   load_var
-   load_obs
-   load_well
 """
 from copy import deepcopy as dcopy
-import os
-import csv
-import shutil
-import zipfile
-import tempfile
-from io import TextIOWrapper as TxtIO
 
 import numpy as np
+
+from . import data_io
 
 
 __all__ = [
@@ -45,9 +38,6 @@ __all__ = [
     "StdyHeadObs",
     "TimeSeries",
     "Well",
-    "load_var",
-    "load_obs",
-    "load_well",
 ]
 
 
@@ -76,7 +66,7 @@ class Variable(object):
     def __init__(
         self, name, value, symbol="x", units="-", description="no description"
     ):
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
         self.__value = None
         self.value = value
         self.symbol = str(symbol)
@@ -177,42 +167,7 @@ class Variable(object):
         -----
         The file will get the suffix ``".var"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Var_" + self.name
-        # ensure the name ends with '.var'
-        if name[-4:] != ".var":
-            name += ".var"
-        name = _formname(name)
-        file_path = os.path.join(path, name)
-        # write the csv-file
-        with open(file_path, "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Variable"])
-            writer.writerow(["name", self.name])
-            writer.writerow(["symbol", self.symbol])
-            writer.writerow(["units", self.units])
-            writer.writerow(["description", self.description])
-            if np.asanyarray(self.__value).dtype == np.int:
-                writer.writerow(["integer"])
-            else:
-                writer.writerow(["float"])
-            if self.scalar:
-                writer.writerow(["scalar"])
-                writer.writerow(["value", self.value])
-            else:
-                writer.writerow(["shape"] + list(np.shape(self.value)))
-                tmpvalue = np.reshape(self.value, -1)
-                writer.writerow(["values", len(tmpvalue)])
-                for val in tmpvalue:
-                    writer.writerow([val])
-        return file_path
+        return data_io.save_var(self, path, name)
 
 
 class TimeVar(Variable):
@@ -366,7 +321,7 @@ class Observation(object):
     def __init__(self, name, time, observation, description="Observation"):
         self.__it = None
         self.__itfinished = None
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
         self.description = str(description)
 
         if isinstance(observation, Variable):
@@ -645,50 +600,7 @@ class Observation(object):
         -----
         The file will get the suffix ``".obs"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Obs_" + self.name
-        # ensure the name ends with '.obs'
-        if name[-4:] != ".obs":
-            name += ".obs"
-        name = _formname(name)
-        # create temporal directory for the included files
-        patht = tempfile.mkdtemp(dir=path)
-        # write the csv-file
-        # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Observation"])
-            writer.writerow(["name", self.name])
-            writer.writerow(["state", self.state])
-            writer.writerow(["description", self.description])
-            if self.state == "steady":
-                obsname = name[:-4] + "_ObsVar.var"
-                writer.writerow(["observation", obsname])
-                self._observation.save(patht, obsname)
-            else:
-                timname = name[:-4] + "_TimVar.var"
-                obsname = name[:-4] + "_ObsVar.var"
-                writer.writerow(["time", timname])
-                writer.writerow(["observation", obsname])
-                self._time.save(patht, timname)
-                self._observation.save(patht, obsname)
-        # compress everything to one zip-file
-        file_path = os.path.join(path, name)
-        with zipfile.ZipFile(file_path, "w") as zfile:
-            # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
-            zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            if self.state == "transient":
-                zfile.write(os.path.join(patht, timname), timname)
-            zfile.write(os.path.join(patht, obsname), obsname)
-        shutil.rmtree(patht, ignore_errors=True)
-        return file_path
+        return data_io.save_obs(self, path, name)
 
 
 class StdyObs(Observation):
@@ -825,7 +737,7 @@ class Well(object):
     def __init__(
         self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
     ):
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
 
         if isinstance(radius, Variable):
             self._radius = dcopy(radius)
@@ -1070,212 +982,4 @@ class Well(object):
         -----
         The file will get the suffix ``".wel"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Well_" + self.name
-        # ensure the name ends with '.csv'
-        if name[-4:] != ".wel":
-            name += ".wel"
-        name = _formname(name)
-        # create temporal directory for the included files
-        patht = tempfile.mkdtemp(dir=path)
-        # write the csv-file
-        # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Well"])
-            writer.writerow(["name", self.name])
-            # define names for the variable-files
-            radiuname = name[:-4] + "_RadVar.var"
-            coordname = name[:-4] + "_CooVar.var"
-            welldname = name[:-4] + "_WedVar.var"
-            aquifname = name[:-4] + "_AqdVar.var"
-            # save variable-files
-            writer.writerow(["radius", radiuname])
-            self._radius.save(patht, radiuname)
-            writer.writerow(["coordinates", coordname])
-            self._coordinates.save(patht, coordname)
-            writer.writerow(["welldepth", welldname])
-            self._welldepth.save(patht, welldname)
-            writer.writerow(["aquiferdepth", aquifname])
-            self._aquiferdepth.save(patht, aquifname)
-        # compress everything to one zip-file
-        file_path = os.path.join(path, name)
-        with zipfile.ZipFile(file_path, "w") as zfile:
-            # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
-            zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            zfile.write(os.path.join(patht, radiuname), radiuname)
-            zfile.write(os.path.join(patht, coordname), coordname)
-            zfile.write(os.path.join(patht, welldname), welldname)
-            zfile.write(os.path.join(patht, aquifname), aquifname)
-        # delete the temporary directory
-        shutil.rmtree(patht, ignore_errors=True)
-        return file_path
-
-
-# Loading routines ###
-
-
-def load_var(varfile):
-    """Load a variable from file.
-
-    This reads a variable from a csv file.
-
-    Parameters
-    ----------
-    varfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with open(varfile, "r") as vfile:
-            data = csv.reader(vfile)
-            if next(data)[0] != "Variable":
-                raise Exception
-            name = next(data)[1]
-            symbol = next(data)[1]
-            units = next(data)[1]
-            description = next(data)[1]
-            integer = next(data)[0] == "integer"
-            shapenfo = _nextr(data)
-            if shapenfo[0] == "scalar":
-                if integer:
-                    value = np.int(next(data)[1])
-                else:
-                    value = np.float(next(data)[1])
-            else:
-                shape = tuple(np.array(shapenfo[1:], dtype=np.int))
-                vcnt = np.int(next(data)[1])
-                vlist = []
-                for __ in range(vcnt):
-                    vlist.append(next(data)[0])
-                if integer:
-                    value = np.array(vlist, dtype=np.int).reshape(shape)
-                else:
-                    value = np.array(vlist, dtype=np.float).reshape(shape)
-
-        var = Variable(name, value, symbol, units, description)
-    except Exception:
-        try:
-            data = csv.reader(varfile)
-            if next(data)[0] != "Variable":
-                raise Exception
-            name = next(data)[1]
-            symbol = next(data)[1]
-            units = next(data)[1]
-            description = next(data)[1]
-            integer = next(data)[0] == "integer"
-            shapenfo = _nextr(data)
-            if shapenfo[0] == "scalar":
-                if integer:
-                    value = np.int(next(data)[1])
-                else:
-                    value = np.float(next(data)[1])
-            else:
-                shape = tuple(np.array(shapenfo[1:], dtype=np.int))
-                vcnt = np.int(next(data)[1])
-                vlist = []
-                for __ in range(vcnt):
-                    vlist.append(next(data)[0])
-                if integer:
-                    value = np.array(vlist, dtype=np.int).reshape(shape)
-                else:
-                    value = np.array(vlist, dtype=np.float).reshape(shape)
-
-            var = Variable(name, value, symbol, units, description)
-        except Exception:
-            raise Exception("loadVar: loading the variable was not possible")
-    return var
-
-
-def load_obs(obsfile):
-    """Load an observation from file.
-
-    This reads a observation from a csv file.
-
-    Parameters
-    ----------
-    obsfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(obsfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            if next(data)[0] != "Observation":
-                raise Exception
-            name = next(data)[1]
-            steady = next(data)[1] == "steady"
-            description = next(data)[1]
-            if not steady:
-                timef = next(data)[1]
-            obsf = next(data)[1]
-
-            if not steady:
-                time = load_var(TxtIO(zfile.open(timef)))
-            else:
-                time = None
-
-            obs = load_var(TxtIO(zfile.open(obsf)))
-
-        observation = Observation(name, time, obs, description)
-    except Exception:
-        raise Exception("loadObs: loading the observation was not possible")
-    return observation
-
-
-def load_well(welfile):
-    """Load a well from file.
-
-    This reads a well from a csv file.
-
-    Parameters
-    ----------
-    welfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(welfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            if next(data)[0] != "Well":
-                raise Exception
-            name = next(data)[1]
-            radf = next(data)[1]
-            coordf = next(data)[1]
-            welldf = next(data)[1]
-            aquidf = next(data)[1]
-
-            rad = load_var(TxtIO(zfile.open(radf)))
-            coord = load_var(TxtIO(zfile.open(coordf)))
-            welld = load_var(TxtIO(zfile.open(welldf)))
-            aquid = load_var(TxtIO(zfile.open(aquidf)))
-
-        well = Well(name, rad, coord, welld, aquid)
-    except Exception:
-        raise Exception("loadWell: loading the well was not possible")
-    return well
-
-
-# TOOLS ###
-
-
-def _formstr(string):
-    # remove spaces, tabs, linebreaks and other separators
-    return "".join(str(string).split())
-
-
-def _formname(string):
-    # remove slashes
-    string = "".join(str(string).split(os.path.sep))
-    # remove spaces, tabs, linebreaks and other separators
-    return _formstr(string)
-
-
-def _nextr(data):
-    return tuple(filter(None, next(data)))
+        return data_io.save_well(self, path, name)

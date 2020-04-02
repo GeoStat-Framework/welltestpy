@@ -59,7 +59,7 @@ Routines
 Loading routines
 ~~~~~~~~~~~~~~~~
 
-.. currentmodule:: welltestpy.data.campaignlib
+.. currentmodule:: welltestpy.data.data_io
 
 Campaign related loading routines
 
@@ -67,14 +67,10 @@ Campaign related loading routines
     load_campaign
     load_fieldsite
 
-.. currentmodule:: welltestpy.data.testslib
-
 Field test related loading routines
 
 .. autosummary::
     load_test
-
-.. currentmodule:: welltestpy.data.varlib
 
 Variable related loading routines
 
@@ -83,9 +79,9 @@ Variable related loading routines
     load_obs
     load_well
 """
-from welltestpy.data import varlib, testslib, campaignlib
+from . import varlib, testslib, campaignlib, data_io
 
-from welltestpy.data.varlib import (
+from .varlib import (
     Variable,
     TimeVar,
     HeadVar,
@@ -96,16 +92,19 @@ from welltestpy.data.varlib import (
     DrawdownObs,
     StdyHeadObs,
     Well,
+)
+from .testslib import PumpingTest
+from .campaignlib import (
+    FieldSite,
+    Campaign,
+)
+from .data_io import (
     load_var,
     load_obs,
     load_well,
-)
-from welltestpy.data.testslib import PumpingTest, load_test
-from welltestpy.data.campaignlib import (
-    FieldSite,
-    Campaign,
-    load_fieldsite,
     load_campaign,
+    load_fieldsite,
+    load_test,
 )
 
 __all__ = [
@@ -119,16 +118,25 @@ __all__ = [
     "DrawdownObs",
     "StdyHeadObs",
     "Well",
+]
+__all__ += [
     "PumpingTest",
+]
+__all__ += [
     "FieldSite",
     "Campaign",
+]
+__all__ += [
     "load_var",
     "load_obs",
     "load_well",
     "load_test",
     "load_fieldsite",
     "load_campaign",
+]
+__all__ += [
     "varlib",
     "testslib",
     "campaignlib",
+    "data_io",
 ]

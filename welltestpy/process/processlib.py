@@ -15,7 +15,7 @@ from copy import deepcopy as dcopy
 import numpy as np
 from scipy import signal
 
-from welltestpy.data.testslib import PumpingTest
+from ..data import testslib
 
 __all__ = ["normpumptest", "combinepumptest", "filterdrawdown"]
 
@@ -30,7 +30,7 @@ def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
     factor : :class:`float`, optional
         Scaling factor that can be used for unit conversion. Default: ``1.0``
     """
-    if not isinstance(pumptest, PumpingTest):
+    if not isinstance(pumptest, testslib.PumpingTest):
         raise ValueError(str(pumptest) + " is no pumping test")
 
     oldprate = dcopy(pumptest.pumpingrate)
@@ -179,7 +179,7 @@ def combinepumptest(
         description = temptest2.description
         timeframe = temptest2.timeframe
 
-    finalpt = PumpingTest(
+    finalpt = testslib.PumpingTest(
         finalname,
         pwell,
         prate,

@@ -15,13 +15,18 @@ Subpackages
     process
     tools
 """
-from welltestpy import data, estimate, process, tools
+from . import data, estimate, process, tools
 
 try:
-    from welltestpy._version import __version__
+    from ._version import __version__
 except ImportError:  # pragma: nocover
     # package is not installed
     __version__ = "0.0.0.dev0"
 
+from .data.campaignlib import Campaign, FieldSite
+from .data.testslib import PumpingTest
+from .data.data_io import load_campaign
+
 __all__ = ["__version__"]
 __all__ += ["data", "estimate", "process", "tools"]
+__all__ += ["Campaign", "FieldSite", "PumpingTest", "load_campaign"]

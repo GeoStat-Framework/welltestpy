@@ -10,6 +10,8 @@ import matplotlib as mpl
 mpl.use("Agg")
 
 import welltestpy as wtp
+from welltestpy.tools import triangulate, sym, plot_well_pos
+
 import anaflow as ana
 
 
@@ -22,8 +24,8 @@ class TestWTP(unittest.TestCase):
 
     def test_create(self):
         # create the field-site and the campaign
-        field = wtp.data.FieldSite(name="UFZ", coordinates=[51.3538, 12.4313])
-        campaign = wtp.data.Campaign(name="UFZ-campaign", fieldsite=field)
+        field = wtp.FieldSite(name="UFZ", coordinates=[51.3538, 12.4313])
+        campaign = wtp.Campaign(name="UFZ-campaign", fieldsite=field)
 
         # add 4 wells to the campaign
         campaign.add_well(name="well_0", radius=0.1, coordinates=(0.0, 0.0))
@@ -47,7 +49,7 @@ class TestWTP(unittest.TestCase):
         )
 
         # create a pumping test at well_0
-        pumptest = wtp.data.PumpingTest(
+        pumptest = wtp.PumpingTest(
             name="well_0",
             pumpingwell="well_0",
             pumpingrate=self.rate,
@@ -73,7 +75,7 @@ class TestWTP(unittest.TestCase):
         campaign.save()
 
     def test_est_theis(self):
-        campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
+        campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
         estimation = wtp.estimate.Theis("est_theis", campaign, generate=True)
         estimation.run()
         res = estimation.estimated_para
@@ -82,7 +84,7 @@ class TestWTP(unittest.TestCase):
         self.assertAlmostEqual(np.exp(res["lnS"]), self.storage, 2)
 
     def test_est_thiem(self):
-        campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
+        campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
         estimation = wtp.estimate.Thiem("est_thiem", campaign, generate=True)
         estimation.run()
         res = estimation.estimated_para
@@ -93,7 +95,7 @@ class TestWTP(unittest.TestCase):
         self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
 
     def test_est_ext_thiem2D(self):
-        campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
+        campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
         estimation = wtp.estimate.ExtThiem2D(
             "est_ext_thiem2D", campaign, generate=True
         )
@@ -104,7 +106,7 @@ class TestWTP(unittest.TestCase):
         self.assertAlmostEqual(res["var"], 0.0, 0)
 
     # def test_est_ext_thiem3D(self):
-    #     campaign = wtp.data.load_campaign("Cmp_UFZ-campaign.cmp")
+    #     campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
     #     estimation = wtp.estimate.ExtThiem3D(
     #         "est_ext_thiem3D", campaign, generate=True
     #     )
@@ -115,8 +117,6 @@ class TestWTP(unittest.TestCase):
     #     self.assertAlmostEqual(res["var"], 0.0, 0)
 
     def test_triangulate(self):
-        from welltestpy.tools import triangulate, sym, plot_well_pos
-
         dist_mat = np.zeros((4, 4), dtype=float)
         dist_mat[0, 1] = 3  # distance between well 0 and 1
         dist_mat[0, 2] = 4  # distance between well 0 and 2

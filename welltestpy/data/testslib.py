@@ -12,31 +12,14 @@ The following classes and functions are provided
    load_test
 """
 from copy import deepcopy as dcopy
-import os
-import csv
-import shutil
-import zipfile
-import tempfile
-from io import TextIOWrapper as TxtIO, BytesIO as BytIO
 
 import numpy as np
 
-from welltestpy.tools.plotter import plot_pump_test
-from welltestpy.data.varlib import (
-    Variable,
-    Observation,
-    StdyHeadObs,
-    DrawdownObs,
-    load_var,
-    load_obs,
-    _nextr,
-    _formstr,
-    _formname,
-)
-import welltestpy as wtp
+from ..tools import plotter
+from . import varlib, data_io
+from ..process import processlib
 
-
-__all__ = ["Test", "PumpingTest", "load_test"]
+__all__ = ["Test", "PumpingTest"]
 
 
 class Test(object):
@@ -58,7 +41,7 @@ class Test(object):
     """
 
     def __init__(self, name, description="no description", timeframe=None):
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
         self.description = str(description)
         self.timeframe = str(timeframe)
         self._testtype = "Test"
@@ -128,31 +111,34 @@ class PumpingTest(Test):
 
         self.pumpingwell = str(pumpingwell)
 
-        if isinstance(pumpingrate, Variable):
+        if isinstance(pumpingrate, varlib.Variable):
             self._pumpingrate = dcopy(pumpingrate)
-        elif isinstance(pumpingrate, Observation):
+        elif isinstance(pumpingrate, varlib.Observation):
             self._pumpingrate = dcopy(pumpingrate)
         else:
-            self._pumpingrate = Variable(
+            self._pumpingrate = varlib.Variable(
                 "pumpingrate",
                 pumpingrate,
                 "Q",
                 "m^3/s",
                 "Pumpingrate at test '" + self.name + "'",
             )
-        if isinstance(self._pumpingrate, Variable) and not self.constant_rate:
+        if (
+            isinstance(self._pumpingrate, varlib.Variable)
+            and not self.constant_rate
+        ):
             raise ValueError("PumpingTest: 'pumpingrate' not scalar")
         if (
-            isinstance(self._pumpingrate, Observation)
+            isinstance(self._pumpingrate, varlib.Observation)
             and self._pumpingrate.state == "steady"
             and not self.constant_rate
         ):
             raise ValueError("PumpingTest: 'pumpingrate' not scalar")
 
-        if isinstance(aquiferdepth, Variable):
+        if isinstance(aquiferdepth, varlib.Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
         else:
-            self._aquiferdepth = Variable(
+            self._aquiferdepth = varlib.Variable(
                 "aquiferdepth",
                 aquiferdepth,
                 "L_a",
@@ -164,10 +150,10 @@ class PumpingTest(Test):
         if self.aquiferdepth <= 0.0:
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
 
-        if isinstance(aquiferradius, Variable):
+        if isinstance(aquiferradius, varlib.Variable):
             self._aquiferradius = dcopy(aquiferradius)
         else:
-            self._aquiferradius = Variable(
+            self._aquiferradius = varlib.Variable(
                 "aquiferradius",
                 aquiferradius,
                 "R",
@@ -213,13 +199,13 @@ class PumpingTest(Test):
             tout = float(time)
         for obs in self.observations:
             if self.observations[obs].state == "transient":
-                wtp.process.filterdrawdown(self.observations[obs], tout=tout)
+                processlib.filterdrawdown(self.observations[obs], tout=tout)
                 del self.observations[obs].time
         if (
-            isinstance(self._pumpingrate, Observation)
+            isinstance(self._pumpingrate, varlib.Observation)
             and self._pumpingrate.state == "transient"
         ):
-            wtp.process.filterdrawdown(self._pumpingrate, tout=tout)
+            processlib.filterdrawdown(self._pumpingrate, tout=tout)
             del self._pumpingrate.time
 
     def state(self, wells=None):
@@ -275,7 +261,7 @@ class PumpingTest(Test):
     @pumpingrate.setter
     def pumpingrate(self, pumpingrate):
         tmp = dcopy(self._pumpingrate)
-        if isinstance(pumpingrate, Variable):
+        if isinstance(pumpingrate, varlib.Variable):
             self._pumpingrate = dcopy(pumpingrate)
         else:
             self._pumpingrate(pumpingrate)
@@ -291,7 +277,7 @@ class PumpingTest(Test):
     @aquiferdepth.setter
     def aquiferdepth(self, aquiferdepth):
         tmp = dcopy(self._aquiferdepth)
-        if isinstance(aquiferdepth, Variable):
+        if isinstance(aquiferdepth, varlib.Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
         else:
             self._aquiferdepth(aquiferdepth)
@@ -310,7 +296,7 @@ class PumpingTest(Test):
     @aquiferradius.setter
     def aquiferradius(self, aquiferradius):
         tmp = dcopy(self._aquiferradius)
-        if isinstance(aquiferradius, Variable):
+        if isinstance(aquiferradius, varlib.Variable):
             self._aquiferradius = dcopy(aquiferradius)
         else:
             self._aquiferradius(aquiferradius)
@@ -333,7 +319,7 @@ class PumpingTest(Test):
         if obs is not None:
             if isinstance(obs, dict):
                 for k in obs.keys():
-                    if not isinstance(obs[k], Observation):
+                    if not isinstance(obs[k], varlib.Observation):
                         raise ValueError(
                             "PumpingTest: some 'observations' "
                             + "are not of type Observation"
@@ -365,7 +351,7 @@ class PumpingTest(Test):
         description : :class:`str`, optional
             Description of the Variable. Default: ``"Steady observation"``
         """
-        obs = StdyHeadObs(well, observation, description)
+        obs = varlib.StdyHeadObs(well, observation, description)
         self.addobservations(obs)
 
     def add_transient_obs(
@@ -389,7 +375,7 @@ class PumpingTest(Test):
         description : :class:`str`, optional
             Description of the Variable. Default: ``"Drawdown observation"``
         """
-        obs = DrawdownObs(well, time, observation, description)
+        obs = varlib.DrawdownObs(well, time, observation, description)
         self.addobservations(obs)
 
     def addobservations(self, obs):
@@ -404,7 +390,7 @@ class PumpingTest(Test):
         """
         if isinstance(obs, dict):
             for k in obs:
-                if not isinstance(obs[k], Observation):
+                if not isinstance(obs[k], varlib.Observation):
                     raise ValueError(
                         "PumpingTest_addobservations: some "
                         + "'observations' are not "
@@ -417,7 +403,7 @@ class PumpingTest(Test):
                     )
             for k in obs:
                 self.__observations[k] = dcopy(obs[k])
-        elif isinstance(obs, Observation):
+        elif isinstance(obs, varlib.Observation):
             if obs in self.observations:
                 raise ValueError(
                     "PumpingTest_addobservations: "
@@ -468,7 +454,7 @@ class PumpingTest(Test):
         -----
         This will be used by the Campaign class.
         """
-        plot_pump_test(
+        plotter.plot_pump_test(
             pump_test=self,
             wells=wells,
             exclude=exclude,
@@ -494,137 +480,4 @@ class PumpingTest(Test):
         -----
         The file will get the suffix ``".tst"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Test_" + self.name
-        # ensure the name ends with '.csv'
-        if name[-4:] != ".tst":
-            name += ".tst"
-        name = _formname(name)
-        # create temporal directory for the included files
-        patht = tempfile.mkdtemp(dir=path)
-        # write the csv-file
-        # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Testtype", "PumpingTest"])
-            writer.writerow(["name", self.name])
-            writer.writerow(["description", self.description])
-            writer.writerow(["timeframe", self.timeframe])
-            writer.writerow(["pumpingwell", self.pumpingwell])
-            # define names for the variable-files (file extension added autom.)
-            pumprname = name[:-4] + "_PprVar"
-            aquidname = name[:-4] + "_AqdVar"
-            aquirname = name[:-4] + "_AqrVar"
-            # save variable-files
-            pumpr_path = self._pumpingrate.save(patht, pumprname)
-            pumpr_base = os.path.basename(pumpr_path)
-            writer.writerow(["pumpingrate", pumpr_base])
-            aquid_path = self._aquiferdepth.save(patht, aquidname)
-            aquid_base = os.path.basename(aquid_path)
-            writer.writerow(["aquiferdepth", aquid_base])
-            aquir_path = self._aquiferradius.save(patht, aquirname)
-            aquir_base = os.path.basename(aquir_path)
-            writer.writerow(["aquiferradius", aquir_base])
-            okeys = tuple(self.observations.keys())
-            writer.writerow(["Observations", len(okeys)])
-            obsname = {}
-            for k in okeys:
-                obsname[k] = name[:-4] + "_" + k + "_Obs.obs"
-                writer.writerow([k, obsname[k]])
-                self.observations[k].save(patht, obsname[k])
-        # compress everything to one zip-file
-        file_path = os.path.join(path, name)
-        with zipfile.ZipFile(file_path, "w") as zfile:
-            zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            zfile.write(pumpr_path, pumpr_base)
-            zfile.write(aquir_path, aquir_base)
-            zfile.write(aquid_path, aquid_base)
-            for k in okeys:
-                zfile.write(os.path.join(patht, obsname[k]), obsname[k])
-        # delete the temporary directory
-        shutil.rmtree(patht, ignore_errors=True)
-        return file_path
-
-
-def load_test(tstfile):
-    """Load a test from file.
-
-    This reads a test from a csv file.
-
-    Parameters
-    ----------
-    tstfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(tstfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            row = _nextr(data)
-            if row[0] != "Testtype":
-                raise Exception
-            if row[1] == "PumpingTest":
-                routine = _load_pumping_test
-            else:
-                raise Exception
-    except Exception:
-        raise Exception("loadTest: loading the test " + "was not possible")
-
-    return routine(tstfile)
-
-
-def _load_pumping_test(tstfile):
-    """Load a pumping test from file.
-
-    This reads a pumping test from a csv file.
-
-    Parameters
-    ----------
-    tstfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(tstfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            if next(data)[1] != "PumpingTest":
-                raise Exception
-            name = next(data)[1]
-            description = next(data)[1]
-            timeframe = next(data)[1]
-            pumpingwell = next(data)[1]
-            rate_raw = TxtIO(zfile.open(next(data)[1]))
-            try:
-                pumpingrate = load_var(rate_raw)
-            except Exception:
-                pumpingrate = load_obs(rate_raw)
-            aquiferdepth = load_var(TxtIO(zfile.open(next(data)[1])))
-            aquiferradius = load_var(TxtIO(zfile.open(next(data)[1])))
-            obscnt = np.int(next(data)[1])
-            observations = {}
-            for __ in range(obscnt):
-                row = _nextr(data)
-                observations[row[0]] = load_obs(BytIO(zfile.read(row[1])))
-
-        pumpingtest = PumpingTest(
-            name,
-            pumpingwell,
-            pumpingrate,
-            observations,
-            aquiferdepth,
-            aquiferradius,
-            description,
-            timeframe,
-        )
-    except Exception:
-        raise Exception(
-            "loadPumpingTest: loading the pumpingtest " + "was not possible"
-        )
-    return pumpingtest
+        return data_io.save_pumping_test(self, path, name)

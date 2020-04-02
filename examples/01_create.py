@@ -4,8 +4,8 @@ import welltestpy as wtp
 import anaflow as ana
 
 ### create the field-site and the campaign
-field = wtp.data.FieldSite(name="UFZ", coordinates=[51.353839, 12.431385])
-campaign = wtp.data.Campaign(name="UFZ-campaign", fieldsite=field)
+field = wtp.FieldSite(name="UFZ", coordinates=[51.353839, 12.431385])
+campaign = wtp.Campaign(name="UFZ-campaign", fieldsite=field)
 
 ### add 4 wells to the campaign
 campaign.add_well(name="well_0", radius=0.1, coordinates=(0.0, 0.0))
@@ -33,7 +33,7 @@ drawdown = ana.theis(
 )
 
 ### create a pumping test at well_0
-pumptest = wtp.data.PumpingTest(
+pumptest = wtp.PumpingTest(
     name="well_0",
     pumpingwell="well_0",
     pumpingrate=rate,

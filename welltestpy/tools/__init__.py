@@ -31,11 +31,11 @@ The following classes and functions are provided
    plotparatrace
    plotsensitivity
 """
-from welltestpy.tools import plotter, trilib
+from . import plotter, trilib
 
-from welltestpy.tools.trilib import triangulate, sym
+from .trilib import triangulate, sym
 
-from welltestpy.tools.plotter import (
+from .plotter import (
     campaign_plot,
     fadeline,
     plot_well_pos,
@@ -59,7 +59,5 @@ __all__ = [
     "plotparainteract",
     "plotparatrace",
     "plotsensitivity",
-    "plotter",
-    "trilib",
-    "BytIO",
 ]
+__all__ += ["plotter", "trilib"]
