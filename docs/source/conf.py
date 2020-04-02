@@ -20,10 +20,15 @@
 # NOTE:
 # pip install sphinx_rtd_theme
 # is needed in order to build the documentation
-import os
-import sys
+import datetime
+import warnings
 
-sys.path.insert(0, os.path.abspath("../../"))
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message="Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.",
+)
+
 from welltestpy import __version__ as ver
 
 
@@ -57,6 +62,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",  # parameters look better than with numpydoc only
     "numpydoc",
+    'sphinx_gallery.gen_gallery',
 ]
 
 # autosummaries from source-files
@@ -95,8 +101,9 @@ source_suffix = ".rst"
 master_doc = "contents"
 
 # General information about the project.
-project = "WellTestPy"
-copyright = "2019, Sebastian Mueller"
+curr_year = datetime.datetime.now().year
+project = "welltestpy"
+copyright = "2018 - {}, Sebastian Mueller".format(curr_year)
 author = "Sebastian Mueller"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,7 +177,10 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "WellTestPydoc"
+htmlhelp_basename = "welltestpydoc"
+# logos for the page
+html_logo = "pics/WTP_150.png"
+html_favicon = "pics/WTP.ico"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -198,7 +208,7 @@ latex_documents = [
     (
         master_doc,
         "welltestpy.tex",
-        "WellTestPy Documentation",
+        "welltestpy Documentation",
         "Sebastian Mueller",
         "manual",
     )
@@ -210,7 +220,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "WellTestPy", "WellTestPy Documentation", [author], 1)
+    (master_doc, "welltestpy", "welltestpy Documentation", [author], 1)
 ]
 
 
@@ -222,10 +232,10 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        "WellTestPy",
-        "WellTestPy Documentation",
+        "welltestpy",
+        "welltestpy Documentation",
         author,
-        "WellTestPy",
+        "welltestpy",
         "Analytical solutions for the groundwater flow equation",
         "Miscellaneous",
     )
@@ -242,4 +252,37 @@ intersphinx_mapping = {
     "Python": ("https://docs.python.org/", None),
     "NumPy": ("http://docs.scipy.org/doc/numpy/", None),
     "SciPy": ("http://docs.scipy.org/doc/scipy/reference", None),
+    "matplotlib": ("http://matplotlib.org", None),
+    "Sphinx": ("http://www.sphinx-doc.org/en/stable/", None),
+}
+
+# -- Sphinx Gallery Options
+from sphinx_gallery.sorting import FileNameSortKey
+
+sphinx_gallery_conf = {
+    # only show "print" output as output
+    "capture_repr": (),
+    # path to your examples scripts
+    "examples_dirs": [
+        "../../examples",
+    ],
+    # path where to save gallery generated examples
+    "gallery_dirs": [
+        "examples",
+    ],
+    # Pattern to search for example files
+    "filename_pattern": "/.*.py",
+    "ignore_pattern": r"03_estimate_hetero\.py",
+    # Remove the "Download all examples" button from the top level gallery
+    "download_all_examples": False,
+    # Sort gallery example by file name instead of number of lines (default)
+    "within_subsection_order": FileNameSortKey,
+    # directory where function granular galleries are stored
+    "backreferences_dir": None,
+    # Modules for which function level galleries are created.  In
+    "doc_module": "welltestpy",
+    # "image_scrapers": ('pyvista', 'matplotlib'),
+    # "first_notebook_cell": ("%matplotlib inline\n"
+    #                         "from pyvista import set_plot_theme\n"
+    #                         "set_plot_theme('document')"),
 }
