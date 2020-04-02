@@ -17,8 +17,9 @@ All notable changes to **welltestpy** will be documented in this file.
   - Thiem
 - better plotting
 - unit-tests run with py35-py38 on Linux/Win/Mac
-- coverage
+- coverage calculation
 - sphinx gallery for examples
+- allow style setting in plotting routines
 
 ### Bugfixes
 - estimation results stored as dict (order could alter before)
