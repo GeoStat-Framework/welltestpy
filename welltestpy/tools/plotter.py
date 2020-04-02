@@ -18,6 +18,7 @@ The following classes and functions are provided
    plotparatrace
    plotsensitivity
 """
+import copy
 import warnings
 import functools as ft
 
@@ -117,7 +118,7 @@ def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
         )
 
 
-def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
+def campaign_plot(campaign, select_test=None, fig=None, style="WTP", **kwargs):
     """Plot an overview of the tests within the campaign."""
     if select_test is None:
         tests = list(campaign.tests.keys())
@@ -126,7 +127,15 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
 
     tests.sort()
     nroftests = len(tests)
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig = _get_fig_ax(fig, ax=False, dpi=75, figsize=[8, 3 * nroftests])
 
         for n, t in enumerate(tests):
@@ -140,7 +149,7 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
 
 
 def campaign_well_plot(
-    campaign, plot_tests=True, plot_well_names=True, fig=None
+    campaign, plot_tests=True, plot_well_names=True, fig=None, style="WTP"
 ):
     """Plot of the well constellation within the campaign."""
     well_const0 = []
@@ -156,8 +165,17 @@ def campaign_well_plot(
         names.append(w)
     well_const = [well_const0]
 
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
         fig = plot_well_pos(
             well_const,
             names,
@@ -184,7 +202,7 @@ def campaign_well_plot(
                         x=[x0, x1],
                         y=[y0, y1],
                         label=label,
-                        color=clrs[(i + 2) % 10],
+                        color=clrs[(i + 2) % clr_n],
                         linewidth=3,
                         zorder=10,
                     )
@@ -197,7 +215,7 @@ def campaign_well_plot(
 
 
 def plot_pump_test(
-    pump_test, wells, exclude=None, fig=None, ax=None, **kwargs
+    pump_test, wells, exclude=None, fig=None, ax=None, style="WTP", **kwargs
 ):
     """Plot a pumping test.
 
@@ -217,8 +235,17 @@ def plot_pump_test(
     -----
     This will be used by the Campaign class.
     """
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
         fig, ax = _get_fig_ax(fig, ax)
         exclude = set() if exclude is None else set(exclude)
         well_set = set(wells)
@@ -256,7 +283,7 @@ def plot_pump_test(
                     pump_test.observations[k].value[0],
                     displace,
                     linewidth=2,
-                    color=clrs[i % 10],
+                    color=clrs[i % clr_n],
                     label=(
                         pump_test.observations[k].name
                         + " r={:1.2f}".format(dist)
@@ -322,6 +349,7 @@ def plot_well_pos(
     filename=None,
     plot_well_names=True,
     fig=None,
+    style="WTP",
 ):
     """Plot all well constellations and label the points with the names."""
     # calculate Column- and Row-count for quadratic shape of the plot
@@ -357,7 +385,15 @@ def plot_well_pos(
     space = 0.1 * max(abs(xmax - xmin), abs(ymax - ymin))
     xspace = yspace = space
 
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig = _get_fig_ax(
             fig, ax=False, dpi=100, figsize=[9 * col_n, 5 * row_n]
         )
@@ -406,11 +442,24 @@ def plotfit_transient(
     plotname=None,
     fig=None,
     ax=None,
+    style="WTP",
 ):
     """Plot of transient estimation fitting."""
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style1 = "ggplot"
+        style2 = "default"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    else:
+        style1 = style2 = style
+    with plt.style.context(style1):
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-    with plt.style.context("default"):
+        clr_n = len(clrs)
+    with plt.style.context(style2):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(12, 8))
         val_fix = setup.val_fix
         for kwarg in ["time", "rad"]:
@@ -442,7 +491,7 @@ def plotfit_transient(
             h2 = plot_f(**{extra["time"]: timarr, extra["rad"]: re}).reshape(
                 -1
             )
-            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             alpha = 0.3 * (1 - (re - min(rad)) / (max(rad) - min(rad))) + 0.3
             zord = 100 * (len(rad) - ri)
 
@@ -515,6 +564,7 @@ def plotfit_steady(
     ax_ins=True,
     fig=None,
     ax=None,
+    style="WTP",
 ):
     """Plot of steady estimation fitting."""
     val_fix = setup.val_fix
@@ -533,8 +583,17 @@ def plotfit_steady(
     test_name.sort()
     rad_unique, rad_un_idx = np.unique(rad, return_index=True)
 
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
         fig, ax = _get_fig_ax(fig, ax, figsize=(9, 6))
         if ax_ins:
             axins = ax.inset_axes([0.4, 0.07, 0.57, 0.5])
@@ -559,7 +618,7 @@ def plotfit_steady(
         for ri, re in enumerate(rad):
             h = plot_f(**{extra["rad"]: re}).reshape(-1)
             h1 = data[ri]
-            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             if radnames[ri, 0] == radnames[ri, 1]:
                 label = "test {}".format(radnames[ri, 0])
             else:
@@ -590,11 +649,19 @@ def plotfit_steady(
     return ax
 
 
-def plotparainteract(result, paranames, plotname=None, fig=None):
+def plotparainteract(result, paranames, plotname=None, fig=None, style="WTP"):
     """Plot of parameter interaction."""
     import pandas as pd
 
-    with plt.style.context("default"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "default"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
         fields = [par for par in result.dtype.names if par.startswith("par")]
         parameterdistribtion = result[fields]
@@ -625,11 +692,20 @@ def plotparatrace(
     stdvalues=None,
     plotname=None,
     fig=None,
+    style="WTP",
 ):
     """Plot of parameter trace."""
     rep = len(result)
     rows = len(parameternames)
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
 
@@ -671,11 +747,18 @@ def plotparatrace(
 
 
 def plotsensitivity(
-    paralabels, sensitivities, plotname=None, fig=None, ax=None
+    paralabels, sensitivities, plotname=None, fig=None, ax=None, style="WTP"
 ):
     """Plot of sensitivity results."""
-    with plt.style.context("ggplot"):
-
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax)
         w_props = {"linewidth": 1, "edgecolor": "w", "width": 0.5}
         wedges, __ = ax.pie(
