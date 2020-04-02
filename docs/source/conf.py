@@ -62,7 +62,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",  # parameters look better than with numpydoc only
     "numpydoc",
-    'sphinx_gallery.gen_gallery',
+    "sphinx_gallery.gen_gallery",
 ]
 
 # autosummaries from source-files
@@ -263,13 +263,9 @@ sphinx_gallery_conf = {
     # only show "print" output as output
     "capture_repr": (),
     # path to your examples scripts
-    "examples_dirs": [
-        "../../examples",
-    ],
+    "examples_dirs": ["../../examples",],
     # path where to save gallery generated examples
-    "gallery_dirs": [
-        "examples",
-    ],
+    "gallery_dirs": ["examples",],
     # Pattern to search for example files
     "filename_pattern": "/.*.py",
     "ignore_pattern": r"03_estimate_hetero\.py",
