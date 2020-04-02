@@ -10,16 +10,17 @@ Subpackages
 The following subpackages are provided
 
 .. autosummary::
-    estimatelib
-    spotpy_classes
+    estimators
+    spotpylib
+    steady_lib
+    transient_lib
 
-Estimation classes
-^^^^^^^^^^^^^^^^^^
+Estimators
+^^^^^^^^^^
 
-The following estimation classes are provided
+The following estimators are provided
 
 .. autosummary::
-    TransientPumping
     ExtTheis3D
     ExtTheis2D
     Neuman2004
@@ -28,14 +29,10 @@ The following estimation classes are provided
     ExtThiem2D
     Neuman2004Steady
     Thiem
-    TypeCurve
 """
-from __future__ import absolute_import
+from . import estimators, spotpylib, steady_lib, transient_lib
 
-from welltestpy.estimate import estimatelib, spotpy_classes
-
-from welltestpy.estimate.estimatelib import (
-    TransientPumping,
+from .estimators import (
     ExtTheis3D,
     ExtTheis2D,
     Neuman2004,
@@ -45,10 +42,9 @@ from welltestpy.estimate.estimatelib import (
     Neuman2004Steady,
     Thiem,
 )
-from welltestpy.estimate.spotpy_classes import TypeCurve
 
-__all__ = [
-    "TransientPumping",
+__all__ = ["estimators", "spotpylib", "steady_lib", "transient_lib"]
+__all__ += [
     "ExtTheis3D",
     "ExtTheis2D",
     "Neuman2004",
@@ -57,7 +53,4 @@ __all__ = [
     "ExtThiem2D",
     "Neuman2004Steady",
     "Thiem",
-    "TypeCurve",
-    "estimatelib",
-    "spotpy_classes",
 ]

@@ -8,36 +8,13 @@ The following classes and functions are provided
 .. autosummary::
    FieldSite
    Campaign
-   load_fieldsite
-   load_campaign
 """
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
-import os
-import csv
-import shutil
-import zipfile
-import tempfile
-from io import TextIOWrapper as TxtIO
 
-import numpy as np
+from ..tools import plotter
+from . import data_io, varlib, testslib
 
-from welltestpy.tools import BytIO
-from welltestpy.tools.plotter import campaign_plot, campaign_well_plot
-from welltestpy.data.varlib import (
-    Variable,
-    CoordinatesVar,
-    load_var,
-    Well,
-    load_well,
-    _nextr,
-    _formstr,
-    _formname,
-)
-from welltestpy.data.testslib import Test, load_test
-
-__all__ = ["FieldSite", "Campaign", "load_fieldsite", "load_campaign"]
+__all__ = ["FieldSite", "Campaign"]
 
 
 class FieldSite(object):
@@ -59,7 +36,7 @@ class FieldSite(object):
     """
 
     def __init__(self, name, description="Field site", coordinates=None):
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
         self.description = str(description)
         self._coordinates = None
         self.coordinates = coordinates
@@ -75,13 +52,6 @@ class FieldSite(object):
         if self._coordinates is not None:
             info += self._coordinates.info + "\n"
         info += "----" + "\n"
-        #        print("----")
-        #        print("Field-site:   "+str(self.name))
-        #        print("Description:  "+str(self.description))
-        #        print("--")
-        #        if hasattr(self, '_coordinates'):
-        #            self._coordinates.info
-        #        print("----")
         return info
 
     @property
@@ -94,10 +64,10 @@ class FieldSite(object):
     @coordinates.setter
     def coordinates(self, coordinates):
         if coordinates is not None:
-            if isinstance(coordinates, Variable):
+            if isinstance(coordinates, varlib.Variable):
                 self._coordinates = dcopy(coordinates)
             else:
-                self._coordinates = CoordinatesVar(
+                self._coordinates = varlib.CoordinatesVar(
                     coordinates[0], coordinates[1]
                 )
         else:
@@ -124,45 +94,7 @@ class FieldSite(object):
         -----
         The file will get the suffix ``".fds"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Field_" + self.name
-        # ensure the name ends with '.csv'
-        if name[-4:] != ".fds":
-            name += ".fds"
-        name = _formname(name)
-        # create temporal directory for the included files
-        patht = tempfile.mkdtemp(dir=path)
-        # write the csv-file
-        # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Fieldsite"])
-            writer.writerow(["name", self.name])
-            writer.writerow(["description", self.description])
-            # define names for the variable-files
-            if self._coordinates is not None:
-                coordname = name[:-4] + "_CooVar.var"
-                # save variable-files
-                writer.writerow(["coordinates", coordname])
-                self._coordinates.save(patht, coordname)
-            else:
-                writer.writerow(["coordinates", "None"])
-        # compress everything to one zip-file
-        file_path = os.path.join(path, name)
-        with zipfile.ZipFile(file_path, "w") as zfile:
-            zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            if self._coordinates is not None:
-                zfile.write(os.path.join(patht, coordname), coordname)
-        # delete the temporary directory
-        shutil.rmtree(patht, ignore_errors=True)
-        return file_path
+        return data_io.save_fieldsite(self, path, name)
 
 
 class Campaign(object):
@@ -203,7 +135,7 @@ class Campaign(object):
         timeframe=None,
         description="Welltest campaign",
     ):
-        self.name = _formstr(name)
+        self.name = data_io._formstr(name)
         self.description = str(description)
         self._fieldsite = None
         self.fieldsite = fieldsite
@@ -238,7 +170,7 @@ class Campaign(object):
         if wells is not None:
             if isinstance(wells, dict):
                 for k in wells.keys():
-                    if not isinstance(wells[k], Well):
+                    if not isinstance(wells[k], varlib.Well):
                         raise ValueError(
                             "Campaign: some 'wells' are not of " + "type Well"
                         )
@@ -250,9 +182,9 @@ class Campaign(object):
                 self.__wells = dcopy(wells)
             elif isinstance(wells, (list, tuple)):
                 for wel in wells:
-                    if not isinstance(wel, Well):
+                    if not isinstance(wel, varlib.Well):
                         raise ValueError(
-                            "Campaign: some 'wells' " + "are not of type Well"
+                            "Campaign: some 'wells' " + "are not of type u"
                         )
                 self.__wells = {}
                 for wel in wells:
@@ -284,7 +216,7 @@ class Campaign(object):
         aquiferdepth : :class:`Variable` or :class:`float`, optional
             Depth of the aquifer at the well. Default: ``"None"``
         """
-        well = Well(name, radius, coordinates, welldepth, aquiferdepth)
+        well = varlib.Well(name, radius, coordinates, welldepth, aquiferdepth)
         self.addwells(well)
 
     def addwells(self, wells):
@@ -299,7 +231,7 @@ class Campaign(object):
         """
         if isinstance(wells, dict):
             for k in wells.keys():
-                if not isinstance(wells[k], Well):
+                if not isinstance(wells[k], varlib.Well):
                     raise ValueError(
                         "Campaign_addwells: some 'wells' "
                         + "are not of type Well"
@@ -318,7 +250,7 @@ class Campaign(object):
                 self.__wells[k] = dcopy(wells[k])
         elif isinstance(wells, (list, tuple)):
             for wel in wells:
-                if not isinstance(wel, Well):
+                if not isinstance(wel, varlib.Well):
                     raise ValueError(
                         "Campaign_addwells: some 'wells' "
                         + "are not of type Well"
@@ -330,7 +262,7 @@ class Campaign(object):
                     )
             for wel in wells:
                 self.__wells[wel.name] = dcopy(wel)
-        elif isinstance(wells, Well):
+        elif isinstance(wells, varlib.Well):
             self.__wells[wells.name] = dcopy(wells)
         else:
             raise ValueError(
@@ -367,7 +299,7 @@ class Campaign(object):
         if tests is not None:
             if isinstance(tests, dict):
                 for k in tests.keys():
-                    if not isinstance(tests[k], Test):
+                    if not isinstance(tests[k], testslib.Test):
                         raise ValueError(
                             "Campaign: 'tests' are not of " + "type Test"
                         )
@@ -379,14 +311,14 @@ class Campaign(object):
                 self.__tests = dcopy(tests)
             elif isinstance(tests, (list, tuple)):
                 for tes in tests:
-                    if not isinstance(tes, Test):
+                    if not isinstance(tes, testslib.Test):
                         raise ValueError(
                             "Campaign: some 'tests' are not of " + "type Test"
                         )
                 self.__tests = {}
                 for tes in tests:
                     self.__tests[tes.name] = dcopy(tes)
-            elif isinstance(tests, Test):
+            elif isinstance(tests, testslib.Test):
                 self.__tests[tests.name] = dcopy(tests)
             else:
                 raise ValueError(
@@ -408,7 +340,7 @@ class Campaign(object):
         """
         if isinstance(tests, dict):
             for k in tests.keys():
-                if not isinstance(tests[k], Test):
+                if not isinstance(tests[k], testslib.Test):
                     raise ValueError(
                         "Campaign_addtests: some 'tests' "
                         + "are not of type Test"
@@ -427,7 +359,7 @@ class Campaign(object):
                 self.__tests[k] = dcopy(tests[k])
         elif isinstance(tests, (list, tuple)):
             for tes in tests:
-                if not isinstance(tes, Test):
+                if not isinstance(tes, testslib.Test):
                     raise ValueError(
                         "Campaign_addtests: some 'tests' "
                         + "are not of type Test"
@@ -439,7 +371,7 @@ class Campaign(object):
                     )
             for tes in tests:
                 self.__tests[tes.name] = dcopy(tes)
-        elif isinstance(tests, Test):
+        elif isinstance(tests, testslib.Test):
             if tests.name in tuple(self.__tests.keys()):
                 raise ValueError("Campaign.addtests: 'test' already present")
             self.__tests[tests.name] = dcopy(tests)
@@ -484,7 +416,7 @@ class Campaign(object):
         **kwargs
             Keyword-arguments forwarded to :any:`campaign_plot`
         """
-        campaign_plot(self, select_tests, **kwargs)
+        return plotter.campaign_plot(self, select_tests, **kwargs)
 
     def plot_wells(self, **kwargs):
         """Generate a plot of the wells within the campaign.
@@ -496,7 +428,7 @@ class Campaign(object):
         **kwargs
             Keyword-arguments forwarded to :any:`campaign_well_plot`.
         """
-        return campaign_well_plot(self, **kwargs)
+        return plotter.campaign_well_plot(self, **kwargs)
 
     def save(self, path="", name=None):
         """Save the campaign to file.
@@ -515,141 +447,4 @@ class Campaign(object):
         -----
         The file will get the suffix ``".cmp"``.
         """
-        path = os.path.normpath(path)
-        # create the path if not existing
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # create a standard name if None is given
-        if name is None:
-            name = "Cmp_" + self.name
-        # ensure the name ends with '.csv'
-        if name[-4:] != ".cmp":
-            name += ".cmp"
-        name = _formname(name)
-        # create temporal directory for the included files
-        patht = tempfile.mkdtemp(dir=path)
-        # write the csv-file
-        # with open(patht+name[:-4]+".csv", 'w') as csvf:
-        with open(os.path.join(patht, "info.csv"), "w") as csvf:
-            writer = csv.writer(
-                csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
-            )
-            writer.writerow(["Campaign"])
-            writer.writerow(["name", self.name])
-            writer.writerow(["description", self.description])
-            writer.writerow(["timeframe", self.timeframe])
-            # define names for the variable-files
-            if self._fieldsite is not None:
-                fieldsname = name[:-4] + "_Fieldsite.fds"
-                # save variable-files
-                writer.writerow(["fieldsite", fieldsname])
-                self._fieldsite.save(patht, fieldsname)
-            else:
-                writer.writerow(["fieldsite", "None"])
-
-            wkeys = tuple(self.wells.keys())
-            writer.writerow(["Wells", len(wkeys)])
-            wellsname = {}
-            for k in wkeys:
-                wellsname[k] = name[:-4] + "_" + k + "_Well.wel"
-                writer.writerow([k, wellsname[k]])
-                self.wells[k].save(patht, wellsname[k])
-
-            tkeys = tuple(self.tests.keys())
-            writer.writerow(["Tests", len(tkeys)])
-            testsname = {}
-            for k in tkeys:
-                testsname[k] = name[:-4] + "_" + k + "_Test.tst"
-                writer.writerow([k, testsname[k]])
-                self.tests[k].save(patht, testsname[k])
-
-        # compress everything to one zip-file
-        file_path = os.path.join(path, name)
-        with zipfile.ZipFile(file_path, "w") as zfile:
-            zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-            if self._fieldsite is not None:
-                zfile.write(os.path.join(patht, fieldsname), fieldsname)
-            for k in wkeys:
-                zfile.write(os.path.join(patht, wellsname[k]), wellsname[k])
-            for k in tkeys:
-                zfile.write(os.path.join(patht, testsname[k]), testsname[k])
-        # delete the temporary directory
-        shutil.rmtree(patht, ignore_errors=True)
-        return file_path
-
-
-def load_fieldsite(fdsfile):
-    """Load a field site from file.
-
-    This reads a field site from a csv file.
-
-    Parameters
-    ----------
-    fdsfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(fdsfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            if next(data)[0] != "Fieldsite":
-                raise Exception
-            name = next(data)[1]
-            description = next(data)[1]
-            coordinfo = next(data)[1]
-            if coordinfo == "None":
-                coordinates = None
-            else:
-                coordinates = load_var(TxtIO(zfile.open(coordinfo)))
-        fieldsite = FieldSite(name, description, coordinates)
-    except Exception:
-        raise Exception(
-            "loadFieldSite: loading the fieldsite " + "was not possible"
-        )
-    return fieldsite
-
-
-def load_campaign(cmpfile):
-    """Load a campaign from file.
-
-    This reads a campaign from a csv file.
-
-    Parameters
-    ----------
-    cmpfile : :class:`str`
-        Path to the file
-    """
-    try:
-        with zipfile.ZipFile(cmpfile, "r") as zfile:
-            info = TxtIO(zfile.open("info.csv"))
-            data = csv.reader(info)
-            if next(data)[0] != "Campaign":
-                raise Exception
-            name = next(data)[1]
-            description = next(data)[1]
-            timeframe = next(data)[1]
-            row = _nextr(data)
-            if row[1] == "None":
-                fieldsite = None
-            else:
-                fieldsite = load_fieldsite(BytIO(zfile.read(row[1])))
-            wcnt = np.int(next(data)[1])
-            wells = {}
-            for __ in range(wcnt):
-                row = _nextr(data)
-                wells[row[0]] = load_well(BytIO(zfile.read(row[1])))
-
-            tcnt = np.int(next(data)[1])
-            tests = {}
-            for __ in range(tcnt):
-                row = _nextr(data)
-                tests[row[0]] = load_test(BytIO(zfile.read(row[1])))
-
-        campaign = Campaign(
-            name, fieldsite, wells, tests, timeframe, description
-        )
-    except Exception:
-        raise Exception(
-            "loadPumpingTest: loading the pumpingtest " + "was not possible"
-        )
-    return campaign
+        return data_io.save_campaign(self, path, name)

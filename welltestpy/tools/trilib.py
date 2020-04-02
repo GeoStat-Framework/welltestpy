@@ -11,15 +11,9 @@ The following functions are provided
    sym
 """
 # pylint: disable=C0103
-from __future__ import absolute_import, division, print_function
-
 from copy import deepcopy as dcopy
 import numpy as np
 
-import matplotlib.pyplot as plt
-
-# use the ggplot style like R
-plt.style.use("ggplot")
 
 __all__ = ["triangulate", "sym"]
 

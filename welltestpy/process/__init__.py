@@ -14,9 +14,7 @@ The following classes and functions are provided
     combinepumptest
     filterdrawdown
 """
-from __future__ import absolute_import
-
-from welltestpy.process.processlib import (
+from .processlib import (
     normpumptest,
     combinepumptest,
     filterdrawdown,

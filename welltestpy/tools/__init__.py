@@ -4,23 +4,18 @@ welltestpy subpackage providing miscellaneous tools.
 
 .. currentmodule:: welltestpy.tools
 
-Subpackages
-^^^^^^^^^^^
-
-The following subpackages are provided
-
-.. autosummary::
-    plotter
-    trilib
-
 Included functions
 ^^^^^^^^^^^^^^^^^^
 
-The following classes and functions are provided
+The following functions are provided for point triangulation
 
 .. autosummary::
    triangulate
    sym
+
+The following plotting routines are provided
+
+.. autosummary::
    campaign_plot
    fadeline
    plot_well_pos
@@ -31,22 +26,11 @@ The following classes and functions are provided
    plotparatrace
    plotsensitivity
 """
-from __future__ import absolute_import
+from . import plotter, trilib
 
-try:
-    import StringIO
+from .trilib import triangulate, sym
 
-    BytIO = StringIO.StringIO
-except ImportError:
-    import io
-
-    BytIO = io.BytesIO
-
-from welltestpy.tools import plotter, trilib
-
-from welltestpy.tools.trilib import triangulate, sym
-
-from welltestpy.tools.plotter import (
+from .plotter import (
     campaign_plot,
     fadeline,
     plot_well_pos,
@@ -70,7 +54,5 @@ __all__ = [
     "plotparainteract",
     "plotparatrace",
     "plotsensitivity",
-    "plotter",
-    "trilib",
-    "BytIO",
 ]
+__all__ += ["plotter", "trilib"]
