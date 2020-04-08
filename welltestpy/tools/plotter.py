@@ -392,8 +392,6 @@ def plot_pump_test(
             title="Pumping test '{}'".format(pump_test.name),
             loc="upper left",
             bbox_to_anchor=(1, 1),
-            fancybox=True,
-            framealpha=0.75,
         )
         if state == "mixed":  # add a second legend
             ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
@@ -598,7 +596,7 @@ def plotfit_transient(
             zord = 100 * (len(rad) - ri)
 
             if radnames[ri, 0] == radnames[ri, 1]:
-                label = "test {}".format(radnames[ri, 0])
+                label = "test at '{}'".format(radnames[ri, 0])
                 label_eff = "fitted type curve"
                 eff_zord = zord + 100  # first line should be on top
             else:
@@ -720,7 +718,7 @@ def plotfit_steady(
             h1 = data[ri]
             color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             if radnames[ri, 0] == radnames[ri, 1]:
-                label = "test {}".format(radnames[ri, 0])
+                label = "test at '{}'".format(radnames[ri, 0])
             else:
                 label = None
             ax.plot([re, re], [h, h1], alpha=0.6, color=color, zorder=100)
