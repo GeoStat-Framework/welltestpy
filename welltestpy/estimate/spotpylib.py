@@ -53,7 +53,7 @@ def fast_rep(para_no, infer_fac=4, freq_step=2):
     )
 
 
-class TypeCurve(object):
+class TypeCurve:
     r"""Spotpy class for an estimation of subsurface parameters.
 
     This class fits a given Type Curve to given data.

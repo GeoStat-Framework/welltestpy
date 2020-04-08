@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-class TransientPumping(object):
+class TransientPumping:
     """Class to estimate transient Type-Curve parameters.
 
     Parameters

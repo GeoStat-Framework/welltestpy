@@ -17,7 +17,7 @@ from . import data_io, varlib, testslib
 __all__ = ["FieldSite", "Campaign"]
 
 
-class FieldSite(object):
+class FieldSite:
     """Class for a field site.
 
     This is a class for a field site.
@@ -97,7 +97,7 @@ class FieldSite(object):
         return data_io.save_fieldsite(self, path, name)
 
 
-class Campaign(object):
+class Campaign:
     """Class for a well based campaign.
 
     This is a class for a well based test campaign on a field site.

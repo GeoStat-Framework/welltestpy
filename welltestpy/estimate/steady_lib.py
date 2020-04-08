@@ -26,7 +26,7 @@ __all__ = [
 ]
 
 
-class SteadyPumping(object):
+class SteadyPumping:
     """Class to estimate steady Type-Curve parameters.
 
     Parameters

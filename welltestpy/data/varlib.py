@@ -41,7 +41,7 @@ __all__ = [
 ]
 
 
-class Variable(object):
+class Variable:
     """Class for a variable.
 
     This is a class for a physical variable which is either a scalar or an
@@ -299,7 +299,7 @@ class CoordinatesVar(Variable):
         )
 
 
-class Observation(object):
+class Observation:
     """
     Class for a observation.
 
@@ -388,11 +388,11 @@ class Observation(object):
                     + "shape-missmatch"
                 )
             return self.time, self.observation
-        else:
-            if observation is None:
-                observation = in1
-            self._setobservation(observation)
-            return self.observation
+        # steady case
+        if observation is None:
+            observation = in1
+        self._setobservation(observation)
+        return self.observation
 
     def __repr__(self):
         """Represenetation."""
@@ -704,7 +704,7 @@ class StdyHeadObs(Observation):
         )
 
 
-class Well(object):
+class Well:
     """Class for a pumping-/observation-well.
 
     This is a class for a well within a aquifer-testing campaign.

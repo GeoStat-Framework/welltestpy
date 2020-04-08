@@ -21,7 +21,7 @@ from ..process import processlib
 __all__ = ["Test", "PumpingTest"]
 
 
-class Test(object):
+class Test:
     """General class for a well based test.
 
     This is a class for a well based test on a field site.
