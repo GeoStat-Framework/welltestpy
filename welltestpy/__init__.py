@@ -3,7 +3,7 @@
 Purpose
 =======
 
-WellTestPy provides a framework to handle and plot data from well based
+welltestpy provides a framework to handle and plot data from well based
 field campaigns as well as a parameter estimation module.
 
 Subpackages

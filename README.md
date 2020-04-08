@@ -1,4 +1,4 @@
-# Welcome to WellTestPy
+# Welcome to welltestpy
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1229051.svg)](https://doi.org/10.5281/zenodo.1229051)
 [![PyPI version](https://badge.fury.io/py/welltestpy.svg)](https://badge.fury.io/py/welltestpy)
@@ -8,12 +8,12 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/WTP.png" alt="WellTestPy-LOGO" width="251px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/WTP.png" alt="welltestpy-LOGO" width="251px"/>
 </p>
 
 ## Purpose
 
-WellTestPy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
+welltestpy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
 
 
 ## Installation
@@ -23,7 +23,7 @@ You can install the latest version with the following command:
     pip install welltestpy
 
 
-## Documentation for WellTestPy
+## Documentation for welltestpy
 
 You can find the documentation under [geostat-framework.readthedocs.io][doc_link].
 

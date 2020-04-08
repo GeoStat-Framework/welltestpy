@@ -1,12 +1,12 @@
 =====================
-WellTestPy Quickstart
+welltestpy Quickstart
 =====================
 
 .. image:: pics/WTP.png
    :width: 150px
    :align: center
 
-WellTestPy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
+welltestpy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
 
 
 Installation
