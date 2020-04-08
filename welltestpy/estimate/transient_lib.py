@@ -135,7 +135,7 @@ class TransientPumping:
         self.result = None
         """:class:`list`: result of the spotpy estimation"""
         self.sens = None
-        """:class:`list`: result of the spotpy sensitivity analysis"""
+        """:class:`dict`: result of the spotpy sensitivity analysis"""
         self.testinclude = {}
         """:class:`dict`: dictonary of which tests should be included"""
 
@@ -612,12 +612,18 @@ class TransientPumping:
             parmin = sampler.parameter()["minbound"]
             parmax = sampler.parameter()["maxbound"]
             bounds = list(zip(parmin, parmax))
-            self.sens = sampler.analyze(
+            sens_est = sampler.analyze(
                 bounds, np.nan_to_num(data["like1"]), len(paranames), paranames
             )
-            np.savetxt(sensname, self.sens["ST"])
-            np.savetxt(sensname1, self.sens["S1"])
-            plotter.plotsensitivity(paralabels, self.sens, plotname)
+            self.sens = {}
+            for sen_typ in sens_est:
+                self.sens[sen_typ] = {
+                    par: sen for par, sen in zip(paranames, sens_est[sen_typ])
+                }
+            header = " ".join(paranames)
+            np.savetxt(sensname, sens_est["ST"], header=header)
+            np.savetxt(sensname1, sens_est["S1"], header=header)
+            plotter.plotsensitivity(paralabels, sens_est, plotname)
             plotter.plotparatrace(
                 data,
                 parameternames=paranames,
