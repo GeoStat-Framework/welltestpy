@@ -21,6 +21,7 @@ class TestWTP(unittest.TestCase):
         self.time = np.geomspace(10, 7200, 10)
         self.transmissivity = 1e-4
         self.storage = 1e-4
+        self.s_types = ["ST", "S1"]
 
     def test_create(self):
         # create the field-site and the campaign
@@ -64,15 +65,13 @@ class TestWTP(unittest.TestCase):
 
         # add the pumping test to the campaign
         campaign.addtests(pumptest)
-        # optionally make the test steady
-        # campaign.tests["well_0"].make_steady()
-
         # plot the well constellation and a test overview
         campaign.plot_wells()
         campaign.plot()
-
         # save the whole campaign
         campaign.save()
+        # test making steady
+        campaign.tests["well_0"].make_steady()
 
     def test_est_theis(self):
         campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -82,6 +81,9 @@ class TestWTP(unittest.TestCase):
         estimation.sensitivity()
         self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
         self.assertAlmostEqual(np.exp(res["lnS"]), self.storage, 2)
+        sens = estimation.sens
+        for s_typ in self.s_types:
+            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["lnS"])
 
     def test_est_thiem(self):
         campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -93,6 +95,9 @@ class TestWTP(unittest.TestCase):
         estimation.gen_setup(dummy=True)
         estimation.sensitivity()
         self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        sens = estimation.sens
+        for s_typ in self.s_types:
+            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["dummy"])
 
     def test_est_ext_thiem2D(self):
         campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -104,6 +109,10 @@ class TestWTP(unittest.TestCase):
         estimation.sensitivity()
         self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
         self.assertAlmostEqual(res["var"], 0.0, 0)
+        sens = estimation.sens
+        for s_typ in self.s_types:
+            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["var"])
+            self.assertTrue(sens[s_typ]["var"] > sens[s_typ]["len_scale"])
 
     # def test_est_ext_thiem3D(self):
     #     campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
