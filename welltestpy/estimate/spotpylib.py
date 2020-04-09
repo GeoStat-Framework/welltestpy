@@ -29,8 +29,8 @@ FIT = {
     "exp": np.log,
     "squareroot": lambda x: np.power(x, 2),
     "sqrt": lambda x: np.power(x, 2),
-    "quadratic": lambda x: np.sqrt(x),
-    "quad": lambda x: np.sqrt(x),
+    "quadratic": np.sqrt,
+    "quad": np.sqrt,
     "inverse": lambda x: 1.0 / x,
     "inv": lambda x: 1.0 / x,
 }
