@@ -6,7 +6,7 @@ welltestpy Quickstart
    :width: 150px
    :align: center
 
-welltestpy provides a framework to handle and plot data from well based field campaigns as well as a data interpretation module.
+welltestpy provides a framework to handle, process, plot and analyse data from well based field campaigns.
 
 
 Installation
@@ -31,7 +31,7 @@ The following functions are provided directly
     welltestpy.data      # Subpackage to handle data from field campaigns
     welltestpy.estimate  # Subpackage to estimate field parameters
     welltestpy.process   # Subpackage to pre- and post-process data
-    welltestpy.tools     # Subpackage with miscellaneous tools
+    welltestpy.tools     # Subpackage with tools for plotting and triagulation
 
 
 Requirements
