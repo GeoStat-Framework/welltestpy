@@ -33,12 +33,15 @@ def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
     if not isinstance(pumptest, testslib.PumpingTest):
         raise ValueError(str(pumptest) + " is no pumping test")
 
+    if not pumptest.constant_rate:
+        raise ValueError(str(pumptest) + " is no constant rate pumping test")
+
     oldprate = dcopy(pumptest.rate)
     pumptest.pumpingrate = pumpingrate
 
     for obs in pumptest.observations:
         pumptest.observations[obs].observation *= (
-            factor * pumpingrate / oldprate
+            factor * pumptest.rate / oldprate
         )
 
 
