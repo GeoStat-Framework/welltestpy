@@ -53,7 +53,7 @@ setup(
     maintainer_email="sebastian.mueller@ufz.de",
     author="Sebastian Mueller",
     author_email="sebastian.mueller@ufz.de",
-    url="https://github.com/GeoStat-Framework/AnaFlow",
+    url="https://github.com/GeoStat-Framework/welltestpy",
     license="MIT",
     classifiers=CLASSIFIERS,
     platforms=["Windows", "Linux", "Mac OS-X"],
