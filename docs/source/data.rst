@@ -10,6 +10,7 @@ welltestpy.data
 .. toctree::
    :hidden:
 
-   data.campaignlib.rst
-   data.testslib.rst
+   data.data_io.rst
    data.varlib.rst
+   data.testslib.rst
+   data.campaignlib.rst

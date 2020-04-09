@@ -2,22 +2,21 @@
 """
 welltestpy subpackage providing Spotpy classes for the estimating.
 
-.. currentmodule:: welltestpy.estimate.spotpy_classes
+.. currentmodule:: welltestpy.estimate.spotpylib
 
 The following functions and classes are provided
 
 .. autosummary::
    TypeCurve
+   fast_rep
 """
-from __future__ import absolute_import, division, print_function
-
 import functools as ft
 
 import numpy as np
 import spotpy
 
 
-__all__ = ["TypeCurve"]
+__all__ = ["TypeCurve", "fast_rep"]
 
 
 # functions for fitting
@@ -30,14 +29,31 @@ FIT = {
     "exp": np.log,
     "squareroot": lambda x: np.power(x, 2),
     "sqrt": lambda x: np.power(x, 2),
-    "quadratic": lambda x: np.sqrt(x),
-    "quad": lambda x: np.sqrt(x),
+    "quadratic": np.sqrt,
+    "quad": np.sqrt,
     "inverse": lambda x: 1.0 / x,
     "inv": lambda x: 1.0 / x,
 }
 
 
-class TypeCurve(object):
+def fast_rep(para_no, infer_fac=4, freq_step=2):
+    """Get number of iterations needed for the FAST algorithm.
+
+    Parameters
+    ----------
+    para_no : :class:`int`
+        Number of parameters in the model.
+    infer_fac : :class:`int`, optional
+        The inference fractor. Default: 4
+    freq_step : :class:`int`, optional
+        The frequency step. Default: 2
+    """
+    return 2 * int(
+        para_no * (1 + 4 * infer_fac ** 2 * (1 + (para_no - 2) * freq_step))
+    )
+
+
+class TypeCurve:
     r"""Spotpy class for an estimation of subsurface parameters.
 
     This class fits a given Type Curve to given data.

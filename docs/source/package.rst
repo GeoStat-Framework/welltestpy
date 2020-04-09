@@ -1,5 +1,5 @@
 ==============
-WellTestPy API
+welltestpy API
 ==============
 
 .. automodule:: welltestpy

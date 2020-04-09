@@ -18,8 +18,8 @@ The following classes and functions are provided
    plotparatrace
    plotsensitivity
 """
-from __future__ import absolute_import, division, print_function
-
+# pylint: disable=C0103
+import copy
 import warnings
 import functools as ft
 
@@ -38,7 +38,7 @@ def _get_fig_ax(
     sub_kwargs=None,
     **fig_kwargs
 ):  # pragma: no cover
-    # 0->None or given, 1->False, 2->True
+    # ax_case: 0->None (create one) or given, 1->False, 2->True
     ax_case = 1 + int(ax) if isinstance(ax, bool) else 0
     sub_args = (111,) if sub_args is None else sub_args
     sub_kwargs = {} if sub_kwargs is None else sub_kwargs
@@ -52,7 +52,7 @@ def _get_fig_ax(
         assert ax.get_figure() is fig
         return fig, ax
     # if ax=False we only want a figure
-    elif ax_case == 1:
+    if ax_case == 1:
         return plt.figure(**fig_kwargs) if fig is None else fig
     # if ax=True we want the current axis of the given figure
     assert fig is not None
@@ -68,7 +68,24 @@ def _sort_lgd(ax, **kwargs):
 
 
 def dashes(i=1, max_n=12, width=1):
-    """Dashes for matplotlib."""
+    """
+    Dashes for matplotlib.
+
+    Parameters
+    ----------
+    i : int, optional
+        Number of dots. The default is 1.
+    max_n : int, optional
+        Maximal Number of dots. The default is 12.
+    width : float, optional
+        Linewidth. The default is 1.
+
+    Returns
+    -------
+    list
+        dashes list for matplotlib.
+
+    """
     return i * [width, width] + [max_n * 2 * width - 2 * i * width, width]
 
 
@@ -106,21 +123,33 @@ def fadeline(ax, x, y, label=None, color=None, steps=20, **kwargs):
     kwargs["solid_capstyle"] = "butt"
 
     for i in range(steps):
-        if i == 0:
-            label0 = label
-        else:
-            label0 = None
-        ax.plot(
-            [xarr[i], xarr[i + 1]],
-            [yarr[i], yarr[i + 1]],
-            label=label0,
-            alpha=(steps - i) * (1.0 / steps) * 0.9 + 0.1,
-            **kwargs
-        )
+        kwargs["label"] = label if i == 0 else None
+        kwargs["alpha"] = (steps - i) * (1.0 / steps) * 0.9 + 0.1
+        ax.plot([xarr[i], xarr[i + 1]], [yarr[i], yarr[i + 1]], **kwargs)
 
 
-def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
-    """Plot an overview of the tests within the campaign."""
+def campaign_plot(campaign, select_test=None, fig=None, style="WTP", **kwargs):
+    """
+    Plot an overview of the tests within the campaign.
+
+    Parameters
+    ----------
+    campaign : :class:`Campaign`
+        The campaign to be plotted.
+    select_test : dict, optional
+        The selected tests to be added to the plot. The default is None.
+    fig : Figure, optional
+        Matplotlib figure to plot on. The default is None.
+    style : str, optional
+        Plot stlye. The default is "WTP".
+    **kwargs : TYPE
+        Keyword arguments forwarded to the tests plotting routines.
+
+    Returns
+    -------
+    fig : Figure
+        The created matplotlib figure.
+    """
     if select_test is None:
         tests = list(campaign.tests.keys())
     else:
@@ -128,7 +157,15 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
 
     tests.sort()
     nroftests = len(tests)
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig = _get_fig_ax(fig, ax=False, dpi=75, figsize=[8, 3 * nroftests])
 
         for n, t in enumerate(tests):
@@ -142,30 +179,59 @@ def campaign_plot(campaign, select_test=None, fig=None, **kwargs):
 
 
 def campaign_well_plot(
-    campaign, plot_tests=True, plot_well_names=True, fig=None
+    campaign, plot_tests=True, plot_well_names=True, fig=None, style="WTP"
 ):
-    """Plot of the well constellation within the campaign."""
+    """
+    Plot of the well constellation within the campaign.
+
+    Parameters
+    ----------
+    campaign : :class:`Campaign`
+        The campaign to be plotted.
+    plot_tests : bool, optional
+        DESCRIPTION. The default is True.
+    plot_well_names : TYPE, optional
+        DESCRIPTION. The default is True.
+    fig : Figure, optional
+        Matplotlib figure to plot on. The default is None.
+    style : str, optional
+        Plot stlye. The default is "WTP".
+
+    Returns
+    -------
+    ax : Axes
+        The created matplotlib axes.
+
+    """
     well_const0 = []
     names = []
 
     for w in campaign.wells:
         well_const0.append(
-            [
-                campaign.wells[w].coordinates[0],
-                campaign.wells[w].coordinates[1],
-            ]
+            [campaign.wells[w].pos[0], campaign.wells[w].pos[1]]
         )
         names.append(w)
     well_const = [well_const0]
 
-    with plt.style.context("ggplot"):
-        fig = plot_well_pos(
-            well_const,
-            names,
-            campaign.name,
-            plot_well_names=plot_well_names,
-            fig=fig,
-        )
+    fig = plot_well_pos(
+        well_const,
+        names,
+        plot_well_names=plot_well_names,
+        fig=fig,
+        style=style,
+    )
+
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
 
         fig, ax = _get_fig_ax(fig, ax=True)
 
@@ -175,17 +241,17 @@ def campaign_well_plot(
             for i, t in enumerate(testlist):
                 p_well = campaign.tests[t].pumpingwell
                 for j, obs in enumerate(campaign.tests[t].observations):
-                    x0 = campaign.wells[p_well].coordinates[0]
-                    y0 = campaign.wells[p_well].coordinates[1]
-                    x1 = campaign.wells[obs].coordinates[0]
-                    y1 = campaign.wells[obs].coordinates[1]
+                    x0 = campaign.wells[p_well].pos[0]
+                    y0 = campaign.wells[p_well].pos[1]
+                    x1 = campaign.wells[obs].pos[0]
+                    y1 = campaign.wells[obs].pos[1]
                     label = "'{}'".format(t) if j == 0 else None
                     fadeline(
                         ax=ax,
                         x=[x0, x1],
                         y=[y0, y1],
                         label=label,
-                        color="C" + str((i + 2) % 10),
+                        color=clrs[(i + 2) % clr_n],
                         linewidth=3,
                         zorder=10,
                     )
@@ -198,7 +264,7 @@ def campaign_well_plot(
 
 
 def plot_pump_test(
-    pump_test, wells, exclude=None, fig=None, ax=None, **kwargs
+    pump_test, wells, exclude=None, fig=None, ax=None, style="WTP", **kwargs
 ):
     """Plot a pumping test.
 
@@ -211,14 +277,33 @@ def plot_pump_test(
     exclude: :class:`list`, optional
         List of wells that should be excluded from the plot.
         Default: ``None``
+    fig : Figure, optional
+        Matplotlib figure to plot on. The default is None.
     ax : :class:`Axes`
-        Axes where the plot should be done.
+        Matplotlib axes to plot on. The default is None.
+    style : str, optional
+        Plot stlye. The default is "WTP".
+
+    Returns
+    -------
+    ax : Axes
+        The created matplotlib axes.
 
     Notes
     -----
     This will be used by the Campaign class.
     """
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
         fig, ax = _get_fig_ax(fig, ax)
         exclude = set() if exclude is None else set(exclude)
         well_set = set(wells)
@@ -241,7 +326,7 @@ def plot_pump_test(
             ax1 = None
             ax2 = ax
         else:
-            return
+            raise ValueError("plot_pump_test: unknow state of pumping test.")
         for i, k in enumerate(plot_wells):
             if k != pump_test.pumpingwell:
                 dist = wells[k] - wells[pump_test.pumpingwell]
@@ -249,14 +334,14 @@ def plot_pump_test(
                 dist = wells[pump_test.pumpingwell].radius
             if pump_test.observations[k].state == "transient":
                 if abslab:
-                    displace = np.abs(pump_test.observations[k].value[1])
+                    displace = np.abs(pump_test.observations[k].value[0])
                 else:
-                    displace = pump_test.observations[k].value[1]
+                    displace = pump_test.observations[k].value[0]
                 ax1.plot(
-                    pump_test.observations[k].value[0],
+                    pump_test.observations[k].value[1],
                     displace,
                     linewidth=2,
-                    color="C{}".format(i % 10),
+                    color=clrs[i % clr_n],
                     label=(
                         pump_test.observations[k].name
                         + " r={:1.2f}".format(dist)
@@ -280,7 +365,7 @@ def plot_pump_test(
                 ax2.scatter(
                     dist, displace, color=color, label=label,
                 )
-                ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
+                ax2.set_xlabel("r in {}".format(wells[k].coordinates.units))
                 ax2.set_ylabel(
                     abslab + "{}".format(pump_test.observations[k].labels)
                 )
@@ -304,8 +389,6 @@ def plot_pump_test(
             title="Pumping test '{}'".format(pump_test.name),
             loc="upper left",
             bbox_to_anchor=(1, 1),
-            fancybox=True,
-            framealpha=0.75,
         )
         if state == "mixed":  # add a second legend
             ax2.legend(loc="upper right", fancybox=True, framealpha=0.75)
@@ -321,9 +404,37 @@ def plot_well_pos(
     title="",
     filename=None,
     plot_well_names=True,
+    ticks_set="auto",
     fig=None,
+    style="WTP",
 ):
-    """Plot all well constellations and label the points with the names."""
+    """
+    Plot all well constellations and label the points with the names.
+
+    Parameters
+    ----------
+    well_const : list
+        List of well constellations.
+    names : list of str, optional
+        Names for the wells. The default is None.
+    title : str, optional
+        Plot title. The default is "".
+    filename : str, optional
+        Filename if the result should be saved. The default is None.
+    plot_well_names : bool, optional
+        Whether to plot the well-names. The default is True.
+    ticks_set : int or str, optional
+        Tick spacing in the plot. The default is "auto".
+    fig : Figure, optional
+        Matplotlib figure to plot on. The default is None.
+    style : str, optional
+        Plot stlye. The default is "WTP".
+
+    Returns
+    -------
+    fig : Figure
+        The created matplotlib figure.
+    """
     # calculate Column- and Row-count for quadratic shape of the plot
     # total number of plots
     total_n = len(well_const)
@@ -357,7 +468,28 @@ def plot_well_pos(
     space = 0.1 * max(abs(xmax - xmin), abs(ymax - ymin))
     xspace = yspace = space
 
-    with plt.style.context("ggplot"):
+    if ticks_set == "auto":
+        # bit hacky auto-ticking to be more pleasant for the eyes
+        tick_list = [1, 2, 5, 10]
+        tk_space = space * 10 / 7  # assume about 7 ticks
+        scaling = np.log10(tk_space)
+        if np.log10(0.4) < scaling < 1:
+            # if space is less 10, choose nearest value in tick_list (by log)
+            ticks_set = min(tick_list, key=lambda x: abs(np.log(x / tk_space)))
+        else:
+            # k * 10 ** n as ticks (0.1, 0.2, ..., 10, 20, ..., 100, 200, ...)
+            space_pot = 10 ** int(np.floor(scaling))
+            ticks_set = space_pot * int(np.around(tk_space / space_pot))
+
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig = _get_fig_ax(
             fig, ax=False, dpi=100, figsize=[9 * col_n, 5 * row_n]
         )
@@ -374,15 +506,16 @@ def plot_well_pos(
                     ax.annotate(
                         "  " + name, (wells[j][0], wells[j][1]), zorder=100
                     )
-            ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
-            ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
-            ax.set_xlabel("x distance in $[m]$")  # , fontsize=16)
-            ax.set_ylabel("y distance in $[m]$")  # , fontsize=16)
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(ticks_set))
+            ax.yaxis.set_major_locator(ticker.MultipleLocator(ticks_set))
+            ax.set_xlabel("x distance in $[m]$")
+            ax.set_ylabel("y distance in $[m]$")
             if total_n > 1:
                 ax.set_title("Result {}".format(i))
 
+        if title:
+            fig.suptitle(title)
         fig.tight_layout(rect=[0, 0, 1, 0.95])
-
         if filename is not None:
             fig.savefig(filename, format="pdf")
 
@@ -406,17 +539,33 @@ def plotfit_transient(
     plotname=None,
     fig=None,
     ax=None,
+    style="WTP",
 ):
     """Plot of transient estimation fitting."""
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style1 = "ggplot"
+        style2 = "default"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    else:
+        style1 = style2 = style
+    with plt.style.context(style1):
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-    with plt.style.context("default"):
+        clr_n = len(clrs)
+    with plt.style.context(style2):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(12, 8))
         val_fix = setup.val_fix
         for kwarg in ["time", "rad"]:
             val_fix.pop(extra[kwarg], None)
 
-        para_kw = setup.get_sim_kwargs(para)
+        para_ordered = np.empty(len(setup.para_names))
+        for i, name in enumerate(setup.para_names):
+            para_ordered[i] = para[name]
+        para_kw = setup.get_sim_kwargs(para_ordered)
         val_fix.update(para_kw)
 
         plot_f = ft.partial(setup.func, **val_fix)
@@ -430,7 +579,7 @@ def plotfit_transient(
         xydir = np.zeros_like(time)
         test_name = list(np.unique(radnames[:, 0]))
         test_name.sort()
-        rad_unique, rad_un_idx = np.unique(rad, return_index=True)
+        __, rad_un_idx = np.unique(rad, return_index=True)
         for ri, re in enumerate(rad):
             r1 = re * r_gen
             r11 = re * r_gen1
@@ -439,22 +588,24 @@ def plotfit_transient(
             h2 = plot_f(**{extra["time"]: timarr, extra["rad"]: re}).reshape(
                 -1
             )
-            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             alpha = 0.3 * (1 - (re - min(rad)) / (max(rad) - min(rad))) + 0.3
-            zord = 1000 * (len(rad) - ri)
+            zord = 100 * (len(rad) - ri)
 
             if radnames[ri, 0] == radnames[ri, 1]:
-                label = "test {}".format(radnames[ri, 0])
+                label = "test at '{}'".format(radnames[ri, 0])
                 label_eff = "fitted type curve"
+                eff_zord = zord + 100  # first line should be on top
             else:
                 label = None
                 label_eff = None
+                eff_zord = 1
             if ri in rad_un_idx:
                 ax.plot(
                     r11,
                     timarr,
                     h2,
-                    zorder=zord - 1000 * max(rad),
+                    zorder=eff_zord,
                     color="k",
                     alpha=alpha,
                     label=label_eff,
@@ -469,14 +620,14 @@ def plotfit_transient(
                 alpha=0.6,
                 arrow_length_ratio=0.0,
                 color=color,
-                zorder=zord + 300,
+                zorder=zord + 30,
             )
             ax.scatter(
                 r1,
                 time,
                 h1,
                 depthshade=False,
-                zorder=zord + 600,
+                zorder=zord + 60,
                 color=color,
                 label=label,
             )
@@ -486,12 +637,11 @@ def plotfit_transient(
             h = plot_f(**{extra["time"]: te, extra["rad"]: radarr}).reshape(-1)
             ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
 
-        # ax.view_init(elev=45, azim=155)
         ax.view_init(elev=40, azim=125)
         ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
         ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
         ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
-        _sort_lgd(ax, loc="lower left", markerscale=2)
+        _sort_lgd(ax, loc="upper right", markerscale=2)
         fig.tight_layout()
         if plotname is not None:
             fig.savefig(plotname, format="pdf")
@@ -510,12 +660,16 @@ def plotfit_steady(
     ax_ins=True,
     fig=None,
     ax=None,
+    style="WTP",
 ):
     """Plot of steady estimation fitting."""
     val_fix = setup.val_fix
     val_fix.pop(extra["rad"], None)
 
-    para_kw = setup.get_sim_kwargs(para)
+    para_ordered = np.empty(len(setup.para_names))
+    for i, name in enumerate(setup.para_names):
+        para_ordered[i] = para[name]
+    para_kw = setup.get_sim_kwargs(para_ordered)
     val_fix.update(para_kw)
 
     plot_f = ft.partial(setup.func, **val_fix)
@@ -523,10 +677,18 @@ def plotfit_steady(
 
     test_name = list(np.unique(radnames[:, 0]))
     test_name.sort()
-    rad_unique, rad_un_idx = np.unique(rad, return_index=True)
 
-    with plt.style.context("ggplot"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        clr_n = len(clrs)
         fig, ax = _get_fig_ax(fig, ax, figsize=(9, 6))
         if ax_ins:
             axins = ax.inset_axes([0.4, 0.07, 0.57, 0.5])
@@ -539,12 +701,21 @@ def plotfit_steady(
             )
             axins.set_xscale("log")
             axins.set_facecolor("w")
+            axins.text(
+                0.975,
+                0.025,
+                "log-radius plot",
+                ha="right",
+                va="bottom",
+                bbox=dict(boxstyle="round", ec="k", fc="w"),
+                transform=axins.transAxes,
+            )
         for ri, re in enumerate(rad):
             h = plot_f(**{extra["rad"]: re}).reshape(-1)
             h1 = data[ri]
-            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % 10]
+            color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             if radnames[ri, 0] == radnames[ri, 1]:
-                label = "test {}".format(radnames[ri, 0])
+                label = "test at '{}'".format(radnames[ri, 0])
             else:
                 label = None
             ax.plot([re, re], [h, h1], alpha=0.6, color=color, zorder=100)
@@ -561,6 +732,7 @@ def plotfit_steady(
             alpha=0.6,
             color="k",
             zorder=200,
+            label="fitted type curve",
         )
         ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
         ax.set_ylabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
@@ -572,11 +744,19 @@ def plotfit_steady(
     return ax
 
 
-def plotparainteract(result, paranames, plotname=None, fig=None):
+def plotparainteract(result, paranames, plotname=None, fig=None, style="WTP"):
     """Plot of parameter interaction."""
     import pandas as pd
 
-    with plt.style.context("default"):
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "default"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
         fields = [par for par in result.dtype.names if par.startswith("par")]
         parameterdistribtion = result[fields]
@@ -607,25 +787,36 @@ def plotparatrace(
     stdvalues=None,
     plotname=None,
     fig=None,
+    style="WTP",
 ):
     """Plot of parameter trace."""
     rep = len(result)
     rows = len(parameternames)
-    with plt.style.context("ggplot"):
-
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
+        clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
 
         for j in range(rows):
             ax = fig.add_subplot(rows, 1, 1 + j)
             data = result["par" + parameternames[j]]
 
-            ax.plot(data, "-", color="C0")
+            ax.plot(data, "-", color=clrs[0])
 
             if stdvalues is not None:
                 ax.plot(
-                    [stdvalues[j]] * rep,
+                    [stdvalues[parameternames[j]]] * rep,
                     "--",
-                    label="best value: {:04.2f}".format(stdvalues[j]),
+                    label="best value: {:04.2f}".format(
+                        stdvalues[parameternames[j]]
+                    ),
                     color="k",
                     alpha=0.7,
                 )
@@ -651,11 +842,18 @@ def plotparatrace(
 
 
 def plotsensitivity(
-    paralabels, sensitivities, plotname=None, fig=None, ax=None
+    paralabels, sensitivities, plotname=None, fig=None, ax=None, style="WTP"
 ):
     """Plot of sensitivity results."""
-    with plt.style.context("ggplot"):
-
+    style = copy.deepcopy(plt.rcParams) if style is None else style
+    keep_fs = False
+    if style == "WTP":
+        style = "ggplot"
+        font_size = plt.rcParams.get("font.size", 10.0)
+        keep_fs = True
+    with plt.style.context(style):
+        if keep_fs:
+            plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax)
         w_props = {"linewidth": 1, "edgecolor": "w", "width": 0.5}
         wedges, __ = ax.pie(
