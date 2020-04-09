@@ -36,7 +36,7 @@ that is stored in a file called `Cmp_UFZ-campaign.cmp`.
 ```python
 import welltestpy as wtp
 
-# create the field-site and the campaign
+# load the campaign
 campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
 
 # plot the well constellation and a test overview

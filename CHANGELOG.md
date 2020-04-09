@@ -26,6 +26,14 @@ All notable changes to **welltestpy** will be documented in this file.
 
 ### Changes
 - py2 support dropped
+- `Fieldsite.coordinates` now returns a `Variable`; `Fieldsite.pos` as shortcut
+- `Fieldsite.pumpingrate` now returns a `Variable`; `Fieldsite.rate` as shortcut
+- `Fieldsite.auqiferradius` now returns a `Variable`; `Fieldsite.radius` as shortcut
+- `Fieldsite.auqiferdepth` now returns a `Variable`; `Fieldsite.depth` as shortcut
+- `Well.coordinates` now returns a `Variable`; `Well.pos` as shortcut
+- `Well.welldepth` now returns a `Variable`; `Well.depth` as shortcut
+- `Well.wellradius` added and returns the radius `Variable`
+- `Well.aquiferdepth` now returns a `Variable`
 
 
 ## [0.3.2] - 2019-03-08
