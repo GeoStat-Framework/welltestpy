@@ -760,9 +760,7 @@ class Well:
                 "m",
                 "coordinates of well '" + str(name) + "'",
             )
-        if np.shape(self.coordinates) != (2,) and not np.isscalar(
-            self.coordinates
-        ):
+        if np.shape(self.pos) != (2,) and not np.isscalar(self.pos):
             raise ValueError(
                 "Well: 'coordinates' should be given as "
                 + "[x,y] values or one single distance value"
@@ -780,7 +778,7 @@ class Well:
             )
         if not self._welldepth.scalar:
             raise ValueError("Well: 'welldepth' needs to be scalar")
-        if self.welldepth <= 0.0:
+        if self.depth <= 0.0:
             raise ValueError("Well: 'welldepth' needs to be positiv")
 
         if isinstance(aquiferdepth, Variable):
@@ -804,7 +802,7 @@ class Well:
                 )
         if not self._aquiferdepth.scalar:
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
-        if self.aquiferdepth <= 0.0:
+        if self.aquiferdepth.value <= 0.0:
             raise ValueError("Well: 'aquiferdepth' needs to be positiv")
 
     @property
@@ -818,7 +816,7 @@ class Well:
         info += "Well-name: " + str(self.name) + "\n"
         info += "--" + "\n"
         info += self._radius.info + "\n"
-        info += self._coordinates.info + "\n"
+        info += self.coordinates.info + "\n"
         info += self._welldepth.info + "\n"
         info += self._aquiferdepth.info + "\n"
         info += "----" + "\n"
@@ -829,8 +827,13 @@ class Well:
         """:class:`float`: Radius of the well."""
         return self._radius.value
 
-    @radius.setter
-    def radius(self, radius):
+    @property
+    def wellradius(self):
+        """:class:`float`: Radius variable of the well."""
+        return self._radius
+
+    @wellradius.setter
+    def wellradius(self, radius):
         tmp = dcopy(self._radius)
         if isinstance(radius, Variable):
             self._radius = dcopy(radius)
@@ -844,9 +847,14 @@ class Well:
             raise ValueError("Well: 'radius' needs to be positiv")
 
     @property
-    def coordinates(self):
-        """:class:`numpy.ndarray`: Coordinates of the well."""
+    def pos(self):
+        """:class:`numpy.ndarray`: Position of the well."""
         return self._coordinates.value
+
+    @property
+    def coordinates(self):
+        """:class:`numpy.ndarray`: Coordinates variable of the well."""
+        return self._coordinates
 
     @coordinates.setter
     def coordinates(self, coordinates):
@@ -855,9 +863,7 @@ class Well:
             self._coordinates = dcopy(coordinates)
         else:
             self._coordinates(coordinates)
-        if np.shape(self.coordinates) != (2,) and not np.isscalar(
-            self.coordinates
-        ):
+        if np.shape(self.pos) != (2,) and not np.isscalar(self.pos):
             self._coordinates = dcopy(tmp)
             raise ValueError(
                 "Well: 'coordinates' should be given as "
@@ -865,9 +871,14 @@ class Well:
             )
 
     @property
-    def welldepth(self):
+    def depth(self):
         """:class:`float`: Depth of the well."""
         return self._welldepth.value
+
+    @property
+    def welldepth(self):
+        """:class:`float`: Depth variable of the well."""
+        return self._welldepth
 
     @welldepth.setter
     def welldepth(self, welldepth):
@@ -879,14 +890,14 @@ class Well:
         if not self._welldepth.scalar:
             self._welldepth = dcopy(tmp)
             raise ValueError("Well: 'welldepth' needs to be scalar")
-        if self.welldepth <= 0.0:
+        if self.depth <= 0.0:
             self._welldepth = dcopy(tmp)
             raise ValueError("Well: 'welldepth' needs to be positiv")
 
     @property
     def aquiferdepth(self):
         """:class:`float`: Aquifer depth at the well."""
-        return self._aquiferdepth.value
+        return self._aquiferdepth
 
     @aquiferdepth.setter
     def aquiferdepth(self, aquiferdepth):
@@ -898,7 +909,7 @@ class Well:
         if not self._aquiferdepth.scalar:
             self._aquiferdepth = dcopy(tmp)
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
-        if self.aquiferdepth <= 0.0:
+        if self.aquiferdepth.value <= 0.0:
             self._aquiferdepth = dcopy(tmp)
             raise ValueError("Well: 'aquiferdepth' needs to be positiv")
 
@@ -911,9 +922,9 @@ class Well:
             Coordinates to calculate the distance to or another well.
         """
         if isinstance(well, Well):
-            return np.linalg.norm(self.coordinates - well.coordinates)
+            return np.linalg.norm(self.pos - well.pos)
         try:
-            return np.linalg.norm(self.coordinates - well)
+            return np.linalg.norm(self.pos - well)
         except ValueError:
             raise ValueError(
                 "Well: the distant-well needs to be an "
@@ -959,7 +970,7 @@ class Well:
 
     def __abs__(self):
         """Distance to origin."""
-        return np.linalg.norm(self.coordinates)
+        return np.linalg.norm(self.pos)
 
     def save(self, path="", name=None):
         """Save a well to file.

@@ -55,10 +55,17 @@ class FieldSite:
         return info
 
     @property
+    def pos(self):
+        """:class:`numpy.ndarray`: Position of the field site."""
+        if self._coordinates is not None:
+            return self._coordinates.value
+        return None
+
+    @property
     def coordinates(self):
         """:class:`numpy.ndarray`: Coordinates of the field site."""
         if self._coordinates is not None:
-            return self._coordinates.value
+            return self._coordinates
         return None
 
     @coordinates.setter

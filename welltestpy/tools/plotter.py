@@ -208,10 +208,7 @@ def campaign_well_plot(
 
     for w in campaign.wells:
         well_const0.append(
-            [
-                campaign.wells[w].coordinates[0],
-                campaign.wells[w].coordinates[1],
-            ]
+            [campaign.wells[w].pos[0], campaign.wells[w].pos[1]]
         )
         names.append(w)
     well_const = [well_const0]
@@ -244,10 +241,10 @@ def campaign_well_plot(
             for i, t in enumerate(testlist):
                 p_well = campaign.tests[t].pumpingwell
                 for j, obs in enumerate(campaign.tests[t].observations):
-                    x0 = campaign.wells[p_well].coordinates[0]
-                    y0 = campaign.wells[p_well].coordinates[1]
-                    x1 = campaign.wells[obs].coordinates[0]
-                    y1 = campaign.wells[obs].coordinates[1]
+                    x0 = campaign.wells[p_well].pos[0]
+                    y0 = campaign.wells[p_well].pos[1]
+                    x1 = campaign.wells[obs].pos[0]
+                    y1 = campaign.wells[obs].pos[1]
                     label = "'{}'".format(t) if j == 0 else None
                     fadeline(
                         ax=ax,
@@ -368,7 +365,7 @@ def plot_pump_test(
                 ax2.scatter(
                     dist, displace, color=color, label=label,
                 )
-                ax2.set_xlabel("r in {}".format(wells[k]._coordinates.units))
+                ax2.set_xlabel("r in {}".format(wells[k].coordinates.units))
                 ax2.set_ylabel(
                     abslab + "{}".format(pump_test.observations[k].labels)
                 )

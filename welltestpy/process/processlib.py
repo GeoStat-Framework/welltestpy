@@ -33,7 +33,7 @@ def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
     if not isinstance(pumptest, testslib.PumpingTest):
         raise ValueError(str(pumptest) + " is no pumping test")
 
-    oldprate = dcopy(pumptest.pumpingrate)
+    oldprate = dcopy(pumptest.rate)
     pumptest.pumpingrate = pumpingrate
 
     for obs in pumptest.observations:
@@ -141,27 +141,27 @@ def combinepumptest(
 
     if pumpingrate is None:
         if infooftest1:
-            pumpingrate = temptest1.pumpingrate
+            pumpingrate = temptest1.rate
         else:
-            pumpingrate = temptest2.pumpingrate
+            pumpingrate = temptest2.rate
 
     normpumptest(temptest1, pumpingrate, factor1)
     normpumptest(temptest2, pumpingrate, factor2)
 
-    prate = temptest1.pumpingrate
+    prate = temptest1.rate
 
     if infooftest1:
         if pwell in temptest1.observations and pwell in temptest2.observations:
             temptest2.delobservations(pwell)
-        aquiferdepth = temptest1.aquiferdepth
-        aquiferradius = temptest1.aquiferradius
+        aquiferdepth = temptest1.depth
+        aquiferradius = temptest1.radius
         description = temptest1.description
         timeframe = temptest1.timeframe
     else:
         if pwell in temptest1.observations and pwell in temptest2.observations:
             temptest1.delobservations(pwell)
-        aquiferdepth = temptest2.aquiferdepth
-        aquiferradius = temptest2.aquiferradius
+        aquiferdepth = temptest2.depth
+        aquiferradius = temptest2.radius
         description = temptest2.description
         timeframe = temptest2.timeframe
 
@@ -169,13 +169,13 @@ def combinepumptest(
     observations.update(temptest2.observations)
 
     if infooftest1:
-        aquiferdepth = temptest1.aquiferdepth
-        aquiferradius = temptest1.aquiferradius
+        aquiferdepth = temptest1.depth
+        aquiferradius = temptest1.radius
         description = temptest1.description
         timeframe = temptest1.timeframe
     else:
-        aquiferdepth = temptest2.aquiferdepth
-        aquiferradius = temptest2.aquiferradius
+        aquiferdepth = temptest2.depth
+        aquiferradius = temptest2.radius
         description = temptest2.description
         timeframe = temptest2.timeframe
 

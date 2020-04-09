@@ -205,13 +205,13 @@ def save_well(well, path="", name=None):
         aquifname = name[:-4] + "_AqdVar.var"
         # save variable-files
         writer.writerow(["radius", radiuname])
-        well._radius.save(patht, radiuname)
+        well.wellradius.save(patht, radiuname)
         writer.writerow(["coordinates", coordname])
-        well._coordinates.save(patht, coordname)
+        well.coordinates.save(patht, coordname)
         writer.writerow(["welldepth", welldname])
-        well._welldepth.save(patht, welldname)
+        well.welldepth.save(patht, welldname)
         writer.writerow(["aquiferdepth", aquifname])
-        well._aquiferdepth.save(patht, aquifname)
+        well.aquiferdepth.save(patht, aquifname)
     # compress everything to one zip-file
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
@@ -267,11 +267,11 @@ def save_campaign(campaign, path="", name=None):
         writer.writerow(["description", campaign.description])
         writer.writerow(["timeframe", campaign.timeframe])
         # define names for the variable-files
-        if campaign._fieldsite is not None:
+        if campaign.fieldsite is not None:
             fieldsname = name[:-4] + "_Fieldsite.fds"
             # save variable-files
             writer.writerow(["fieldsite", fieldsname])
-            campaign._fieldsite.save(patht, fieldsname)
+            campaign.fieldsite.save(patht, fieldsname)
         else:
             writer.writerow(["fieldsite", "None"])
 
@@ -295,7 +295,7 @@ def save_campaign(campaign, path="", name=None):
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
         zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-        if campaign._fieldsite is not None:
+        if campaign.fieldsite is not None:
             zfile.write(os.path.join(patht, fieldsname), fieldsname)
         for k in wkeys:
             zfile.write(os.path.join(patht, wellsname[k]), wellsname[k])
@@ -346,18 +346,18 @@ def save_fieldsite(fieldsite, path="", name=None):
         writer.writerow(["name", fieldsite.name])
         writer.writerow(["description", fieldsite.description])
         # define names for the variable-files
-        if fieldsite._coordinates is not None:
+        if fieldsite.coordinates is not None:
             coordname = name[:-4] + "_CooVar.var"
             # save variable-files
             writer.writerow(["coordinates", coordname])
-            fieldsite._coordinates.save(patht, coordname)
+            fieldsite.coordinates.save(patht, coordname)
         else:
             writer.writerow(["coordinates", "None"])
     # compress everything to one zip-file
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
         zfile.write(os.path.join(patht, "info.csv"), "info.csv")
-        if fieldsite._coordinates is not None:
+        if fieldsite.coordinates is not None:
             zfile.write(os.path.join(patht, coordname), coordname)
     # delete the temporary directory
     shutil.rmtree(patht, ignore_errors=True)
@@ -410,13 +410,13 @@ def save_pumping_test(pump_test, path="", name=None):
         aquidname = name[:-4] + "_AqdVar"
         aquirname = name[:-4] + "_AqrVar"
         # save variable-files
-        pumpr_path = pump_test._pumpingrate.save(patht, pumprname)
+        pumpr_path = pump_test.pumpingrate.save(patht, pumprname)
         pumpr_base = os.path.basename(pumpr_path)
         writer.writerow(["pumpingrate", pumpr_base])
-        aquid_path = pump_test._aquiferdepth.save(patht, aquidname)
+        aquid_path = pump_test.aquiferdepth.save(patht, aquidname)
         aquid_base = os.path.basename(aquid_path)
         writer.writerow(["aquiferdepth", aquid_base])
-        aquir_path = pump_test._aquiferradius.save(patht, aquirname)
+        aquir_path = pump_test.aquiferradius.save(patht, aquirname)
         aquir_base = os.path.basename(aquir_path)
         writer.writerow(["aquiferradius", aquir_base])
         okeys = tuple(pump_test.observations.keys())

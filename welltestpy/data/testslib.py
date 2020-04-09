@@ -56,6 +56,28 @@ class Test:
         """:class:`str`: String containing the test type."""
         return self._testtype
 
+    def plot(self, wells, exclude=None, fig=None, ax=None, **kwargs):
+        """Generate a plot of the pumping test.
+
+        This will plot the test on the given figure axes.
+
+        Parameters
+        ----------
+        ax : :class:`Axes`
+            Axes where the plot should be done.
+        wells : :class:`dict`
+            Dictonary containing the well classes sorted by name.
+        exclude: :class:`list`, optional
+            List of wells that should be excluded from the plot.
+            Default: ``None``
+
+        Notes
+        -----
+        This will be used by the Campaign class.
+        """
+        # update ax (or create it if None) and return it
+        return ax
+
 
 class PumpingTest(Test):
     """Class for a pumping test.
@@ -110,9 +132,7 @@ class PumpingTest(Test):
 
         self.pumpingwell = str(pumpingwell)
 
-        if isinstance(pumpingrate, varlib.Variable):
-            self._pumpingrate = dcopy(pumpingrate)
-        elif isinstance(pumpingrate, varlib.Observation):
+        if isinstance(pumpingrate, (varlib.Variable, varlib.Observation)):
             self._pumpingrate = dcopy(pumpingrate)
         else:
             self._pumpingrate = varlib.Variable(
@@ -146,7 +166,7 @@ class PumpingTest(Test):
             )
         if not self._aquiferdepth.scalar:
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
-        if self.aquiferdepth <= 0.0:
+        if self.depth <= 0.0:
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
 
         if isinstance(aquiferradius, varlib.Variable):
@@ -161,7 +181,7 @@ class PumpingTest(Test):
             )
         if not self._aquiferradius.scalar:
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
-        if self.aquiferradius <= 0.0:
+        if self.radius <= 0.0:
             raise ValueError(
                 "PumpingTest: 'aquiferradius' " + "needs to be positiv"
             )
@@ -250,12 +270,17 @@ class PumpingTest(Test):
     @property
     def constant_rate(self):
         """:class:`bool`: state if this is a constant rate test."""
-        return np.isscalar(self.pumpingrate)
+        return np.isscalar(self.rate)
+
+    @property
+    def rate(self):
+        """:class:`float`: pumping rate at the pumping well."""
+        return self._pumpingrate.value
 
     @property
     def pumpingrate(self):
-        """:class:`float`: pumping rate at the pumping well."""
-        return self._pumpingrate.value
+        """:class:`float`: pumping rate variable at the pumping well."""
+        return self._pumpingrate
 
     @pumpingrate.setter
     def pumpingrate(self, pumpingrate):
@@ -269,9 +294,14 @@ class PumpingTest(Test):
             raise ValueError("PumpingTest: 'pumpingrate' needs to be scalar")
 
     @property
-    def aquiferdepth(self):
+    def depth(self):
         """:class:`float`: aquifer depth at the field site."""
         return self._aquiferdepth.value
+
+    @property
+    def aquiferdepth(self):
+        """:class:`float`: aquifer depth at the field site."""
+        return self._aquiferdepth
 
     @aquiferdepth.setter
     def aquiferdepth(self, aquiferdepth):
@@ -283,14 +313,19 @@ class PumpingTest(Test):
         if not self._aquiferdepth.scalar:
             self._aquiferdepth = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
-        if self.aquiferdepth <= 0.0:
+        if self.depth <= 0.0:
             self._aquiferdepth = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
 
     @property
-    def aquiferradius(self):
+    def radius(self):
         """:class:`float`: aquifer radius at the field site."""
         return self._aquiferradius.value
+
+    @property
+    def aquiferradius(self):
+        """:class:`float`: aquifer radius at the field site."""
+        return self._aquiferradius
 
     @aquiferradius.setter
     def aquiferradius(self, aquiferradius):
@@ -302,7 +337,7 @@ class PumpingTest(Test):
         if not self._aquiferradius.scalar:
             self._aquiferradius = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
-        if self.aquiferradius <= 0.0:
+        if self.radius <= 0.0:
             self._aquiferradius = dcopy(tmp)
             raise ValueError(
                 "PumpingTest: 'aquiferradius' " + "needs to be positiv"
@@ -453,7 +488,7 @@ class PumpingTest(Test):
         -----
         This will be used by the Campaign class.
         """
-        plotter.plot_pump_test(
+        return plotter.plot_pump_test(
             pump_test=self,
             wells=wells,
             exclude=exclude,

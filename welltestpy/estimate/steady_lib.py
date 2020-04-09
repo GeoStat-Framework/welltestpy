@@ -183,7 +183,7 @@ class SteadyPumping:
         for test in self.testinclude:
             pwell = self.campaign.tests[test].pumpingwell
             rwell_list.append(self.campaign.wells[pwell].radius)
-            rinf_list.append(self.campaign.tests[test].aquiferradius)
+            rinf_list.append(self.campaign.tests[test].radius)
         self.rwell = min(rwell_list)
         """:class:`float`: radius of the pumping wells"""
         self.rinf = max(rinf_list)
