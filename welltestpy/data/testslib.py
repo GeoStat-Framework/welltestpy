@@ -370,7 +370,7 @@ class PumpingTest(Test):
         description : :class:`str`, optional
             Description of the Variable. Default: ``"Drawdown observation"``
         """
-        obs = varlib.DrawdownObs(well, time, observation, description)
+        obs = varlib.DrawdownObs(well, observation, time, description)
         self.add_observations(obs)
 
     def add_observations(self, obs):

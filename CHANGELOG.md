@@ -36,6 +36,7 @@ All notable changes to **welltestpy** will be documented in this file.
 - `Well.aquiferdepth` now returns a `Variable`
 - `Fieldsite.addobservations` renamed to `Fieldsite.add_observations`
 - `Fieldsite.delobservations` renamed to `Fieldsite.del_observations`
+- `Observation` has changed order of inputs/outputs. Now: `observation`, `time`
 
 
 ## [0.3.2] - 2019-03-08

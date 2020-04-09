@@ -302,57 +302,40 @@ class Observation:
     ----------
     name : :class:`str`
         Name of the Variable.
-    time : :class:`Variable`
-        Value of the Variable.
     observation : :class:`Variable`
         Name of the Variable. Default: ``"x"``
+    time : :class:`Variable`
+        Value of the Variable.
     description : :class:`str`, optional
         Description of the Variable. Default: ``"Observation"``
     """
 
-    def __init__(self, name, time, observation, description="Observation"):
+    def __init__(
+        self, name, observation, time=None, description="Observation"
+    ):
         self.__it = None
         self.__itfinished = None
+        self._time = None
+        self._observation = None
         self.name = data_io._formstr(name)
         self.description = str(description)
 
-        if isinstance(observation, Variable):
-            self._observation = dcopy(observation)
-        else:
-            raise ValueError(
-                "Observation: "
-                + "'observation' must be instance of 'variable'"
-            )
-
-        if time is not None:
-            if isinstance(time, Variable):
-                self._time = dcopy(time)
-            else:
-                self._time = TimeVar(time)
-
-            self.__state = "transient"
-        else:
-            self.__state = "steady"
+        self._setobservation(observation)
+        self._settime(time)
         self._checkshape()
 
-    def __call__(self, in1=None, in2=None, time=None, observation=None):
+    def __call__(self, observation=None, time=None):
         """Call a variable.
 
         Here you can set a new value or you can get the value of the variable.
 
         Parameters
         ----------
-        in1 : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
-            New Value for time (if transient) or observation (if steady).
-            Default: ``"None"``
-        in2 : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
-            New Value for observation (if transient).
+        observation : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
+            New Value for observation.
             Default: ``"None"``
         time : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
             New Value for time.
-            Default: ``"None"``
-        observation : scalar, :class:`numpy.ndarray`, :class:`Variable`, optional
-            New Value for observation.
             Default: ``"None"``
 
         Returns
@@ -361,30 +344,13 @@ class Observation:
         or :class:`numpy.ndarray`
             ``(time, observation)`` or ``observation``.
         """
-        # in1 and in2 are for non-keyword call
-        if self.state == "transient":
-            if time is None:
-                time = in1
-            if observation is None:
-                observation = in2
-            tmp1 = dcopy(self._time)
-            tmp2 = dcopy(self._observation)
-            self._settime(time)
+        if observation is not None:
             self._setobservation(observation)
-            if not self._checkshape():
-                self._settime(tmp1)
-                self._setobservation(tmp2)
-                raise ValueError(
-                    "Observation: "
-                    + "'observation' and 'time' have a "
-                    + "shape-missmatch"
-                )
-            return self.time, self.observation
-        # steady case
-        if observation is None:
-            observation = in1
-        self._setobservation(observation)
-        return self.observation
+        if time is not None:
+            self._settime(time)
+        if observation is not None or time is not None:
+            self._checkshape()
+        return self.value
 
     def __repr__(self):
         """Represenetation."""
@@ -433,7 +399,7 @@ class Observation:
         or :class:`numpy.ndarray`
         """
         if self.state == "transient":
-            return self.time, self.observation
+            return self.observation, self.time
         return self.observation
 
     @property
@@ -443,7 +409,7 @@ class Observation:
 
         Either ``"steady"`` or ``"transient"``.
         """
-        return self.__state
+        return "steady" if self._time is None else "transient"
 
     @property
     def kind(self):
@@ -457,9 +423,16 @@ class Observation:
 
         :class:`int` or :class:`float` or :class:`numpy.ndarray`
         """
-        if self.state == "transient":
-            return self._time.value
-        return None
+        return self._time.value if self.state == "transient" else None
+
+    @time.setter
+    def time(self, time):
+        self._settime(time)
+        self._checkshape()
+
+    @time.deleter
+    def time(self):
+        self._time = None
 
     @property
     def observation(self):
@@ -470,52 +443,17 @@ class Observation:
         """
         return self._observation.value
 
+    @observation.setter
+    def observation(self, observation):
+        self._setobservation(observation)
+        self._checkshape()
+
     @property
     def units(self):
         """[:class:`tuple` of] :class:`str`: units of the observation."""
         if self.state == "steady":
             return self._observation.units
         return self._time.units + "," + self._observation.units
-
-    @time.setter
-    def time(self, time):
-        if self.state == "steady":
-            self.__state = "transient"
-            self._settime(time)
-            if not self._checkshape():
-                del self.time
-                raise ValueError(
-                    "Observation: "
-                    + "'time' has a "
-                    + "shape-missmatch with 'observation'"
-                )
-        else:
-            tmp = dcopy(self._time)
-            self._settime(time)
-            if not self._checkshape():
-                self._settime(tmp)
-                raise ValueError(
-                    "Observation: "
-                    + "'time' has a "
-                    + "shape-missmatch with 'observation'"
-                )
-
-    @time.deleter
-    def time(self):
-        self.__state = "steady"
-        del self._time
-
-    @observation.setter
-    def observation(self, observation):
-        tmp = dcopy(self._observation)
-        self._setobservation(observation)
-        if not self._checkshape():
-            self._setobservation(tmp)
-            raise ValueError(
-                "Observation: "
-                + "'observation' has a "
-                + "shape-missmatch with 'time'"
-            )
 
     def reshape(self):
         """Reshape obeservations to flat array."""
@@ -528,23 +466,31 @@ class Observation:
     def _settime(self, time):
         if isinstance(time, Variable):
             self._time = dcopy(time)
+        elif self._time is None:
+            self._time = TimeVar(time)
+        elif time is None:
+            self._time = None
         else:
             self._time(time)
 
     def _setobservation(self, observation):
         if isinstance(observation, Variable):
             self._observation = dcopy(observation)
+        elif observation is None:
+            self._observation = None
         else:
             self._observation(observation)
 
     def _checkshape(self):
-        if self.state == "transient":
-            if (
-                np.shape(self.time)
-                != np.shape(self.observation)[: len(np.shape(self._time()))]
-            ):
-                return False
-        return True
+        if self.state == "transient" and (
+            np.shape(self.time)
+            != np.shape(self.observation)[: len(np.shape(self.time))]
+        ):
+            raise ValueError(
+                "Observation: "
+                + "'observation' has a "
+                + "shape-missmatch with 'time'"
+            )
 
     def __iter__(self):
         """Iterate over Observations."""
@@ -606,7 +552,7 @@ class StdyObs(Observation):
     """
 
     def __init__(self, name, observation, description="Steady observation"):
-        super().__init__(name, None, observation, description)
+        super().__init__(name, observation, None, description)
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""
@@ -623,20 +569,20 @@ class TimeSeries(Observation):
     ----------
     name : :class:`str`
         Name of the Variable.
-    time : :class:`Variable`
-        Time points of observation.
     values : :class:`Variable`
         Values of the time-series.
+    time : :class:`Variable`
+        Time points of the time-series.
     description : :class:`str`, optional
-        Description of the Variable. Default: ``"Timeseries"``
+        Description of the Variable. Default: ``"Timeseries."``
     """
 
-    def __init__(self, name, time, values, description="Timeseries."):
+    def __init__(self, name, values, time, description="Timeseries."):
         if not isinstance(time, Variable):
             time = TimeVar(time)
         if not isinstance(values, Variable):
             values = Variable(name, values, description=description)
-        super().__init__(name, time, values, description)
+        super().__init__(name, values, time, description)
 
 
 class DrawdownObs(Observation):
@@ -647,22 +593,22 @@ class DrawdownObs(Observation):
     ----------
     name : :class:`str`
         Name of the Variable.
-    time : :class:`Variable`
-        Time points of observation.
     observation : :class:`Variable`
         Observation.
+    time : :class:`Variable`
+        Time points of observation.
     description : :class:`str`, optional
         Description of the Variable. Default: ``"Drawdown observation"``
     """
 
     def __init__(
-        self, name, time, observation, description="Drawdown observation"
+        self, name, observation, time, description="Drawdown observation"
     ):
         if not isinstance(time, Variable):
             time = TimeVar(time)
         if not isinstance(observation, Variable):
             observation = HeadVar(observation)
-        super().__init__(name, time, observation, description)
+        super().__init__(name, observation, time, description)
 
 
 class StdyHeadObs(Observation):
@@ -687,7 +633,7 @@ class StdyHeadObs(Observation):
     ):
         if not isinstance(observation, Variable):
             observation = HeadVar(observation)
-        super().__init__(name, None, observation, description)
+        super().__init__(name, observation, None, description)
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""
@@ -725,77 +671,16 @@ class Well:
     def __init__(
         self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
     ):
+        self._radius = None
+        self._coordinates = None
+        self._welldepth = None
+        self._aquiferdepth = None
+
         self.name = data_io._formstr(name)
-
-        if isinstance(radius, Variable):
-            self._radius = dcopy(radius)
-        else:
-            self._radius = Variable(
-                "radius",
-                radius,
-                "r",
-                "m",
-                "Inner radius of well '" + str(name) + "'",
-            )
-        if not self._radius.scalar:
-            raise ValueError("Well: 'radius' needs to be scalar")
-        if self.radius < 0.0:
-            raise ValueError("Well: 'radius' needs to be positiv")
-
-        if isinstance(coordinates, Variable):
-            self._coordinates = dcopy(coordinates)
-        else:
-            self._coordinates = Variable(
-                "coordinates",
-                coordinates,
-                "XY",
-                "m",
-                "coordinates of well '" + str(name) + "'",
-            )
-        if np.shape(self.pos) != (2,) and not np.isscalar(self.pos):
-            raise ValueError(
-                "Well: 'coordinates' should be given as "
-                + "[x,y] values or one single distance value"
-            )
-
-        if isinstance(welldepth, Variable):
-            self._welldepth = dcopy(welldepth)
-        else:
-            self._welldepth = Variable(
-                "welldepth",
-                welldepth,
-                "L_w",
-                "m",
-                "depth of well '" + str(name) + "'",
-            )
-        if not self._welldepth.scalar:
-            raise ValueError("Well: 'welldepth' needs to be scalar")
-        if self.depth <= 0.0:
-            raise ValueError("Well: 'welldepth' needs to be positiv")
-
-        if isinstance(aquiferdepth, Variable):
-            self._aquiferdepth = dcopy(aquiferdepth)
-        else:
-            if aquiferdepth is None:
-                self._aquiferdepth = Variable(
-                    "aquiferdepth",
-                    welldepth,
-                    "L_a",
-                    "m",
-                    "aquiferdepth at well '" + str(name) + "'",
-                )
-            else:
-                self._aquiferdepth = Variable(
-                    "aquiferdepth",
-                    aquiferdepth,
-                    "L_a",
-                    "m",
-                    "aquiferdepth at well '" + str(name) + "'",
-                )
-        if not self._aquiferdepth.scalar:
-            raise ValueError("Well: 'aquiferdepth' needs to be scalar")
-        if self.aquiferdepth.value <= 0.0:
-            raise ValueError("Well: 'aquiferdepth' needs to be positiv")
+        self.wellradius = radius
+        self.coordinates = coordinates
+        self.welldepth = welldepth
+        self.aquiferdepth = aquiferdepth
 
     @property
     def info(self):
@@ -826,16 +711,21 @@ class Well:
 
     @wellradius.setter
     def wellradius(self, radius):
-        tmp = dcopy(self._radius)
         if isinstance(radius, Variable):
             self._radius = dcopy(radius)
+        elif self._radius is None:
+            self._radius = Variable(
+                "radius",
+                radius,
+                "r",
+                "m",
+                "Inner radius of well '" + str(self.name) + "'",
+            )
         else:
             self._radius(radius)
         if not self._radius.scalar:
-            self._radius = dcopy(tmp)
             raise ValueError("Well: 'radius' needs to be scalar")
         if self.radius <= 0.0:
-            self._radius = dcopy(tmp)
             raise ValueError("Well: 'radius' needs to be positiv")
 
     @property
@@ -850,13 +740,19 @@ class Well:
 
     @coordinates.setter
     def coordinates(self, coordinates):
-        tmp = dcopy(self._coordinates)
         if isinstance(coordinates, Variable):
             self._coordinates = dcopy(coordinates)
+        elif self._coordinates is None:
+            self._coordinates = Variable(
+                "coordinates",
+                coordinates,
+                "XY",
+                "m",
+                "coordinates of well '" + str(self.name) + "'",
+            )
         else:
             self._coordinates(coordinates)
         if np.shape(self.pos) != (2,) and not np.isscalar(self.pos):
-            self._coordinates = dcopy(tmp)
             raise ValueError(
                 "Well: 'coordinates' should be given as "
                 + "[x,y] values or one single distance value"
@@ -874,16 +770,21 @@ class Well:
 
     @welldepth.setter
     def welldepth(self, welldepth):
-        tmp = dcopy(self._welldepth)
         if isinstance(welldepth, Variable):
             self._welldepth = dcopy(welldepth)
+        elif self._welldepth is None:
+            self._welldepth = Variable(
+                "welldepth",
+                welldepth,
+                "L_w",
+                "m",
+                "depth of well '" + str(self.name) + "'",
+            )
         else:
             self._welldepth(welldepth)
         if not self._welldepth.scalar:
-            self._welldepth = dcopy(tmp)
             raise ValueError("Well: 'welldepth' needs to be scalar")
         if self.depth <= 0.0:
-            self._welldepth = dcopy(tmp)
             raise ValueError("Well: 'welldepth' needs to be positiv")
 
     @property
@@ -893,16 +794,30 @@ class Well:
 
     @aquiferdepth.setter
     def aquiferdepth(self, aquiferdepth):
-        tmp = dcopy(self._aquiferdepth)
         if isinstance(aquiferdepth, Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
+        elif self._aquiferdepth is None:
+            if aquiferdepth is None:
+                self._aquiferdepth = Variable(
+                    "aquiferdepth",
+                    self.depth,
+                    "L_a",
+                    "m",
+                    "aquiferdepth at well '" + str(self.name) + "'",
+                )
+            else:
+                self._aquiferdepth = Variable(
+                    "aquiferdepth",
+                    aquiferdepth,
+                    "L_a",
+                    "m",
+                    "aquiferdepth at well '" + str(self.name) + "'",
+                )
         else:
             self._aquiferdepth(aquiferdepth)
         if not self._aquiferdepth.scalar:
-            self._aquiferdepth = dcopy(tmp)
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
         if self.aquiferdepth.value <= 0.0:
-            self._aquiferdepth = dcopy(tmp)
             raise ValueError("Well: 'aquiferdepth' needs to be positiv")
 
     def distance(self, well):

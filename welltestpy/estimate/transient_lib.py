@@ -236,7 +236,7 @@ class TransientPumping:
         if time is None:
             for test in self.testinclude:
                 for obs in self.testinclude[test]:
-                    temptime, _ = self.campaign.tests[test].observations[obs]()
+                    _, temptime = self.campaign.tests[test].observations[obs]()
                     tmin = max(tmin, temptime.min())
                     tmax = min(tmax, temptime.max())
                     tmin = tmax if tmin > tmax else tmin
@@ -264,7 +264,7 @@ class TransientPumping:
         for test in self.testinclude:
             pwell = self.campaign.wells[self.campaign.tests[test].pumpingwell]
             for obs in self.testinclude[test]:
-                _, temphead = self.campaign.tests[test].observations[obs]()
+                temphead, _ = self.campaign.tests[test].observations[obs]()
                 temphead = np.array(temphead).reshape(-1)[np.newaxis].T
 
                 if data is None:

@@ -211,9 +211,9 @@ def filterdrawdown(observation, tout=None, dxscale=2):
         Scale of time-steps used for smoothing.
         Default: ``2``
     """
-    time, head = observation()
-    time = np.array(time, dtype=float).reshape(-1)
+    head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
+    time = np.array(time, dtype=float).reshape(-1)
 
     if tout is None:
         tout = dcopy(time)

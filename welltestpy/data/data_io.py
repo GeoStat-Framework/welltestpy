@@ -544,7 +544,7 @@ def load_obs(obsfile):
 
             obs = load_var(TxtIO(zfile.open(obsf)))
 
-        observation = varlib.Observation(name, time, obs, description)
+        observation = varlib.Observation(name, obs, time, description)
     except Exception:
         raise Exception("loadObs: loading the observation was not possible")
     return observation

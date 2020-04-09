@@ -334,11 +334,11 @@ def plot_pump_test(
                 dist = wells[pump_test.pumpingwell].radius
             if pump_test.observations[k].state == "transient":
                 if abslab:
-                    displace = np.abs(pump_test.observations[k].value[1])
+                    displace = np.abs(pump_test.observations[k].value[0])
                 else:
-                    displace = pump_test.observations[k].value[1]
+                    displace = pump_test.observations[k].value[0]
                 ax1.plot(
-                    pump_test.observations[k].value[0],
+                    pump_test.observations[k].value[1],
                     displace,
                     linewidth=2,
                     color=clrs[i % clr_n],
