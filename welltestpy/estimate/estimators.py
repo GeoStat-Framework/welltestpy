@@ -100,7 +100,7 @@ class ExtTheis3D(transient_lib.TransientPumping):
             "lnS": r"$\ln(S)$",
             "anis": "$e$",
         }
-        super(ExtTheis3D, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.ext_theis_3d,
@@ -178,7 +178,7 @@ class ExtTheis2D(transient_lib.TransientPumping):
             "len_scale": r"$\ell$",
             "lnS": r"$\ln(S)$",
         }
-        super(ExtTheis2D, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.ext_theis_2d,
@@ -256,7 +256,7 @@ class Neuman2004(transient_lib.TransientPumping):
             "len_scale": r"$\ell$",
             "lnS": r"$\ln(S)$",
         }
-        super(Neuman2004, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.neuman2004,
@@ -322,7 +322,7 @@ class Theis(transient_lib.TransientPumping):
         fit_type = {"mu": "log", "lnS": "log"}
         val_kw_names = {"mu": "transmissivity", "lnS": "storage"}
         val_plot_names = {"mu": r"$\ln(T)$", "lnS": r"$\ln(S)$"}
-        super(Theis, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.theis,
@@ -406,7 +406,7 @@ class ExtThiem3D(steady_lib.SteadyPumping):
             "len_scale": r"$\ell$",
             "anis": "$e$",
         }
-        super(ExtThiem3D, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.ext_thiem_3d,
@@ -484,7 +484,7 @@ class ExtThiem2D(steady_lib.SteadyPumping):
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
-        super(ExtThiem2D, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             make_steady=make_steady,
@@ -563,7 +563,7 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
-        super(Neuman2004Steady, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             make_steady=make_steady,
@@ -635,7 +635,7 @@ class Thiem(steady_lib.SteadyPumping):
         fit_type = {"mu": "log"}
         val_kw_names = {"mu": "transmissivity"}
         val_plot_names = {"mu": r"$\ln(T)$"}
-        super(Thiem, self).__init__(
+        super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.thiem,

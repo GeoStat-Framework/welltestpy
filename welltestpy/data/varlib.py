@@ -193,9 +193,7 @@ class TimeVar(Variable):
     def __init__(
         self, value, symbol="t", units="s", description="time given in seconds"
     ):
-        super(TimeVar, self).__init__(
-            "time", value, symbol, units, description
-        )
+        super().__init__("time", value, symbol, units, description)
         if np.ndim(self.value) > 1:
             raise ValueError(
                 "TimeVar: 'time' should have " + "at most one dimension"
@@ -225,9 +223,7 @@ class HeadVar(Variable):
     def __init__(
         self, value, symbol="h", units="m", description="head given in meters"
     ):
-        super(HeadVar, self).__init__(
-            "head", value, symbol, units, description
-        )
+        super().__init__("head", value, symbol, units, description)
 
 
 class TemporalVar(Variable):
@@ -242,9 +238,7 @@ class TemporalVar(Variable):
     """
 
     def __init__(self, value=0.0):
-        super(TemporalVar, self).__init__(
-            "temporal", value, description="temporal variable"
-        )
+        super().__init__("temporal", value, description="temporal variable")
 
 
 class CoordinatesVar(Variable):
@@ -294,9 +288,7 @@ class CoordinatesVar(Variable):
 
         value = np.array([ilat, ilon]).T
 
-        super(CoordinatesVar, self).__init__(
-            "coordinates", value, symbol, units, description
-        )
+        super().__init__("coordinates", value, symbol, units, description)
 
 
 class Observation:
@@ -614,7 +606,7 @@ class StdyObs(Observation):
     """
 
     def __init__(self, name, observation, description="Steady observation"):
-        super(StdyObs, self).__init__(name, None, observation, description)
+        super().__init__(name, None, observation, description)
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""
@@ -644,7 +636,7 @@ class TimeSeries(Observation):
             time = TimeVar(time)
         if not isinstance(values, Variable):
             values = Variable(name, values, description=description)
-        super(TimeSeries, self).__init__(name, time, values, description)
+        super().__init__(name, time, values, description)
 
 
 class DrawdownObs(Observation):
@@ -670,7 +662,7 @@ class DrawdownObs(Observation):
             time = TimeVar(time)
         if not isinstance(observation, Variable):
             observation = HeadVar(observation)
-        super(DrawdownObs, self).__init__(name, time, observation, description)
+        super().__init__(name, time, observation, description)
 
 
 class StdyHeadObs(Observation):
@@ -695,7 +687,7 @@ class StdyHeadObs(Observation):
     ):
         if not isinstance(observation, Variable):
             observation = HeadVar(observation)
-        super(StdyHeadObs, self).__init__(name, None, observation, description)
+        super().__init__(name, None, observation, description)
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""

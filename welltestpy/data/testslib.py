@@ -126,7 +126,7 @@ class PumpingTest(Test):
         description="Pumpingtest",
         timeframe=None,
     ):
-        super(PumpingTest, self).__init__(name, description, timeframe)
+        super().__init__(name, description, timeframe)
 
         self._testtype = "PumpingTest"
 
