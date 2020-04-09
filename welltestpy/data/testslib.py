@@ -128,49 +128,17 @@ class PumpingTest(Test):
     ):
         super().__init__(name, description, timeframe)
 
+        self._pumpingrate = None
+        self._aquiferdepth = None
+        self._aquiferradius = None
+        self.__observations = {}
         self._testtype = "PumpingTest"
 
         self.pumpingwell = str(pumpingwell)
-
-        self._pumpingrate = None
         self.pumpingrate = pumpingrate
-
-        if isinstance(aquiferdepth, varlib.Variable):
-            self._aquiferdepth = dcopy(aquiferdepth)
-        else:
-            self._aquiferdepth = varlib.Variable(
-                "aquiferdepth",
-                aquiferdepth,
-                "L_a",
-                "m",
-                "mean aquiferdepth for test '" + str(name) + "'",
-            )
-        if not self._aquiferdepth.scalar:
-            raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
-        if self.depth <= 0.0:
-            raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
-
-        if isinstance(aquiferradius, varlib.Variable):
-            self._aquiferradius = dcopy(aquiferradius)
-        else:
-            self._aquiferradius = varlib.Variable(
-                "aquiferradius",
-                aquiferradius,
-                "R",
-                "m",
-                "mean aquiferradius for test '" + str(name) + "'",
-            )
-        if not self._aquiferradius.scalar:
-            raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
-        if self.radius <= 0.0:
-            raise ValueError(
-                "PumpingTest: 'aquiferradius' " + "needs to be positiv"
-            )
-
-        if observations is None:
-            self.__observations = {}
-        else:
-            self.observations = observations
+        self.aquiferdepth = aquiferdepth
+        self.aquiferradius = aquiferradius
+        self.observations = observations
 
     def make_steady(self, time="latest"):
         """
@@ -301,16 +269,21 @@ class PumpingTest(Test):
 
     @aquiferdepth.setter
     def aquiferdepth(self, aquiferdepth):
-        tmp = dcopy(self._aquiferdepth)
         if isinstance(aquiferdepth, varlib.Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
+        elif self._aquiferdepth is None:
+            self._aquiferdepth = varlib.Variable(
+                "aquiferdepth",
+                aquiferdepth,
+                "L_a",
+                "m",
+                "mean aquiferdepth for test '" + str(self.name) + "'",
+            )
         else:
             self._aquiferdepth(aquiferdepth)
         if not self._aquiferdepth.scalar:
-            self._aquiferdepth = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
         if self.depth <= 0.0:
-            self._aquiferdepth = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
 
     @property
@@ -325,16 +298,21 @@ class PumpingTest(Test):
 
     @aquiferradius.setter
     def aquiferradius(self, aquiferradius):
-        tmp = dcopy(self._aquiferradius)
         if isinstance(aquiferradius, varlib.Variable):
             self._aquiferradius = dcopy(aquiferradius)
+        elif self._aquiferradius is None:
+            self._aquiferradius = varlib.Variable(
+                "aquiferradius",
+                aquiferradius,
+                "R",
+                "m",
+                "mean aquiferradius for test '" + str(self.name) + "'",
+            )
         else:
             self._aquiferradius(aquiferradius)
         if not self._aquiferradius.scalar:
-            self._aquiferradius = dcopy(tmp)
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
         if self.radius <= 0.0:
-            self._aquiferradius = dcopy(tmp)
             raise ValueError(
                 "PumpingTest: 'aquiferradius' " + "needs to be positiv"
             )
@@ -346,22 +324,9 @@ class PumpingTest(Test):
 
     @observations.setter
     def observations(self, obs):
+        self.__observations = {}
         if obs is not None:
-            if isinstance(obs, dict):
-                for k in obs.keys():
-                    if not isinstance(obs[k], varlib.Observation):
-                        raise ValueError(
-                            "PumpingTest: some 'observations' "
-                            + "are not of type Observation"
-                        )
-                self.__observations = dcopy(obs)
-            else:
-                raise ValueError(
-                    "PumpingTest: 'observations' should"
-                    + " be given as dictonary"
-                )
-        else:
-            self.__observations = {}
+            self.add_observations(obs)
 
     def add_steady_obs(
         self,
@@ -382,7 +347,7 @@ class PumpingTest(Test):
             Description of the Variable. Default: ``"Steady observation"``
         """
         obs = varlib.StdyHeadObs(well, observation, description)
-        self.addobservations(obs)
+        self.add_observations(obs)
 
     def add_transient_obs(
         self,
@@ -406,29 +371,27 @@ class PumpingTest(Test):
             Description of the Variable. Default: ``"Drawdown observation"``
         """
         obs = varlib.DrawdownObs(well, time, observation, description)
-        self.addobservations(obs)
+        self.add_observations(obs)
 
-    def addobservations(self, obs):
+    def add_observations(self, obs):
         """Add some specified observations.
-
-        This will add observations to the pumping test.
 
         Parameters
         ----------
-        obs : :class:`dict`
+        obs : :class:`dict`, :class:`list`, :class:`Observation`
             Observations to be added.
         """
         if isinstance(obs, dict):
             for k in obs:
                 if not isinstance(obs[k], varlib.Observation):
                     raise ValueError(
-                        "PumpingTest_addobservations: some "
+                        "PumpingTest_add_observations: some "
                         + "'observations' are not "
                         + "of type Observation"
                     )
                 if k in self.observations:
                     raise ValueError(
-                        "PumpingTest_addobservations: some "
+                        "PumpingTest_add_observations: some "
                         + "'observations' are already present"
                     )
             for k in obs:
@@ -436,17 +399,28 @@ class PumpingTest(Test):
         elif isinstance(obs, varlib.Observation):
             if obs in self.observations:
                 raise ValueError(
-                    "PumpingTest_addobservations: "
+                    "PumpingTest_add_observations: "
                     + "'observation' are already present"
                 )
             self.__observations[obs.name] = dcopy(obs)
         else:
-            raise ValueError(
-                "PumpingTest_addobservations: 'observations' "
-                + "should be given as dictonary with well as key"
-            )
+            try:
+                iter(obs)
+            except TypeError:
+                raise ValueError(
+                    "PumpingTest_add_observations: 'obs' can't be read."
+                )
+            else:
+                for ob in obs:
+                    if not isinstance(ob, varlib.Observation):
+                        raise ValueError(
+                            "PumpingTest_add_observations: some "
+                            + "'observations' are not "
+                            + "of type Observation"
+                        )
+                    self.__observations[ob.name] = dcopy(ob)
 
-    def delobservations(self, obs):
+    def del_observations(self, obs):
         """Delete some specified observations.
 
         This will delete observations from the pumping test. You can give a

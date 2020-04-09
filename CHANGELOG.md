@@ -34,6 +34,8 @@ All notable changes to **welltestpy** will be documented in this file.
 - `Well.welldepth` now returns a `Variable`; `Well.depth` as shortcut
 - `Well.wellradius` added and returns the radius `Variable`
 - `Well.aquiferdepth` now returns a `Variable`
+- `Fieldsite.addobservations` renamed to `Fieldsite.add_observations`
+- `Fieldsite.delobservations` renamed to `Fieldsite.del_observations`
 
 
 ## [0.3.2] - 2019-03-08

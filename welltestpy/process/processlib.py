@@ -152,14 +152,14 @@ def combinepumptest(
 
     if infooftest1:
         if pwell in temptest1.observations and pwell in temptest2.observations:
-            temptest2.delobservations(pwell)
+            temptest2.del_observations(pwell)
         aquiferdepth = temptest1.depth
         aquiferradius = temptest1.radius
         description = temptest1.description
         timeframe = temptest1.timeframe
     else:
         if pwell in temptest1.observations and pwell in temptest2.observations:
-            temptest1.delobservations(pwell)
+            temptest1.del_observations(pwell)
         aquiferdepth = temptest2.depth
         aquiferradius = temptest2.radius
         description = temptest2.description
