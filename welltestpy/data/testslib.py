@@ -132,27 +132,8 @@ class PumpingTest(Test):
 
         self.pumpingwell = str(pumpingwell)
 
-        if isinstance(pumpingrate, (varlib.Variable, varlib.Observation)):
-            self._pumpingrate = dcopy(pumpingrate)
-        else:
-            self._pumpingrate = varlib.Variable(
-                "pumpingrate",
-                pumpingrate,
-                "Q",
-                "m^3/s",
-                "Pumpingrate at test '" + self.name + "'",
-            )
-        if (
-            isinstance(self._pumpingrate, varlib.Variable)
-            and not self.constant_rate
-        ):
-            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
-        if (
-            isinstance(self._pumpingrate, varlib.Observation)
-            and self._pumpingrate.state == "steady"
-            and not self.constant_rate
-        ):
-            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
+        self._pumpingrate = None
+        self.pumpingrate = pumpingrate
 
         if isinstance(aquiferdepth, varlib.Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
@@ -284,14 +265,29 @@ class PumpingTest(Test):
 
     @pumpingrate.setter
     def pumpingrate(self, pumpingrate):
-        tmp = dcopy(self._pumpingrate)
-        if isinstance(pumpingrate, varlib.Variable):
+        if isinstance(pumpingrate, (varlib.Variable, varlib.Observation)):
             self._pumpingrate = dcopy(pumpingrate)
+        elif self._pumpingrate is None:
+            self._pumpingrate = varlib.Variable(
+                "pumpingrate",
+                pumpingrate,
+                "Q",
+                "m^3/s",
+                "Pumpingrate at test '" + self.name + "'",
+            )
         else:
             self._pumpingrate(pumpingrate)
-        if not self._pumpingrate.scalar:
-            self._pumpingrate = dcopy(tmp)
-            raise ValueError("PumpingTest: 'pumpingrate' needs to be scalar")
+        if (
+            isinstance(self._pumpingrate, varlib.Variable)
+            and not self.constant_rate
+        ):
+            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
+        if (
+            isinstance(self._pumpingrate, varlib.Observation)
+            and self._pumpingrate.state == "steady"
+            and not self.constant_rate
+        ):
+            raise ValueError("PumpingTest: 'pumpingrate' not scalar")
 
     @property
     def depth(self):
