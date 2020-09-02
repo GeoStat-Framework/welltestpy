@@ -2,7 +2,7 @@
 
 All notable changes to **welltestpy** will be documented in this file.
 
-## [1.0.2] - 2020-07-16
+## [1.0.2] - 2020-09-03
 
 ### Bugfixes
 - `StdyHeadObs` and `StdyObs` weren't usable due to an unnecessary `time` check
