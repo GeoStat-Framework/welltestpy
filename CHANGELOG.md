@@ -2,6 +2,17 @@
 
 All notable changes to **welltestpy** will be documented in this file.
 
+## [1.0.2] - 2020-09-03
+
+### Bugfixes
+- `StdyHeadObs` and `StdyObs` weren't usable due to an unnecessary `time` check
+
+
+## [1.0.1] - 2020-04-09
+
+### Bugfixes
+- Wrong URL in setup
+
 
 ## [1.0.0] - 2020-04-09
 
@@ -67,6 +78,8 @@ All notable changes to **welltestpy** will be documented in this file.
 
 First alpha release of welltespy.
 
+[1.0.2]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/GeoStat-Framework/welltestpy/compare/v0.3.2...v1.0.0
 [0.3.2]: https://github.com/GeoStat-Framework/welltestpy/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/GeoStat-Framework/welltestpy/compare/v0.3.0...v0.3.1

@@ -556,9 +556,10 @@ class StdyObs(Observation):
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""
-        raise ValueError(
-            "Observation: " + "'time' not allowed in steady-state"
-        )
+        if time is not None:
+            raise ValueError(
+                "Observation: " + "'time' not allowed in steady-state"
+            )
 
 
 class TimeSeries(Observation):
@@ -637,9 +638,10 @@ class StdyHeadObs(Observation):
 
     def _settime(self, time):
         """For steady observations, this raises a ``ValueError``."""
-        raise ValueError(
-            "Observation: " + "'time' not allowed in steady-state"
-        )
+        if time is not None:
+            raise ValueError(
+                "Observation: " + "'time' not allowed in steady-state"
+            )
 
 
 class Well:
