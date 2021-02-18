@@ -330,6 +330,7 @@ class TransientPumping:
         fittingplotname=None,
         interactplotname=None,
         estname=None,
+        plot_style="WTP",
     ):
         """Run the estimation.
 
@@ -378,11 +379,13 @@ class TransientPumping:
             If ``None``, it will be the current time +
             ``"_estimate"``.
             Default: ``None``
+        plot_style : str, optional
+            Plot stlye. The default is "WTP".
         """
         if self.setup.dummy:
             raise ValueError(
                 "Estimate: for parameter estimation"
-                + " you can't use a dummy paramter."
+                " you can't use a dummy paramter."
             )
         act_time = timemodule.strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -435,35 +438,38 @@ class TransientPumping:
         else:
             rank = 0
 
+        # initialize the sampler
+        sampler = spotpy.algorithms.sceua(
+            self.setup,
+            dbname=dbname,
+            dbformat="csv",
+            parallel=parallel,
+            save_sim=True,
+            db_precision=np.float64,
+        )
+        # start the estimation with the sce-ua algorithm
         if run:
-            # initialize the sampler
-            sampler = spotpy.algorithms.sceua(
-                self.setup,
-                dbname=dbname,
-                dbformat="csv",
-                parallel=parallel,
-                save_sim=True,
-                db_precision=np.float64,
-            )
-            # start the estimation with the sce-ua algorithm
             sampler.sample(rep, ngs=10, kstop=100, pcento=1e-4, peps=1e-3)
 
-            if rank == 0:
-                # save best parameter-set
-                self.result = sampler.getdata()
-                para_opt = spotpy.analyser.get_best_parameterset(
-                    self.result, maximize=False
-                )
-                void_names = para_opt.dtype.names
-                para = []
-                header = []
-                for name in void_names:
-                    para.append(para_opt[0][name])
-                    header.append(name[3:])
-                    self.estimated_para[header[-1]] = para[-1]
-                np.savetxt(paraname, para, header=" ".join(header))
-
         if rank == 0:
+            # save best parameter-set
+            if run:
+                self.result = sampler.getdata()
+            else:
+                self.result = np.genfromtxt(
+                    dbname + ".csv", delimiter=",", names=True
+                )
+            para_opt = spotpy.analyser.get_best_parameterset(
+                self.result, maximize=False
+            )
+            void_names = para_opt.dtype.names
+            para = []
+            header = []
+            for name in void_names:
+                para.append(para_opt[0][name])
+                header.append(name[3:])
+                self.estimated_para[header[-1]] = para[-1]
+            np.savetxt(paraname, para, header=" ".join(header))
             # plot the estimation-results
             plotter.plotparatrace(
                 self.result,
@@ -471,6 +477,7 @@ class TransientPumping:
                 parameterlabels=paralabels,
                 stdvalues=self.estimated_para,
                 plotname=traceplotname,
+                style=plot_style,
             )
             plotter.plotfit_transient(
                 setup=self.setup,
@@ -481,8 +488,11 @@ class TransientPumping:
                 radnames=self.radnames,
                 extra=self.extra_kw_names,
                 plotname=fittingplotname,
+                style=plot_style,
             )
-            plotter.plotparainteract(self.result, paralabels, interactplotname)
+            plotter.plotparainteract(
+                self.result, paralabels, interactplotname, style=plot_style
+            )
 
     def sensitivity(
         self,
@@ -493,6 +503,7 @@ class TransientPumping:
         plotname=None,
         traceplotname=None,
         sensname=None,
+        plot_style="WTP",
     ):
         """Run the sensitivity analysis.
 
@@ -532,11 +543,13 @@ class TransientPumping:
             If ``None``, it will be the current time +
             ``"_estimate"``.
             Default: ``None``
+        plot_style : str, optional
+            Plot stlye. The default is "WTP".
         """
         if len(self.setup.para_names) == 1 and not self.setup.dummy:
             raise ValueError(
                 "Sensitivity: for estimation with only one parameter"
-                + " you have to use a dummy paramter."
+                " you have to use a dummy paramter."
             )
         if rep is None:
             rep = spotpylib.fast_rep(
@@ -623,11 +636,14 @@ class TransientPumping:
             header = " ".join(paranames)
             np.savetxt(sensname, sens_est["ST"], header=header)
             np.savetxt(sensname1, sens_est["S1"], header=header)
-            plotter.plotsensitivity(paralabels, sens_est, plotname)
+            plotter.plotsensitivity(
+                paralabels, sens_est, plotname, style=plot_style
+            )
             plotter.plotparatrace(
                 data,
                 parameternames=paranames,
                 parameterlabels=paralabels,
                 stdvalues=None,
                 plotname=traceplotname,
+                style=plot_style,
             )
