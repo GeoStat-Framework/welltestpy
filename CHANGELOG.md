@@ -2,6 +2,19 @@
 
 All notable changes to **welltestpy** will be documented in this file.
 
+## [1.0.3] - 2021-02
+
+### Enhancements
+- Estimations: run method now provides `plot_style` keyword to control plotting
+
+### Changes
+- Fit plot style for transient pumping tests was updated
+
+### Bugfixes
+- Estimations: run method was throwing an Error when setting `run=False`
+- Plotter: all plotting routines now respect setted font-type from matplotlib
+
+
 ## [1.0.2] - 2020-09-03
 
 ### Bugfixes
@@ -78,6 +91,7 @@ All notable changes to **welltestpy** will be documented in this file.
 
 First alpha release of welltespy.
 
+[1.0.3]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/GeoStat-Framework/welltestpy/compare/v0.3.2...v1.0.0

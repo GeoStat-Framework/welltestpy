@@ -245,7 +245,7 @@ def campaign_well_plot(
                     y0 = campaign.wells[p_well].pos[1]
                     x1 = campaign.wells[obs].pos[0]
                     y1 = campaign.wells[obs].pos[1]
-                    label = "'{}'".format(t) if j == 0 else None
+                    label = "{}".format(t) if j == 0 else None
                     fadeline(
                         ax=ax,
                         x=[x0, x1],
@@ -257,7 +257,7 @@ def campaign_well_plot(
                     )
         # get equal axis (for realism)
         ax.axis("equal")
-        ax.legend(title="Tests", loc="upper left", bbox_to_anchor=(1, 1))
+        ax.legend(title="Test at", loc="upper left", bbox_to_anchor=(1, 1))
         fig.tight_layout()
         fig.show()
     return ax
@@ -362,9 +362,7 @@ def plot_pump_test(
                     dist
                 )
                 color = "C{}".format(i % 10)
-                ax2.scatter(
-                    dist, displace, color=color, label=label,
-                )
+                ax2.scatter(dist, displace, color=color, label=label)
                 ax2.set_xlabel("r in {}".format(wells[k].coordinates.units))
                 ax2.set_ylabel(
                     abslab + "{}".format(pump_test.observations[k].labels)
@@ -508,8 +506,8 @@ def plot_well_pos(
                     )
             ax.xaxis.set_major_locator(ticker.MultipleLocator(ticks_set))
             ax.yaxis.set_major_locator(ticker.MultipleLocator(ticks_set))
-            ax.set_xlabel("x distance in $[m]$")
-            ax.set_ylabel("y distance in $[m]$")
+            ax.set_xlabel("x $[m]$")
+            ax.set_ylabel("y $[m]$")
             if total_n > 1:
                 ax.set_title("Result {}".format(i))
 
@@ -548,6 +546,9 @@ def plotfit_transient(
         style1 = "ggplot"
         style2 = "default"
         font_size = plt.rcParams.get("font.size", 10.0)
+        # font type fix
+        pdf_ft = plt.rcParams.get("pdf.fonttype", 42)
+        ps_ft = plt.rcParams.get("ps.fonttype", 42)
         keep_fs = True
     else:
         style1 = style2 = style
@@ -556,8 +557,10 @@ def plotfit_transient(
         clr_n = len(clrs)
     with plt.style.context(style2):
         if keep_fs:
+            # font type fix (resetted in default)
+            plt.rcParams.update({"pdf.fonttype": pdf_ft, "ps.fonttype": ps_ft})
             plt.rcParams.update({"font.size": font_size})
-        fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(12, 8))
+        fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(7.5, 7))
         val_fix = setup.val_fix
         for kwarg in ["time", "rad"]:
             val_fix.pop(extra[kwarg], None)
@@ -593,8 +596,8 @@ def plotfit_transient(
             zord = 100 * (len(rad) - ri)
 
             if radnames[ri, 0] == radnames[ri, 1]:
-                label = "test at '{}'".format(radnames[ri, 0])
-                label_eff = "fitted type curve"
+                label = radnames[ri, 0]
+                label_eff = "type curve"
                 eff_zord = zord + 100  # first line should be on top
             else:
                 label = None
@@ -637,12 +640,22 @@ def plotfit_transient(
             h = plot_f(**{extra["time"]: te, extra["rad"]: radarr}).reshape(-1)
             ax.plot(radarr, t11, h, color="k", alpha=0.1, linestyle="--")
 
-        ax.view_init(elev=40, azim=125)
-        ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$")
-        ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$")
-        ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$")
-        _sort_lgd(ax, loc="upper right", markerscale=2)
+        ax.view_init(elev=30, azim=130)
+        ax.set_xlabel(r"$r$ in $\left[\mathrm{m}\right]$", labelpad=20)
+        ax.set_ylabel(r"$t$ in $\left[\mathrm{s}\right]$", labelpad=20)
+        ax.set_zlabel(r"$\tilde{h}$ in $\left[\mathrm{m}\right]$", labelpad=10)
+        _sort_lgd(
+            ax,
+            loc="lower center",
+            markerscale=2,
+            bbox_to_anchor=(0.5, -0.1),
+            ncol=5,
+            columnspacing=1.0,
+            handletextpad=0.5,
+            handlelength=1.0,
+        )
         fig.tight_layout()
+        fig.subplots_adjust(top=1, left=0, right=0.9)
         if plotname is not None:
             fig.savefig(plotname, format="pdf")
 
@@ -753,9 +766,14 @@ def plotparainteract(result, paranames, plotname=None, fig=None, style="WTP"):
     if style == "WTP":
         style = "default"
         font_size = plt.rcParams.get("font.size", 10.0)
+        # font type fix
+        pdf_ft = plt.rcParams.get("pdf.fonttype", 42)
+        ps_ft = plt.rcParams.get("ps.fonttype", 42)
         keep_fs = True
     with plt.style.context(style):
         if keep_fs:
+            # font type fix (resetted in default)
+            plt.rcParams.update({"pdf.fonttype": pdf_ft, "ps.fonttype": ps_ft})
             plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
         fields = [par for par in result.dtype.names if par.startswith("par")]

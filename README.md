@@ -2,9 +2,9 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1229051.svg)](https://doi.org/10.5281/zenodo.1229051)
 [![PyPI version](https://badge.fury.io/py/welltestpy.svg)](https://badge.fury.io/py/welltestpy)
-[![Build Status](https://travis-ci.com/GeoStat-Framework/welltestpy.svg?branch=master)](https://travis-ci.com/GeoStat-Framework/welltestpy)
-[![Coverage Status](https://coveralls.io/repos/github/GeoStat-Framework/welltestpy/badge.svg?branch=master)](https://coveralls.io/github/GeoStat-Framework/welltestpy?branch=master)
-[![Documentation Status](https://readthedocs.org/projects/welltestpy/badge/?version=stable)](https://geostat-framework.readthedocs.io/projects/welltestpy/en/stable/?badge=stable)
+[![Build Status](https://github.com/GeoStat-Framework/welltestpy/workflows/Continuous%20Integration/badge.svg?branch=develop)](https://github.com/GeoStat-Framework/welltestpy/actions)
+[![Coverage Status](https://coveralls.io/repos/github/GeoStat-Framework/welltestpy/badge.svg?branch=develop)](https://coveralls.io/github/GeoStat-Framework/welltestpy?branch=develop)
+[![Documentation Status](https://readthedocs.org/projects/welltestpy/badge/?version=latest)](https://geostat-framework.readthedocs.io/projects/welltestpy/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 <p align="center">
@@ -25,7 +25,7 @@ You can install the latest version with the following command:
 
 ## Documentation for welltestpy
 
-You can find the documentation under [geostat-framework.readthedocs.io][doc_link].
+You can find the documentation under [https://welltestpy.readthedocs.io][doc_link].
 
 
 ### Example 1: A campaign containing a pumping test
@@ -121,7 +121,7 @@ You can contact us via <info@geostat-framework.org>.
 
 ## License
 
-[MIT][license_link] © 2018-2020
+[MIT][license_link] © 2018-2021
 
 [license_link]: https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE
 [doc_link]: https://welltestpy.readthedocs.io
