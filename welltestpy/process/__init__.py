@@ -13,11 +13,13 @@ The following classes and functions are provided
     normpumptest
     combinepumptest
     filterdrawdown
+    cooper_jacop
 """
 from .processlib import (
     normpumptest,
     combinepumptest,
     filterdrawdown,
+    cooper_jacob
 )
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown"]
+__all__ = ["normpumptest", "combinepumptest", "filterdrawdown","cooper_jacob"]

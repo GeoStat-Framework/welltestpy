@@ -10,6 +10,7 @@ The following classes are provided
    normpumptest
    combinepumptest
    filterdrawdown
+   cooper_jacop
 """
 from copy import deepcopy as dcopy
 import numpy as np
@@ -240,3 +241,27 @@ def filterdrawdown(observation, tout=None, dxscale=2):
         hout = np.interp(tout, time, head)
 
     return observation(time=tout, observation=hout)
+
+
+def cooper_jacob(observation, sat_thickness):
+    """correction method for observed drawdown for unconfined aquifers.
+
+    Parameters
+    ----------
+    observation : :class:`welltestpy.data.Observation`
+        The observation to be corrected.
+    sat_thickness : :class: 'int'
+    vertical length of the aquifer in which its pores are filled with water.
+
+    Returns
+    -------
+    The corrected drawdown
+
+    """
+    # split the observations into array for head.
+    head = observation()
+
+    # cooper and jacob correction
+    head = head - (head ** 2) / (2 * sat_thickness)
+
+    return observation(observation=head)
