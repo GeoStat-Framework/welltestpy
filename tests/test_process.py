@@ -19,8 +19,8 @@ class TestProcess(unittest.TestCase):
         trns_copy = copy.deepcopy(self.trns_obs)
         stdy_copy = copy.deepcopy(self.stdy_obs)
         # apply correction
-        wtp.process.cooper_jacob(trns_copy, sat_thickness=4)
-        wtp.process.cooper_jacob(stdy_copy, sat_thickness=4)
+        wtp.process.cooper_jacob_correction(trns_copy, sat_thickness=4)
+        wtp.process.cooper_jacob_correction(stdy_copy, sat_thickness=4)
         # reference values
         ref = [0.875, 1.5, 1.875]
         # check if correct
