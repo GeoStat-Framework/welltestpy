@@ -467,6 +467,27 @@ class PumpingTest(Test):
             **kwargs
         )
 
+    def diagnostic_plot(self, observation, **kwargs):
+        """Make a diagnostic plot.
+
+
+        Parameters
+        ----------
+       observation : :class:`Variable`
+            Observation.
+
+        Notes
+        -----
+        This will be used by the Campaign class.
+        """
+        derr = processlib.smoothing_derivative(observation)
+
+        return plotter.diagnostic_plot_pump_test(
+            observation=observation,
+            derivative=derr,
+            **kwargs
+        )
+
     def save(self, path="", name=None):
         """Save a pumping test to file.
 

@@ -895,3 +895,44 @@ def plotsensitivity(
                 bbox_inches="tight",
             )
     return ax
+
+def diagnostic_plot_pump_test(observation, derivative):
+    """plot the derivative with the original data.
+
+               Parameters
+               ----------
+               observation : :class:`welltestpy.data.Observation`
+                    The observation to calculate the derivative.
+
+               derivative : :class:'array'
+                    An array with the calculated derivative
+
+                Returns
+                ---------
+                Diagnostic plot
+          """
+    head, time = observation()
+    head = np.array(head, dtype=float).reshape(-1)
+    time = np.array(time, dtype=float).reshape(-1)
+    # setting variables
+    x = time
+    y = head
+    sx = time
+    sy = head
+    dx = time
+    dy = derivative
+
+    # plotting
+    fig, ax = plt.subplots(dpi=75, figsize=[7.5, 5.5])
+    ax.scatter(x, y, marker=".", color="C1", label="datapoints")
+    ax.plot(dx, dy, label="observed data")
+    ax.plot(sx, sy, color="k", label="time derivative")
+    ax.set_xscale("symlog", linthresh=1)
+    ax.set_yscale("symlog", linthresh=1e-4)
+    ax.set_xlim([1, 1e5])
+    ax.set_xlabel("$t$ in [s]", fontsize=16)
+    ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
+    ax.legend(loc="upper left")
+    fig.tight_layout()
+
+    return fig

@@ -25,6 +25,7 @@ The following plotting routines are provided
    plotparainteract
    plotparatrace
    plotsensitivity
+   diagnostic_plot_pump_test
 """
 from . import plotter, trilib
 
@@ -40,6 +41,7 @@ from .plotter import (
     plotparainteract,
     plotparatrace,
     plotsensitivity,
+    diagnostic_plot_pump_test,
 )
 
 __all__ = [
@@ -54,5 +56,6 @@ __all__ = [
     "plotparainteract",
     "plotparatrace",
     "plotsensitivity",
+    "diagnostic_plot_pump_test",
 ]
 __all__ += ["plotter", "trilib"]
