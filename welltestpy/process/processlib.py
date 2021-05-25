@@ -10,6 +10,7 @@ The following classes are provided
    normpumptest
    combinepumptest
    filterdrawdown
+   smoothing_derivative
 """
 from copy import deepcopy as dcopy
 import numpy as np
@@ -17,7 +18,7 @@ from scipy import signal
 
 from ..data import testslib
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown"]
+__all__ = ["normpumptest", "combinepumptest", "filterdrawdown", "smoothing_derivative"]
 
 
 def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
@@ -207,7 +208,7 @@ def filterdrawdown(observation, tout=None, dxscale=2):
         Scale of time-steps used for smoothing.
         Default: ``2``
     """
-    head, time = observation()
+    head, time = observation
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)
 

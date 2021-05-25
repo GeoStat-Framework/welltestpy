@@ -27,7 +27,7 @@ The following plotting routines are provided
    plotsensitivity
    diagnostic_plot_pump_test
 """
-from . import plotter, trilib
+from . import plotter, trilib, diagnostic_plots
 
 from .trilib import triangulate, sym
 
@@ -41,8 +41,9 @@ from .plotter import (
     plotparainteract,
     plotparatrace,
     plotsensitivity,
-    diagnostic_plot_pump_test,
 )
+
+from .diagnostic_plots import diagnostic_plot_pump_test
 
 __all__ = [
     "triangulate",
@@ -58,4 +59,4 @@ __all__ = [
     "plotsensitivity",
     "diagnostic_plot_pump_test",
 ]
-__all__ += ["plotter", "trilib"]
+__all__ += ["plotter", "trilib", "diagnostic_plots"]

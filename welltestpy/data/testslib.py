@@ -14,7 +14,7 @@ from copy import deepcopy as dcopy
 
 import numpy as np
 
-from ..tools import plotter
+from ..tools import plotter, diagnostic_plots
 from . import varlib, data_io
 from ..process import processlib
 
@@ -467,7 +467,7 @@ class PumpingTest(Test):
             **kwargs
         )
 
-    def diagnostic_plot(self, observation, **kwargs):
+    def diagnostic_plot(self, well, **kwargs):
         """Make a diagnostic plot.
 
 
@@ -480,11 +480,10 @@ class PumpingTest(Test):
         -----
         This will be used by the Campaign class.
         """
-        derr = processlib.smoothing_derivative(observation)
+        observation = self.observations[well]
 
-        return plotter.diagnostic_plot_pump_test(
+        return diagnostic_plots.diagnostic_plot_pump_test(
             observation=observation,
-            derivative=derr,
             **kwargs
         )
 
