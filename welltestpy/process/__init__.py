@@ -22,4 +22,9 @@ from .processlib import (
     smoothing_derivative,
 )
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown", "smoothing_derivative"]
+__all__ = [
+    "normpumptest",
+    "combinepumptest",
+    "filterdrawdown",
+    "smoothing_derivative",
+]

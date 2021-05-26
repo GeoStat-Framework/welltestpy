@@ -18,7 +18,12 @@ from scipy import signal
 
 from ..data import testslib
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown", "smoothing_derivative"]
+__all__ = [
+    "normpumptest",
+    "combinepumptest",
+    "filterdrawdown",
+    "smoothing_derivative",
+]
 
 
 def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
@@ -41,7 +46,9 @@ def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
     pumptest.pumpingrate = pumpingrate
 
     for obs in pumptest.observations:
-        pumptest.observations[obs].observation *= factor * pumptest.rate / oldprate
+        pumptest.observations[obs].observation *= (
+            factor * pumptest.rate / oldprate
+        )
 
 
 def combinepumptest(
@@ -111,13 +118,18 @@ def combinepumptest(
             finalname = test1 + "+" + test2
 
     if campaign.tests[test1].testtype != "PumpingTest":
-        raise ValueError("combinepumptest:" + str(test1) + " is no pumpingtest")
+        raise ValueError(
+            "combinepumptest:" + str(test1) + " is no pumpingtest"
+        )
     if campaign.tests[test2].testtype != "PumpingTest":
-        raise ValueError("combinepumptest:" + str(test2) + " is no pumpingtest")
+        raise ValueError(
+            "combinepumptest:" + str(test2) + " is no pumpingtest"
+        )
 
     if campaign.tests[test1].pumpingwell != campaign.tests[test2].pumpingwell:
         raise ValueError(
-            "combinepumptest: The Pumpingtests do not have the " + "same pumping-well"
+            "combinepumptest: The Pumpingtests do not have the "
+            + "same pumping-well"
         )
 
     pwell = campaign.tests[test1].pumpingwell
@@ -208,7 +220,7 @@ def filterdrawdown(observation, tout=None, dxscale=2):
         Scale of time-steps used for smoothing.
         Default: ``2``
     """
-    head, time = observation
+    head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)
 
@@ -258,26 +270,20 @@ def smoothing_derivative(observation, bourdet=True):
     time = np.array(time, dtype=float).reshape(-1)
     derhead = np.zeros(len(head))
     t = np.arange(len(time))
-
     if bourdet is True:
-        for i in t:
-            if i == 0:
-                continue
-            elif i == t[-1]:
-                continue
-            else:
-                # derivative approximation by Bourdet (1989)
-                dh = (
-                    (
-                        (head[i] - head[i - 1])
-                        / (time[i] - time[i - 1])
-                        * (time[i + 1] - time[i])
-                    )
-                    + (
-                        (head[i + 1] - head[i])
-                        / (time[i + 1] - time[i])
-                        * (time[i] - time[i - 1])
-                    )
-                ) / ((time[i] - time[i - 1]) + (time[i + 1] - time[i]))
-                derhead[i] = dh
+        for i in t[1:-1]:
+            # derivative approximation by Bourdet (1989)
+            dh = (
+                         (
+                                 (head[i] - head[i - 1])
+                                 / (np.log(time[i]) - np.log(time[i - 1]))
+                                 * (np.log(time[i + 1]) - np.log(time[i]))
+                         )
+                         + (
+                                 (head[i + 1] - head[i])
+                                 / (np.log(time[i + 1]) - np.log(time[i]))
+                                 * (np.log(time[i]) - np.log(time[i - 1]))
+                         )
+                 ) / ((np.log(time[i]) - np.log(time[i - 1])) + (np.log(time[i + 1]) - np.log(time[i])))
+            derhead[i] = dh
         return derhead

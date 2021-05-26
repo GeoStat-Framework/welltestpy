@@ -39,14 +39,13 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)
 
-
     # setting variables
     x = time
     y = head
     sx = time
     sy = head
-    dx = time
-    dy = derivative
+    dx = time[1:-1]
+    dy = derivative[1:-1]
 
     # plotting
     if style == "WTP":
@@ -61,9 +60,10 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
     ax.scatter(x, y, marker="+", color="red", label="drawdown")
     ax.plot(sx, sy, c="red")
     ax.plot(dx, dy, c = "black",linestyle='dashed', label="time derivative")
+    ax.scatter(dx, dy, c="black", label="time derivative")
     ax.set_xscale("symlog", linthresh=1)
     ax.set_yscale("symlog", linthresh=1e-4)
-    ax.set_xlim([1, len(time)])
+    ax.set_xlim([time[0], time[-1]])
     ax.set_xlabel("$t$ in [s]", fontsize=16)
     ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
     fig.tight_layout()

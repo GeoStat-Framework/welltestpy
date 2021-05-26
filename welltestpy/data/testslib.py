@@ -449,7 +449,7 @@ class PumpingTest(Test):
         ax : :class:`Axes`
             Axes where the plot should be done.
         wells : :class:`dict`
-            Dictonary containing the well classes sorted by name.
+            Dictionary containing the well classes sorted by name.
         exclude: :class:`list`, optional
             List of wells that should be excluded from the plot.
             Default: ``None``
@@ -467,20 +467,20 @@ class PumpingTest(Test):
             **kwargs
         )
 
-    def diagnostic_plot(self, well, **kwargs):
+    def diagnostic_plot(self, wells, **kwargs):
         """Make a diagnostic plot.
 
 
         Parameters
         ----------
-       observation : :class:`Variable`
-            Observation.
+       wells : :class:`dict`
+            Dictionary containing the well classes sorted by name.
 
         Notes
         -----
         This will be used by the Campaign class.
         """
-        observation = self.observations[well]
+        observation = self.observations[wells]
 
         return diagnostic_plots.diagnostic_plot_pump_test(
             observation=observation,
