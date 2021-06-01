@@ -57,19 +57,18 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
             plt.rcParams.update({"font.size": font_size})
         fig, ax = plotter._get_fig_ax(fig, ax)
 
-    ax.scatter(x, y, marker="+", color="red", label="drawdown")
+    ax.scatter(x, y, color="red", label="drawdown")
     ax.plot(sx, sy, c="red")
-    ax.plot(dx, dy, c = "black",linestyle='dashed', label="time derivative")
-    ax.scatter(dx, dy, c="black", label="time derivative")
+    ax.plot(dx, dy, c = "black",linestyle='dashed')
+    ax.scatter(dx, dy, c="black",marker="+", label="time derivative")
     ax.set_xscale("symlog", linthresh=1)
     ax.set_yscale("symlog", linthresh=1e-4)
     ax.set_xlim([time[0], time[-1]])
-    ax.set_xlabel("$t$ in [s]", fontsize=16)
-    ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
+    ax.set_xlabel("$t$ in [s]", fontsize=font_size)
+    ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=font_size)
     fig.tight_layout()
     lgd = ax.legend(
-        title="Legend",
-        loc="upper right",
+        loc="upper left",
     )
     if plotname is not None:
         fig.savefig(
