@@ -17,7 +17,6 @@ The following classes and functions are provided
    plotparainteract
    plotparatrace
    plotsensitivity
-   diagnostic_plot_pump_test
 """
 # pylint: disable=C0103
 import copy

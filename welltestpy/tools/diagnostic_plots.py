@@ -56,27 +56,26 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
         if keep_fs:
             plt.rcParams.update({"font.size": font_size})
         fig, ax = plotter._get_fig_ax(fig, ax)
-
-    ax.scatter(x, y, color="red", label="drawdown")
-    ax.plot(sx, sy, c="red")
-    ax.plot(dx, dy, c = "black",linestyle='dashed')
-    ax.scatter(dx, dy, c="black",marker="+", label="time derivative")
-    ax.set_xscale("symlog", linthresh=1)
-    ax.set_yscale("symlog", linthresh=1e-4)
-    ax.set_xlim([time[0], time[-1]])
-    ax.set_xlabel("$t$ in [s]", fontsize=font_size)
-    ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=font_size)
-    fig.tight_layout()
-    lgd = ax.legend(
-        loc="upper left",
-    )
-    if plotname is not None:
-        fig.savefig(
-            plotname,
-            format="pdf",
-            bbox_extra_artists=(lgd,),
-            bbox_inches="tight",
+        ax.scatter(x, y, color="red", label="drawdown")
+        ax.plot(sx, sy, c="red")
+        ax.plot(dx, dy, c = "black",linestyle='dashed')
+        ax.scatter(dx, dy, c="black",marker="+",  label="time derivative")
+        ax.set_xscale("symlog", linthresh=1)
+        ax.set_yscale("symlog", linthresh=1e-4)
+        ax.set_xlim([time[0], time[-1]])
+        ax.set_xlabel("$t$ in [s]", fontsize=font_size)
+        ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=font_size)
+        fig.tight_layout()
+        lgd = ax.legend(
+            loc="upper left",
         )
+        if plotname is not None:
+            fig.savefig(
+                plotname,
+                format="pdf",
+                bbox_extra_artists=(lgd,),
+                bbox_inches="tight",
+            )
     return ax
 
 

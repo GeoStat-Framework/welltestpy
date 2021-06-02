@@ -274,16 +274,19 @@ def smoothing_derivative(observation, bourdet=True):
         for i in t[1:-1]:
             # derivative approximation by Bourdet (1989)
             dh = (
-                         (
-                                 (head[i] - head[i - 1])
-                                 / (np.log(time[i]) - np.log(time[i - 1]))
-                                 * (np.log(time[i + 1]) - np.log(time[i]))
-                         )
-                         + (
-                                 (head[i + 1] - head[i])
-                                 / (np.log(time[i + 1]) - np.log(time[i]))
-                                 * (np.log(time[i]) - np.log(time[i - 1]))
-                         )
-                 ) / ((np.log(time[i]) - np.log(time[i - 1])) + (np.log(time[i + 1]) - np.log(time[i])))
+                (
+                    (head[i] - head[i - 1])
+                    / (np.log(time[i]) - np.log(time[i - 1]))
+                    * (np.log(time[i + 1]) - np.log(time[i]))
+                )
+                + (
+                    (head[i + 1] - head[i])
+                    / (np.log(time[i + 1]) - np.log(time[i]))
+                    * (np.log(time[i]) - np.log(time[i - 1]))
+                )
+            ) / (
+                (np.log(time[i]) - np.log(time[i - 1]))
+                + (np.log(time[i + 1]) - np.log(time[i]))
+            )
             derhead[i] = dh
         return derhead
