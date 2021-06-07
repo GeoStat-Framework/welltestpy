@@ -248,7 +248,7 @@ def filterdrawdown(observation, tout=None, dxscale=2):
     return observation(time=tout, observation=hout)
 
 
-def smoothing_derivative(observation, bourdet=True):
+def smoothing_derivative(observation, method="bourdet"):
     """Calculate the derivative of the drawdown curve.
 
     Parameters
@@ -256,8 +256,8 @@ def smoothing_derivative(observation, bourdet=True):
     observation : :class:`welltestpy.data.Observation`
         The observation to calculate the derivative.
 
-    bourdet : :class:`bool`, optional
-        Optional switch to access the Bourdet time derivative
+    method : :class:`bool`, optional, default = bourdet
+        Optional switch to access the method to calculate the time derivative
 
     Returns
     ---------
@@ -270,7 +270,7 @@ def smoothing_derivative(observation, bourdet=True):
     time = np.array(time, dtype=float).reshape(-1)
     derhead = np.zeros(len(head))
     t = np.arange(len(time))
-    if bourdet is True:
+    if method is "bourdet":
         for i in t[1:-1]:
             # derivative approximation by Bourdet (1989)
             dh = (
@@ -290,3 +290,7 @@ def smoothing_derivative(observation, bourdet=True):
             )
             derhead[i] = dh
         return derhead
+    else:
+        raise ValueError(
+            f"smoothing_derivative: method '{method}' could not be found!"
+        )

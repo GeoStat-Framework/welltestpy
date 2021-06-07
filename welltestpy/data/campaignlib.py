@@ -458,7 +458,7 @@ class Campaign:
             # check if the well is present
             if observation_well in self.wells:
                 return self.tests[pumping_test].diagnostic_plot(
-                    wells=observation_well, **kwargs
+                    observation_well=observation_well, **kwargs
                 )
             else:
                 raise ValueError(f"diagnostic_plot: well '{observation_well}' could not be found!")

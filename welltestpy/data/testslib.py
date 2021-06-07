@@ -467,25 +467,28 @@ class PumpingTest(Test):
             **kwargs
         )
 
-    def diagnostic_plot(self, wells, **kwargs):
+    def diagnostic_plot(self, observation_well, **kwargs):
         """Make a diagnostic plot.
 
 
         Parameters
         ----------
-       wells : :class:`dict`
+       observation_well : :class:`dict`
             Dictionary containing the well classes sorted by name.
 
         Notes
         -----
         This will be used by the Campaign class.
         """
-        observation = self.observations[wells]
+        if observation_well in self.observations:
+            observation = self.observations[observation_well]
 
-        return diagnostic_plots.diagnostic_plot_pump_test(
-            observation=observation,
-            **kwargs
-        )
+            return diagnostic_plots.diagnostic_plot_pump_test(
+                observation=observation,
+                **kwargs
+            )
+        else:
+            raise ValueError(f"diagnostic_plot: well '{observation_well}' could not be found!")
 
     def save(self, path="", name=None):
         """Save a pumping test to file.
