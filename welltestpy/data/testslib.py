@@ -176,20 +176,6 @@ class PumpingTest(Test):
             processlib.filterdrawdown(self._pumpingrate, tout=tout)
             del self._pumpingrate.time
 
-    def correct_observations(self, wells=None, method="cooper_jacob"):
-        """
-        Correct observations...
-
-        Parameters
-        ----------
-        wells : :class:`list`, optional
-            List of wells, to check the observation state at. Default: all
-        method : ...
-        """
-        wells = self.observationwells if wells is None else list(wells)
-
-        # loop over wells and apply cooper_jacob correction (check for method in if branches)
-
     def state(self, wells=None):
         """
         Get the state of observation.
