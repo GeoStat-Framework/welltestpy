@@ -141,7 +141,7 @@ def campaign_plot(campaign, select_test=None, fig=None, style="WTP", **kwargs):
     fig : Figure, optional
         Matplotlib figure to plot on. The default is None.
     style : str, optional
-        Plot stlye. The default is "WTP".
+        Plot style. The default is "WTP".
     **kwargs : TYPE
         Keyword arguments forwarded to the tests plotting routines.
 

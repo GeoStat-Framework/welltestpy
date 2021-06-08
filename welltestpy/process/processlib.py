@@ -255,9 +255,9 @@ def smoothing_derivative(observation, method="bourdet"):
     ----------
     observation : :class:`welltestpy.data.Observation`
         The observation to calculate the derivative.
-
-    method : :class:`bool`, optional, default = bourdet
-        Optional switch to access the method to calculate the time derivative
+    method : :class:`str`, optional
+        Method to calculate the time derivative.
+        Default: "bourdet"
 
     Returns
     ---------
@@ -270,7 +270,7 @@ def smoothing_derivative(observation, method="bourdet"):
     time = np.array(time, dtype=float).reshape(-1)
     derhead = np.zeros(len(head))
     t = np.arange(len(time))
-    if method is "bourdet":
+    if method == "bourdet":
         for i in t[1:-1]:
             # derivative approximation by Bourdet (1989)
             dh = (
@@ -292,5 +292,5 @@ def smoothing_derivative(observation, method="bourdet"):
         return derhead
     else:
         raise ValueError(
-            f"smoothing_derivative: method '{method}' could not be found!"
+            f"smoothing_derivative: method '{method}' is unknown!"
         )

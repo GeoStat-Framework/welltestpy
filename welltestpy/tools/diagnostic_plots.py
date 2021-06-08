@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 
 def diagnostic_plot_pump_test(
     observation,
-    linthresh_time=1,
+    method="bourdet",
+    linthresh_time=1.0,
     linthresh_head=1e-5,
     fig=None,
     ax=None,
@@ -35,14 +36,33 @@ def diagnostic_plot_pump_test(
     ----------
     observation : :class:`welltestpy.data.Observation`
          The observation to calculate the derivative.
-
-
+    method : :class:`str`, optional
+        Method to calculate the time derivative.
+        Default: "bourdet"
+    linthresh_time : :class: 'float'
+        Range of time around 0 that behaves linear.
+        Default: 1
+    linthresh_head : :class: 'float'
+        Range of head values around 0 that behaves linear.
+        Default: 1e-5
+    fig : Figure, optional
+        Matplotlib figure to plot on.
+        Default: None.
+    ax : :class:`Axes`
+        Matplotlib axes to plot on.
+        Default: None.
+    plotname : str, optional
+        Plot name if the result should be saved.
+        Default: None.
+    style : str, optional
+        Plot style.
+        Default: "WTP".
 
      Returns
      ---------
      Diagnostic plot
     """
-    derivative = processlib.smoothing_derivative(observation)
+    derivative = processlib.smoothing_derivative(observation,method)
     head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)
@@ -70,40 +90,19 @@ def diagnostic_plot_pump_test(
         ax.scatter(dx, dy, c="black", marker="+", label="time derivative")
         ax.set_xscale("symlog", linthresh=linthresh_time)
         ax.set_yscale("symlog", linthresh=linthresh_head, base=10)
-        ax.set_xlim(time[0], time[-1])
-        yticks = []
-        for i in [
-            -1e5,
-            -1e4,
-            -1e3,
-            -1e2,
-            -1e1,
-            -1e0,
-            -1e-1,
-            -1e-2,
-            1e-2,
-            1e-1,
-            1e0,
-            1e1,
-            1e2,
-            1e3,
-            1e4,
-            1e5,
-        ]:
-            if i > min(head[0], derivative[0]):
-                if i < max(head[-1], derivative[-1]):
-                    yticks.append(i)
-                else:
-                    continue
-            else:
-                continue
-        ax.set_yticks(yticks)
         ax.set_xlabel("$t$ in [s]", fontsize=16)
         ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
+        lgd = ax.legend(loc="upper left")
+        ax.set_xlim(time[0], time[-1])
+        min_v = min(np.min(head), np.min(derivative))
+        max_v = max(np.max(head), np.max(derivative))
+        max_e = int(np.ceil(np.log10(max_v)))
+        if min_v < linthresh_head:
+            min_e = -np.inf
+        else:
+            min_e = int(np.floor(np.log10(min_v)))
+        ax.set_ylim(10 ** min_e, 10 ** max_e)
         fig.tight_layout()
-        lgd = ax.legend(
-            loc="upper left",
-        )
         if plotname is not None:
             fig.savefig(
                 plotname,

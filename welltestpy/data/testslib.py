@@ -473,7 +473,7 @@ class PumpingTest(Test):
 
         Parameters
         ----------
-       observation_well : :class:`dict`
+       observation_well : :class:`str`
             Dictionary containing the well classes sorted by name.
 
         Notes
