@@ -20,20 +20,28 @@ from . import plotter
 import matplotlib.pyplot as plt
 
 
-def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style="WTP"):
+def diagnostic_plot_pump_test(
+    observation,
+    linthresh_time=1,
+    linthresh_head=1e-5,
+    fig=None,
+    ax=None,
+    plotname=None,
+    style="WTP",
+):
     """plot the derivative with the original data.
 
-               Parameters
-               ----------
-               observation : :class:`welltestpy.data.Observation`
-                    The observation to calculate the derivative.
+    Parameters
+    ----------
+    observation : :class:`welltestpy.data.Observation`
+         The observation to calculate the derivative.
 
 
 
-                Returns
-                ---------
-                Diagnostic plot
-          """
+     Returns
+     ---------
+     Diagnostic plot
+    """
     derivative = processlib.smoothing_derivative(observation)
     head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
@@ -58,15 +66,40 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
         fig, ax = plotter._get_fig_ax(fig, ax)
         ax.scatter(x, y, color="red", label="drawdown")
         ax.plot(sx, sy, c="red")
-        ax.plot(dx, dy, c="black", linestyle='dashed')
-        ax.scatter(dx, dy, c="black", marker="+",  label="time derivative")
-        ax.set_xscale("symlog")
-        ax.set_yscale("symlog")
-        ax.set_ylim([0, head[-1]])
+        ax.plot(dx, dy, c="black", linestyle="dashed")
+        ax.scatter(dx, dy, c="black", marker="+", label="time derivative")
+        ax.set_xscale("symlog", linthresh=linthresh_time)
+        ax.set_yscale("symlog", linthresh=linthresh_head, base=10)
         ax.set_xlim(time[0], time[-1])
-        ax.set_xlabel("$t$ in [s]", fontsize=12)
-        ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=12)
-        ax.set_yticks(np.arange(0, head[-1], 0.02))
+        yticks = []
+        for i in [
+            -1e5,
+            -1e4,
+            -1e3,
+            -1e2,
+            -1e1,
+            -1e0,
+            -1e-1,
+            -1e-2,
+            1e-2,
+            1e-1,
+            1e0,
+            1e1,
+            1e2,
+            1e3,
+            1e4,
+            1e5,
+        ]:
+            if i > min(head[0], derivative[0]):
+                if i < max(head[-1], derivative[-1]):
+                    yticks.append(i)
+                else:
+                    continue
+            else:
+                continue
+        ax.set_yticks(yticks)
+        ax.set_xlabel("$t$ in [s]", fontsize=16)
+        ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
         fig.tight_layout()
         lgd = ax.legend(
             loc="upper left",
@@ -79,5 +112,3 @@ def diagnostic_plot_pump_test(observation, fig=None, ax=None,plotname=None,style
                 bbox_inches="tight",
             )
     return ax
-
-
