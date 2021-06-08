@@ -62,7 +62,7 @@ def diagnostic_plot_pump_test(
      ---------
      Diagnostic plot
     """
-    derivative = processlib.smoothing_derivative(observation,method)
+    derivative = processlib.smoothing_derivative(observation, method)
     head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)

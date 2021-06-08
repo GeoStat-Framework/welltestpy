@@ -100,8 +100,8 @@ class PumpingTest(Test):
         need to be an instance of :class:`Observation`
         Default: ``None``
     aquiferdepth : :class:`float` or :class:`Variable`, optional
-        Aquifer depth at the field site. If a `float` is given,
-        it is assumed to be given in ``m``.
+        Aquifer depth at the field site. The saturated thickness can also be stored here.
+        If a `float` is given, it is assumed to be given in ``m``.
         Default: ``1.0``
     aquiferradius : :class:`float` or :class:`Variable`, optional
         Aquifer radius ot the field site. If a `float` is given,
@@ -175,6 +175,20 @@ class PumpingTest(Test):
         ):
             processlib.filterdrawdown(self._pumpingrate, tout=tout)
             del self._pumpingrate.time
+
+    def correct_observations(self, wells=None, method="cooper_jacob"):
+        """
+        Correct observations...
+
+        Parameters
+        ----------
+        wells : :class:`list`, optional
+            List of wells, to check the observation state at. Default: all
+        method : ...
+        """
+        wells = self.observationwells if wells is None else list(wells)
+
+        # loop over wells and apply cooper_jacob correction (check for method in if branches)
 
     def state(self, wells=None):
         """
@@ -474,7 +488,7 @@ class PumpingTest(Test):
         Parameters
         ----------
        observation_well : :class:`str`
-            Dictionary containing the well classes sorted by name.
+            The observation well for the data to make the diagnostic plot.
 
         Notes
         -----
