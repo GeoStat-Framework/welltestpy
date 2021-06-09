@@ -296,7 +296,7 @@ class PumpingTest(Test):
 
     @property
     def depth(self):
-        """:class:`float`: aquifer depth at the field site."""
+        """:class:`float`: aquifer depth or saturated thickness at the field site."""
         return self._aquiferdepth.value
 
     @property
