@@ -464,31 +464,32 @@ class PumpingTest(Test):
             exclude=exclude,
             fig=fig,
             ax=ax,
-            **kwargs
+            **kwargs,
         )
 
     def diagnostic_plot(self, observation_well, **kwargs):
         """Make a diagnostic plot.
 
 
-        Parameters
-        ----------
-       observation_well : :class:`str`
-            The observation well for the data to make the diagnostic plot.
+         Parameters
+         ----------
+        observation_well : :class:`str`
+             The observation well for the data to make the diagnostic plot.
 
-        Notes
-        -----
-        This will be used by the Campaign class.
+         Notes
+         -----
+         This will be used by the Campaign class.
         """
         if observation_well in self.observations:
             observation = self.observations[observation_well]
-
+            rate = self.pumpingrate()
             return diagnostic_plots.diagnostic_plot_pump_test(
-                observation=observation,
-                **kwargs
+                observation=observation, rate=rate, **kwargs
             )
         else:
-            raise ValueError(f"diagnostic_plot: well '{observation_well}' could not be found!")
+            raise ValueError(
+                f"diagnostic_plot: well '{observation_well}' could not be found!"
+            )
 
     def save(self, path="", name=None):
         """Save a pumping test to file.

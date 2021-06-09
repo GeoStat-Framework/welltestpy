@@ -248,13 +248,15 @@ def filterdrawdown(observation, tout=None, dxscale=2):
     return observation(time=tout, observation=hout)
 
 
-def smoothing_derivative(observation, method="bourdet"):
+def smoothing_derivative(head, time, method="bourdet"):
     """Calculate the derivative of the drawdown curve.
 
     Parameters
     ----------
-    observation : :class:`welltestpy.data.Observation`
-        The observation to calculate the derivative.
+    head : :class: 'array'
+        An array with the observed head values.
+    time: :class: 'array'
+        An array with the time values for the observed head values.
     method : :class:`str`, optional
         Method to calculate the time derivative.
         Default: "bourdet"
@@ -265,9 +267,6 @@ def smoothing_derivative(observation, method="bourdet"):
 
     """
     # create arrays for the input of head and time.
-    head, time = observation()
-    head = np.array(head, dtype=float).reshape(-1)
-    time = np.array(time, dtype=float).reshape(-1)
     derhead = np.zeros(len(head))
     t = np.arange(len(time))
     if method == "bourdet":

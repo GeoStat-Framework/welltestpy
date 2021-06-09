@@ -454,16 +454,22 @@ class Campaign:
         # check if this is a pumping test
         if pumping_test in self.tests:
             if not isinstance(self.tests[pumping_test], testslib.PumpingTest):
-                raise ValueError(f"diagnostic_plot: test '{pumping_test}' is not of instance PumpingTest!")
+                raise ValueError(
+                    f"diagnostic_plot: test '{pumping_test}' is not of instance PumpingTest!"
+                )
             # check if the well is present
             if observation_well in self.wells:
                 return self.tests[pumping_test].diagnostic_plot(
                     observation_well=observation_well, **kwargs
                 )
             else:
-                raise ValueError(f"diagnostic_plot: well '{observation_well}' could not be found!")
+                raise ValueError(
+                    f"diagnostic_plot: well '{observation_well}' could not be found!"
+                )
         else:
-            raise ValueError(f"diagnostic_plot: test '{pumping_test}' could not be found!")
+            raise ValueError(
+                f"diagnostic_plot: test '{pumping_test}' could not be found!"
+            )
 
     def save(self, path="", name=None):
         """Save the campaign to file.

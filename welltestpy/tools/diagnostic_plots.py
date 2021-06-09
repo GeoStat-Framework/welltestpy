@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 
 def diagnostic_plot_pump_test(
     observation,
+    rate,
     method="bourdet",
     linthresh_time=1.0,
     linthresh_head=1e-5,
@@ -36,6 +37,8 @@ def diagnostic_plot_pump_test(
     ----------
     observation : :class:`welltestpy.data.Observation`
          The observation to calculate the derivative.
+    rate : :class:`float`
+        Pumping rate.
     method : :class:`str`, optional
         Method to calculate the time derivative.
         Default: "bourdet"
@@ -62,11 +65,14 @@ def diagnostic_plot_pump_test(
      ---------
      Diagnostic plot
     """
-    derivative = processlib.smoothing_derivative(observation, method)
     head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
     time = np.array(time, dtype=float).reshape(-1)
-
+    if rate < 0:
+        head = head * -1
+    derivative = processlib.smoothing_derivative(
+        head=head, time=time, method=method
+    )
     # setting variables
     x = time
     y = head
@@ -89,7 +95,7 @@ def diagnostic_plot_pump_test(
         ax.plot(dx, dy, c="black", linestyle="dashed")
         ax.scatter(dx, dy, c="black", marker="+", label="time derivative")
         ax.set_xscale("symlog", linthresh=linthresh_time)
-        ax.set_yscale("symlog", linthresh=linthresh_head, base=10)
+        ax.set_yscale("symlog", linthresh=linthresh_head)
         ax.set_xlabel("$t$ in [s]", fontsize=16)
         ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
         lgd = ax.legend(loc="upper left")
