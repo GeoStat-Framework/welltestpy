@@ -19,7 +19,12 @@ from .processlib import (
     normpumptest,
     combinepumptest,
     filterdrawdown,
-    cooper_jacob_correction
+    cooper_jacob_correction,
 )
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown","cooper_jacob_correction"]
+__all__ = [
+    "normpumptest",
+    "combinepumptest",
+    "filterdrawdown",
+    "cooper_jacob_correction",
+]

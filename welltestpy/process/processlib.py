@@ -18,7 +18,12 @@ from scipy import signal
 
 from ..data import testslib
 
-__all__ = ["normpumptest", "combinepumptest", "filterdrawdown","cooper_jacob_correction"]
+__all__ = [
+    "normpumptest",
+    "combinepumptest",
+    "filterdrawdown",
+    "cooper_jacob_correction",
+]
 
 
 def normpumptest(pumptest, pumpingrate=-1.0, factor=1.0):
@@ -264,7 +269,7 @@ def cooper_jacob_correction(observation, sat_thickness):
     # cooper and jacob correction
     head = head - (head ** 2) / (2 * sat_thickness)
 
-    #return new observation
+    # return new observation
     observation(observation=head)
 
     return observation
