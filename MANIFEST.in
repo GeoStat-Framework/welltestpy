@@ -1,12 +1,6 @@
-include README.md
-include MANIFEST.in
-include setup.py
-include setup.cfg
-recursive-include welltestpy *.py
-recursive-include tests *.py
-recursive-include docs/source *
-include docs/Makefile docs/requirements.txt docs/requirements_doc.txt
-include LICENSE
-include requirements.txt
-include requirements_setup.txt
-include requirements_test.txt
+prune *
+graft welltestpy
+graft tests
+
+include LICENSE README.md pyproject.toml setup.cfg
+global-exclude __pycache__ *.py[cod] .*

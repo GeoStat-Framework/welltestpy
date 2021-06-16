@@ -464,7 +464,7 @@ class PumpingTest(Test):
             exclude=exclude,
             fig=fig,
             ax=ax,
-            **kwargs
+            **kwargs,
         )
 
     def save(self, path="", name=None):
