@@ -2,6 +2,14 @@
 
 All notable changes to **welltestpy** will be documented in this file.
 
+## [Unreleased]
+
+### Changes
+- modernized packaging workflow using `pyproject.toml`
+- removed `setup.py` (use `pip>21.1` for editable installs)
+- removed `dev` as extra install dependencies
+
+
 ## [1.0.3] - 2021-02
 
 ### Enhancements
@@ -91,6 +99,7 @@ All notable changes to **welltestpy** will be documented in this file.
 
 First alpha release of welltespy.
 
+[Unreleased]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.3...HEAD
 [1.0.3]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.0...v1.0.1
