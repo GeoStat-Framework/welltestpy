@@ -177,16 +177,17 @@ class PumpingTest(Test):
             del self._pumpingrate.time
 
     def correct_observations(
-        self, aquiferdepth, wells=None, method="cooper_jacob"
+        self, aquiferdepth=None, wells=None, method="cooper_jacob"
     ):
         """
         Correct observations with the selected method.
 
         Parameters
         ----------
-        aquiferdepth : :class:`float`
+        aquiferdepth : :class:`float`, optional
             Aquifer depth at the field site. Can also be used to store the saturated thickness of the aquifer.
             `float` is given in ``m``.
+            Default: PumpingTest.depth
         wells : :class:`list`, optional
             List of wells, to check the observation state at.
             Default: all
@@ -199,7 +200,8 @@ class PumpingTest(Test):
         This will be used by the Campaign class.
 
         """
-
+        if aquiferdepth is None:
+            aquiferdepth = self.depth
         wells = self.observationwells if wells is None else list(wells)
         if method == "cooper_jacob":
             for obs in wells:
