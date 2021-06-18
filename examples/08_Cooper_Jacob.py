@@ -1,6 +1,7 @@
 """
 Correcting drawdown : The Cooper-Jacob method
 ---------------------------------------------
+
 Here we demonstrate the correction established by Cooper and Jacob in 1946.
 This method corrects drawdown data for the reduction in saturated thickness
 resulting from groundwater withdrawal by a pumping well and thereby enables

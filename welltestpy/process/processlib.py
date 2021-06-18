@@ -255,8 +255,8 @@ def cooper_jacob_correction(observation, sat_thickness):
     ----------
     observation : :class:`welltestpy.data.Observation`
         The observation to be corrected.
-    sat_thickness : :class: 'int'
-    vertical length of the aquifer in which its pores are filled with water.
+    sat_thickness : :class:`float`
+        vertical length of the aquifer in which its pores are filled with water.
 
     Returns
     -------
