@@ -98,16 +98,20 @@ def diagnostic_plot_pump_test(
         ax.set_yscale("symlog", linthresh=linthresh_head)
         ax.set_xlabel("$t$ in [s]", fontsize=16)
         ax.set_ylabel("$h$ and $dh/dx$ in [m]", fontsize=16)
-        lgd = ax.legend(loc="upper left")
-        ax.set_xlim(time[0], time[-1])
-        min_v = min(np.min(head), np.min(derivative))
-        max_v = max(np.max(head), np.max(derivative))
+        lgd = ax.legend(loc="upper left", facecolor="w")
+        min_v = min(np.min(head), np.min(dy))
+        max_v = max(np.max(head), np.max(dy))
         max_e = int(np.ceil(np.log10(max_v)))
         if min_v < linthresh_head:
             min_e = -np.inf
         else:
             min_e = int(np.floor(np.log10(min_v)))
-        ax.set_ylim(10 ** min_e, 10 ** max_e)
+        ax.set_ylim(10.0 ** min_e, 10.0 ** max_e)
+        yticks = [0 if min_v < linthresh_head else 10.0 ** min_e]
+        thresh_e = int(np.floor(np.log10(linthresh_head)))
+        first_e = thresh_e if min_v < linthresh_head else (min_e + 1)
+        yticks += list(10.0 ** np.arange(first_e, max_e + 1))
+        ax.set_yticks(yticks)
         fig.tight_layout()
         if plotname is not None:
             fig.savefig(
