@@ -100,8 +100,8 @@ class PumpingTest(Test):
         need to be an instance of :class:`Observation`
         Default: ``None``
     aquiferdepth : :class:`float` or :class:`Variable`, optional
-        Aquifer depth at the field site. If a `float` is given,
-        it is assumed to be given in ``m``.
+        Aquifer depth at the field site. Can also be used to store the saturated thickness of the aquifer.
+        If a `float` is given, t is assumed to be given in ``m``.
         Default: ``1.0``
     aquiferradius : :class:`float` or :class:`Variable`, optional
         Aquifer radius ot the field site. If a `float` is given,
@@ -175,6 +175,45 @@ class PumpingTest(Test):
         ):
             processlib.filterdrawdown(self._pumpingrate, tout=tout)
             del self._pumpingrate.time
+
+    def correct_observations(
+        self, aquiferdepth=None, wells=None, method="cooper_jacob"
+    ):
+        """
+        Correct observations with the selected method.
+
+        Parameters
+        ----------
+        aquiferdepth : :class:`float`, optional
+            Aquifer depth at the field site. Can also be used to store the saturated thickness of the aquifer.
+            `float` is given in ``m``.
+            Default: PumpingTest.depth
+        wells : :class:`list`, optional
+            List of wells, to check the observation state at.
+            Default: all
+        method : :class: 'str', optional
+            Method to correct the drawdown data.
+            Default: ''cooper_jacob''
+
+        Notes
+        -----
+        This will be used by the Campaign class.
+
+        """
+        if aquiferdepth is None:
+            aquiferdepth = self.depth
+        wells = self.observationwells if wells is None else list(wells)
+        if method == "cooper_jacob":
+            for obs in wells:
+                self.observations[obs] = processlib.cooper_jacob_correction(
+                    observation=self.observations[obs],
+                    sat_thickness=aquiferdepth,
+                )
+
+        else:
+            return ValueError(
+                f"correct_observations: method '{method}' is unknown!"
+            )
 
     def state(self, wells=None):
         """
@@ -259,12 +298,12 @@ class PumpingTest(Test):
 
     @property
     def depth(self):
-        """:class:`float`: aquifer depth at the field site."""
+        """:class:`float`: aquifer depth or saturated thickness at the field site."""
         return self._aquiferdepth.value
 
     @property
     def aquiferdepth(self):
-        """:class:`float`: aquifer depth at the field site."""
+        """:class:`float`: aquifer depth or saturated thickness at the field site."""
         return self._aquiferdepth
 
     @aquiferdepth.setter
@@ -284,7 +323,9 @@ class PumpingTest(Test):
         if not self._aquiferdepth.scalar:
             raise ValueError("PumpingTest: 'aquiferdepth' needs to be scalar")
         if self.depth <= 0.0:
-            raise ValueError("PumpingTest: 'aquiferdepth' needs to be positiv")
+            raise ValueError(
+                "PumpingTest: 'aquiferdepth' needs to be positive"
+            )
 
     @property
     def radius(self):
@@ -314,7 +355,7 @@ class PumpingTest(Test):
             raise ValueError("PumpingTest: 'aquiferradius' needs to be scalar")
         if self.radius <= 0.0:
             raise ValueError(
-                "PumpingTest: 'aquiferradius' " + "needs to be positiv"
+                "PumpingTest: 'aquiferradius' " + "needs to be positive"
             )
 
     @property
