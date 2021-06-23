@@ -1,5 +1,5 @@
 """
-Correcting drawdown : The Cooper-Jacob method
+Correcting drawdown: The Cooper-Jacob method
 ---------------------------------------------
 
 Here we demonstrate the correction established by Cooper and Jacob in 1946.
