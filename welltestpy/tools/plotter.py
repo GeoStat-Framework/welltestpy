@@ -36,7 +36,7 @@ def _get_fig_ax(
     ax_name="rectilinear",
     sub_args=None,
     sub_kwargs=None,
-    **fig_kwargs
+    **fig_kwargs,
 ):  # pragma: no cover
     # ax_case: 0->None (create one) or given, 1->False, 2->True
     ax_case = 1 + int(ax) if isinstance(ax, bool) else 0

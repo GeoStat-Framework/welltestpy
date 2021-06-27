@@ -13,12 +13,14 @@ The following classes and functions are provided
     normpumptest
     combinepumptest
     filterdrawdown
+    cooper_jacob_correction
     smoothing_derivative
 """
 from .processlib import (
     normpumptest,
     combinepumptest,
     filterdrawdown,
+    cooper_jacob_correction,
     smoothing_derivative,
 )
 
@@ -26,5 +28,6 @@ __all__ = [
     "normpumptest",
     "combinepumptest",
     "filterdrawdown",
+    "cooper_jacob_correction",
     "smoothing_derivative",
 ]
