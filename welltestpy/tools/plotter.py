@@ -895,4 +895,3 @@ def plotsensitivity(
                 bbox_inches="tight",
             )
     return ax
-

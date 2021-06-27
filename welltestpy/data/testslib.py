@@ -100,8 +100,9 @@ class PumpingTest(Test):
         need to be an instance of :class:`Observation`
         Default: ``None``
     aquiferdepth : :class:`float` or :class:`Variable`, optional
-        Aquifer depth at the field site. Can also be used to store the saturated thickness of the aquifer.
-        If a `float` is given, t is assumed to be given in ``m``.
+        Aquifer depth at the field site.
+        Can also be used to store the saturated thickness of the aquifer.
+        If a `float` is given, it is assumed to be given in ``m``.
         Default: ``1.0``
     aquiferradius : :class:`float` or :class:`Variable`, optional
         Aquifer radius ot the field site. If a `float` is given,
@@ -185,8 +186,7 @@ class PumpingTest(Test):
         Parameters
         ----------
         aquiferdepth : :class:`float`, optional
-            Aquifer depth at the field site. Can also be used to store the saturated thickness of the aquifer.
-            `float` is given in ``m``.
+            Aquifer depth at the field site.
             Default: PumpingTest.depth
         wells : :class:`list`, optional
             List of wells, to check the observation state at.
@@ -298,12 +298,12 @@ class PumpingTest(Test):
 
     @property
     def depth(self):
-        """:class:`float`: aquifer depth or saturated thickness at the field site."""
+        """:class:`float`: aquifer depth or saturated thickness."""
         return self._aquiferdepth.value
 
     @property
     def aquiferdepth(self):
-        """:class:`float`: aquifer depth or saturated thickness at the field site."""
+        """:any:`Variable`: aquifer depth or saturated thickness."""
         return self._aquiferdepth
 
     @aquiferdepth.setter
@@ -509,17 +509,17 @@ class PumpingTest(Test):
         )
 
     def diagnostic_plot(self, observation_well, **kwargs):
-        """Make a diagnostic plot.
+        """
+        Make a diagnostic plot.
 
-
-         Parameters
-         ----------
+        Parameters
+        ----------
         observation_well : :class:`str`
              The observation well for the data to make the diagnostic plot.
 
-         Notes
-         -----
-         This will be used by the Campaign class.
+        Notes
+        -----
+        This will be used by the Campaign class.
         """
         if observation_well in self.observations:
             observation = self.observations[observation_well]
@@ -529,7 +529,7 @@ class PumpingTest(Test):
             )
         else:
             raise ValueError(
-                f"diagnostic_plot: well '{observation_well}' could not be found!"
+                f"diagnostic_plot: well '{observation_well}' not found!"
             )
 
     def save(self, path="", name=None):
