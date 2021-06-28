@@ -108,7 +108,7 @@ class Campaign:
     """Class for a well based campaign.
 
     This is a class for a well based test campaign on a field site.
-    It has a name, a descrition and a timeframe.
+    It has a name, a description and a timeframe.
 
     Parameters
     ----------
@@ -118,7 +118,7 @@ class Campaign:
         The field site.
         Default: ``"Fieldsite"``
     wells : :class:`dict`, optional
-        The wells within the fild site. Keys are the well names and values
+        The wells within the field site. Keys are the well names and values
         are an instance of :class:`Well`.
         Default: ``None``
     wells : :class:`dict`, optional
@@ -436,6 +436,40 @@ class Campaign:
             Keyword-arguments forwarded to :any:`campaign_well_plot`.
         """
         return plotter.campaign_well_plot(self, **kwargs)
+
+    def diagnostic_plot(self, pumping_test, observation_well, **kwargs):
+        """Generate a diagnostic plot.
+
+        Parameters
+        ----------
+        pumping_test : :class:`str`
+            The pumping well that is saved in the campaign.
+
+        observation_well : :class:`str`
+            Observation point to make the diagnostic plot.
+
+        **kwargs
+            Keyword-arguments forwarded to :any:`campaign_well_plot`.
+        """
+        # check if this is a pumping test
+        if pumping_test in self.tests:
+            if not isinstance(self.tests[pumping_test], testslib.PumpingTest):
+                raise ValueError(
+                    f"diagnostic_plot: test '{pumping_test}' is not of instance PumpingTest!"
+                )
+            # check if the well is present
+            if observation_well in self.wells:
+                return self.tests[pumping_test].diagnostic_plot(
+                    observation_well=observation_well, **kwargs
+                )
+            else:
+                raise ValueError(
+                    f"diagnostic_plot: well '{observation_well}' could not be found!"
+                )
+        else:
+            raise ValueError(
+                f"diagnostic_plot: test '{pumping_test}' could not be found!"
+            )
 
     def save(self, path="", name=None):
         """Save the campaign to file.
