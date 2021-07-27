@@ -20,7 +20,7 @@ The following classes and functions are provided
    Well
 """
 from copy import deepcopy as dcopy
-
+import numbers
 import numpy as np
 
 from . import data_io
@@ -121,34 +121,26 @@ class Variable:
 
     @value.setter
     def value(self, value):
-        if np.asanyarray(value).dtype == np.float:
+        if issubclass(np.asanyarray(value).dtype.type, numbers.Real):
             if np.ndim(np.squeeze(value)) == 0:
-                self.__value = np.float(np.squeeze(value))
+                self.__value = float(np.squeeze(value))
             else:
-                self.__value = np.squeeze(np.asanyarray(value, dtype=np.float))
-        elif np.asanyarray(value).dtype == np.int:
+                self.__value = np.squeeze(np.array(value, dtype=float))
+        elif issubclass(np.asanyarray(value).dtype.type, numbers.Integral):
             if np.ndim(np.squeeze(value)) == 0:
-                self.__value = np.int(np.squeeze(value))
+                self.__value = int(np.squeeze(value))
             else:
-                self.__value = np.squeeze(np.asanyarray(value, dtype=np.int))
+                self.__value = np.squeeze(np.array(value, dtype=int))
         else:
             raise ValueError("Variable: 'value' is neither integer nor float")
 
     def __repr__(self):
         """Representation."""
-        return (
-            str(self.name)
-            + " "
-            + self.symbol
-            + ": "
-            + str(self.value)
-            + " "
-            + self.units
-        )
+        return f"{self.name} {self.symbol}: {self.value} {self.units}"
 
     def __str__(self):
         """Representation."""
-        return str(self.name) + " " + self.label
+        return f"{self.name} {self.label}"
 
     def save(self, path="", name=None):
         """Save a variable to file.
@@ -354,7 +346,7 @@ class Observation:
 
     def __repr__(self):
         """Represenetation."""
-        return "Observation '" + str(self.name) + "' " + str(self.label)
+        return f"Observation '{self.name}' {self.label}"
 
     def __str__(self):
         """Represenetation."""
@@ -466,8 +458,6 @@ class Observation:
     def _settime(self, time):
         if isinstance(time, Variable):
             self._time = dcopy(time)
-        elif self._time is None:
-            self._time = TimeVar(time)
         elif time is None:
             self._time = None
         else:
@@ -837,21 +827,15 @@ class Well:
         except ValueError:
             raise ValueError(
                 "Well: the distant-well needs to be an "
-                + "instance of Well-class "
-                + "or a tupel of x-y coordinates "
-                + "or a single distance value "
-                + "and of same coordinates-type."
+                "instance of Well-class "
+                "or a tupel of x-y coordinates "
+                "or a single distance value "
+                "and of same coordinates-type."
             )
 
     def __repr__(self):
         """Represenetation."""
-        return (
-            str(self.name)
-            + " r="
-            + str(self.radius)
-            + " at "
-            + repr(self._coordinates)
-        )
+        return f"{self.name} r={self.radius} at {self._coordinates}"
 
     def __sub__(self, well):
         """Distance between wells."""
@@ -862,18 +846,6 @@ class Well:
         return self.distance(well)
 
     def __and__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __rsub__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __radd__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __rand__(self, well):
         """Distance between wells."""
         return self.distance(well)
 

@@ -9,6 +9,9 @@ All notable changes to **welltestpy** will be documented in this file.
 - removed `setup.py` (use `pip>21.1` for editable installs)
 - removed `dev` as extra install dependencies
 
+### Bugfixes
+- loading steady pumping tests was not possible due to a bug
+
 
 ## [1.0.3] - 2021-02
 

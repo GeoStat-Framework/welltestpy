@@ -14,7 +14,7 @@ import shutil
 import zipfile
 import tempfile
 from io import TextIOWrapper as TxtIO, BytesIO as BytIO
-
+import numbers
 import numpy as np
 
 from . import varlib, campaignlib, testslib
@@ -81,7 +81,8 @@ def save_var(var, path="", name=None):
         writer.writerow(["symbol", var.symbol])
         writer.writerow(["units", var.units])
         writer.writerow(["description", var.description])
-        if np.asanyarray(var.value).dtype == np.int:
+        if issubclass(np.asanyarray(var.value).dtype.type, numbers.Integral):
+            # if np.asanyarray(var.value).dtype == int:
             writer.writerow(["integer"])
         else:
             writer.writerow(["float"])
@@ -466,19 +467,19 @@ def load_var(varfile):
             shapenfo = _nextr(data)
             if shapenfo[0] == "scalar":
                 if integer:
-                    value = np.int(next(data)[1])
+                    value = int(next(data)[1])
                 else:
-                    value = np.float(next(data)[1])
+                    value = float(next(data)[1])
             else:
-                shape = tuple(np.array(shapenfo[1:], dtype=np.int))
-                vcnt = np.int(next(data)[1])
+                shape = tuple(np.array(shapenfo[1:], dtype=int))
+                vcnt = int(next(data)[1])
                 vlist = []
                 for __ in range(vcnt):
                     vlist.append(next(data)[0])
                 if integer:
-                    value = np.array(vlist, dtype=np.int).reshape(shape)
+                    value = np.array(vlist, dtype=int).reshape(shape)
                 else:
-                    value = np.array(vlist, dtype=np.float).reshape(shape)
+                    value = np.array(vlist, dtype=float).reshape(shape)
 
         var = varlib.Variable(name, value, symbol, units, description)
     except Exception:
@@ -494,19 +495,19 @@ def load_var(varfile):
             shapenfo = _nextr(data)
             if shapenfo[0] == "scalar":
                 if integer:
-                    value = np.int(next(data)[1])
+                    value = int(next(data)[1])
                 else:
-                    value = np.float(next(data)[1])
+                    value = float(next(data)[1])
             else:
-                shape = tuple(np.array(shapenfo[1:], dtype=np.int))
-                vcnt = np.int(next(data)[1])
+                shape = tuple(np.array(shapenfo[1:], dtype=int))
+                vcnt = int(next(data)[1])
                 vlist = []
                 for __ in range(vcnt):
                     vlist.append(next(data)[0])
                 if integer:
-                    value = np.array(vlist, dtype=np.int).reshape(shape)
+                    value = np.array(vlist, dtype=int).reshape(shape)
                 else:
-                    value = np.array(vlist, dtype=np.float).reshape(shape)
+                    value = np.array(vlist, dtype=float).reshape(shape)
 
             var = varlib.Variable(name, value, symbol, units, description)
         except Exception:
@@ -607,13 +608,13 @@ def load_campaign(cmpfile):
                 fieldsite = None
             else:
                 fieldsite = load_fieldsite(BytIO(zfile.read(row[1])))
-            wcnt = np.int(next(data)[1])
+            wcnt = int(next(data)[1])
             wells = {}
             for __ in range(wcnt):
                 row = _nextr(data)
                 wells[row[0]] = load_well(BytIO(zfile.read(row[1])))
 
-            tcnt = np.int(next(data)[1])
+            tcnt = int(next(data)[1])
             tests = {}
             for __ in range(tcnt):
                 row = _nextr(data)
@@ -714,7 +715,7 @@ def _load_pumping_test(tstfile):
                 pumpingrate = load_obs(rate_raw)
             aquiferdepth = load_var(TxtIO(zfile.open(next(data)[1])))
             aquiferradius = load_var(TxtIO(zfile.open(next(data)[1])))
-            obscnt = np.int(next(data)[1])
+            obscnt = int(next(data)[1])
             observations = {}
             for __ in range(obscnt):
                 row = _nextr(data)
