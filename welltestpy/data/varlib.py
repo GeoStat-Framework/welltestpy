@@ -652,9 +652,13 @@ class Well:
     coordinates : :class:`Variable` or :class:`numpy.ndarray`
         Value of the Variable.
     welldepth : :class:`Variable` or :class:`float`, optional
-        Depth of the well. Default: 1.0
+        Depth of the well (in saturated zone). Default: 1.0
     aquiferdepth : :class:`Variable` or :class:`float`, optional
-        Depth of the aquifer at the well. Default: ``"None"``
+        Aquifer depth at the well (saturated zone). Defaults to welldepth.
+        Default: ``"None"``
+    screensize : :class:`Variable` or :class:`float`, optional
+        Size of the screen at the well. Defaults to welldepth.
+        Default: ``"None"``
 
     Notes
     -----
@@ -663,18 +667,26 @@ class Well:
     """
 
     def __init__(
-        self, name, radius, coordinates, welldepth=1.0, aquiferdepth=None
+        self,
+        name,
+        radius,
+        coordinates,
+        welldepth=1.0,
+        aquiferdepth=None,
+        screensize=None,
     ):
         self._radius = None
         self._coordinates = None
         self._welldepth = None
         self._aquiferdepth = None
+        self._screensize = None
 
         self.name = data_io._formstr(name)
         self.wellradius = radius
         self.coordinates = coordinates
         self.welldepth = welldepth
         self.aquiferdepth = aquiferdepth
+        self.screensize = screensize
 
     @property
     def info(self):
@@ -690,6 +702,7 @@ class Well:
         info += self.coordinates.info + "\n"
         info += self._welldepth.info + "\n"
         info += self._aquiferdepth.info + "\n"
+        info += self._screensize.info + "\n"
         info += "----" + "\n"
         return info
 
@@ -700,7 +713,7 @@ class Well:
 
     @property
     def wellradius(self):
-        """:class:`float`: Radius variable of the well."""
+        """:class:`Variable`: Radius variable of the well."""
         return self._radius
 
     @wellradius.setter
@@ -729,7 +742,7 @@ class Well:
 
     @property
     def coordinates(self):
-        """:class:`numpy.ndarray`: Coordinates variable of the well."""
+        """:class:`Variable`: Coordinates variable of the well."""
         return self._coordinates
 
     @coordinates.setter
@@ -759,7 +772,7 @@ class Well:
 
     @property
     def welldepth(self):
-        """:class:`float`: Depth variable of the well."""
+        """:class:`Variable`: Depth variable of the well."""
         return self._welldepth
 
     @welldepth.setter
@@ -782,8 +795,13 @@ class Well:
             raise ValueError("Well: 'welldepth' needs to be positiv")
 
     @property
-    def aquiferdepth(self):
+    def aquifer(self):
         """:class:`float`: Aquifer depth at the well."""
+        return self._aquiferdepth.value
+
+    @property
+    def aquiferdepth(self):
+        """:class:`Variable`: Aquifer depth at the well."""
         return self._aquiferdepth
 
     @aquiferdepth.setter
@@ -791,28 +809,48 @@ class Well:
         if isinstance(aquiferdepth, Variable):
             self._aquiferdepth = dcopy(aquiferdepth)
         elif self._aquiferdepth is None:
-            if aquiferdepth is None:
-                self._aquiferdepth = Variable(
-                    "aquiferdepth",
-                    self.depth,
-                    "L_a",
-                    "m",
-                    "aquiferdepth at well '" + str(self.name) + "'",
-                )
-            else:
-                self._aquiferdepth = Variable(
-                    "aquiferdepth",
-                    aquiferdepth,
-                    "L_a",
-                    "m",
-                    "aquiferdepth at well '" + str(self.name) + "'",
-                )
+            self._aquiferdepth = Variable(
+                "aquiferdepth",
+                self.depth if aquiferdepth is None else aquiferdepth,
+                "L_a",
+                self.welldepth.units,
+                "aquifer depth at well '" + str(self.name) + "'",
+            )
         else:
             self._aquiferdepth(aquiferdepth)
         if not self._aquiferdepth.scalar:
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
         if self.aquiferdepth.value <= 0.0:
             raise ValueError("Well: 'aquiferdepth' needs to be positiv")
+
+    @property
+    def screen(self):
+        """:class:`float`: Screen size at the well."""
+        return self._screensize.value
+
+    @property
+    def screensize(self):
+        """:class:`Variable`: Screen size at the well."""
+        return self._screensize
+
+    @screensize.setter
+    def screensize(self, screensize):
+        if isinstance(screensize, Variable):
+            self._screensize = dcopy(screensize)
+        elif self._screensize is None:
+            self._screensize = Variable(
+                "screensize",
+                self.depth if screensize is None else screensize,
+                "L_s",
+                self.welldepth.units,
+                "screen size at well '" + str(self.name) + "'",
+            )
+        else:
+            self._screensize(screensize)
+        if not self._screensize.scalar:
+            raise ValueError("Well: 'screensize' needs to be scalar")
+        if self.screensize.value <= 0.0:
+            raise ValueError("Well: 'screensize' needs to be positiv")
 
     def distance(self, well):
         """Calculate distance to the well.
