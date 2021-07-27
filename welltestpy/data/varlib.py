@@ -460,6 +460,8 @@ class Observation:
             self._time = dcopy(time)
         elif time is None:
             self._time = None
+        elif self._time is None:
+            self._time = TimeVar(time)
         else:
             self._time(time)
 
