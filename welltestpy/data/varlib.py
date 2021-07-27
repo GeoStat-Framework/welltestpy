@@ -136,19 +136,11 @@ class Variable:
 
     def __repr__(self):
         """Representation."""
-        return (
-            str(self.name)
-            + " "
-            + self.symbol
-            + ": "
-            + str(self.value)
-            + " "
-            + self.units
-        )
+        return f"{self.name} {self.symbol}: {self.value} {self.units}"
 
     def __str__(self):
         """Representation."""
-        return str(self.name) + " " + self.label
+        return f"{self.name} {self.label}"
 
     def save(self, path="", name=None):
         """Save a variable to file.
@@ -354,7 +346,7 @@ class Observation:
 
     def __repr__(self):
         """Represenetation."""
-        return "Observation '" + str(self.name) + "' " + str(self.label)
+        return f"Observation '{self.name}' {self.label}"
 
     def __str__(self):
         """Represenetation."""
@@ -835,21 +827,15 @@ class Well:
         except ValueError:
             raise ValueError(
                 "Well: the distant-well needs to be an "
-                + "instance of Well-class "
-                + "or a tupel of x-y coordinates "
-                + "or a single distance value "
-                + "and of same coordinates-type."
+                "instance of Well-class "
+                "or a tupel of x-y coordinates "
+                "or a single distance value "
+                "and of same coordinates-type."
             )
 
     def __repr__(self):
         """Represenetation."""
-        return (
-            str(self.name)
-            + " r="
-            + str(self.radius)
-            + " at "
-            + repr(self._coordinates)
-        )
+        return f"{self.name} r={self.radius} at {self._coordinates}"
 
     def __sub__(self, well):
         """Distance between wells."""
@@ -860,18 +846,6 @@ class Well:
         return self.distance(well)
 
     def __and__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __rsub__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __radd__(self, well):
-        """Distance between wells."""
-        return self.distance(well)
-
-    def __rand__(self, well):
         """Distance between wells."""
         return self.distance(well)
 
