@@ -117,6 +117,9 @@ docs/source/examples/
 docs/source/generated/
 examples/Cmp_UFZ-campaign.cmp
 
+# generated version file
+welltestpy/_version.py
+
 *.DS_Store
 
 *.zip
