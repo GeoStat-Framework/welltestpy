@@ -16,8 +16,15 @@ import tempfile
 from io import TextIOWrapper as TxtIO, BytesIO as BytIO
 import numbers
 import numpy as np
+from packaging.version import parse as version_parse
 
 from . import varlib, campaignlib, testslib
+
+try:
+    from .._version import __version__
+except ImportError:  # pragma: nocover
+    # package is not installed
+    __version__ = "0.0.0.dev0"
 
 
 # TOOLS ###
@@ -76,13 +83,13 @@ def save_var(var, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Variable"])
         writer.writerow(["name", var.name])
         writer.writerow(["symbol", var.symbol])
         writer.writerow(["units", var.units])
         writer.writerow(["description", var.description])
         if issubclass(np.asanyarray(var.value).dtype.type, numbers.Integral):
-            # if np.asanyarray(var.value).dtype == int:
             writer.writerow(["integer"])
         else:
             writer.writerow(["float"])
@@ -134,6 +141,7 @@ def save_obs(obs, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Observation"])
         writer.writerow(["name", obs.name])
         writer.writerow(["state", obs.state])
@@ -185,7 +193,7 @@ def save_well(well, path="", name=None):
     # create a standard name if None is given
     if name is None:
         name = "Well_" + well.name
-    # ensure the name ends with '.csv'
+    # ensure the name ends with '.wel'
     if name[-4:] != ".wel":
         name += ".wel"
     name = _formname(name)
@@ -197,6 +205,7 @@ def save_well(well, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Well"])
         writer.writerow(["name", well.name])
         # define names for the variable-files
@@ -251,7 +260,7 @@ def save_campaign(campaign, path="", name=None):
     # create a standard name if None is given
     if name is None:
         name = "Cmp_" + campaign.name
-    # ensure the name ends with '.csv'
+    # ensure the name ends with '.cmp'
     if name[-4:] != ".cmp":
         name += ".cmp"
     name = _formname(name)
@@ -263,6 +272,7 @@ def save_campaign(campaign, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Campaign"])
         writer.writerow(["name", campaign.name])
         writer.writerow(["description", campaign.description])
@@ -331,7 +341,7 @@ def save_fieldsite(fieldsite, path="", name=None):
     # create a standard name if None is given
     if name is None:
         name = "Field_" + fieldsite.name
-    # ensure the name ends with '.csv'
+    # ensure the name ends with '.fds'
     if name[-4:] != ".fds":
         name += ".fds"
     name = _formname(name)
@@ -343,6 +353,7 @@ def save_fieldsite(fieldsite, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Fieldsite"])
         writer.writerow(["name", fieldsite.name])
         writer.writerow(["description", fieldsite.description])
@@ -389,7 +400,7 @@ def save_pumping_test(pump_test, path="", name=None):
     # create a standard name if None is given
     if name is None:
         name = "Test_" + pump_test.name
-    # ensure the name ends with '.csv'
+    # ensure the name ends with '.tst'
     if name[-4:] != ".tst":
         name += ".tst"
     name = _formname(name)
@@ -401,6 +412,7 @@ def save_pumping_test(pump_test, path="", name=None):
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
         )
+        writer.writerow(["wtp-version", __version__])
         writer.writerow(["Testtype", "PumpingTest"])
         writer.writerow(["name", pump_test.name])
         writer.writerow(["description", pump_test.description])
@@ -444,6 +456,43 @@ def save_pumping_test(pump_test, path="", name=None):
 # LOAD ###
 
 
+def _load_var_data(data):
+    # default version string
+    version_string = "1.0.0"
+    first_line = _nextr(data)
+    if first_line[0] == "wtp-version":
+        version_string = first_line[1]
+        header = _nextr(data)
+    else:
+        header = first_line
+    version = version_parse(version_string)
+    if header[0] != "Variable":
+        raise Exception
+    name = next(data)[1]
+    symbol = next(data)[1]
+    units = next(data)[1]
+    description = next(data)[1]
+    integer = next(data)[0] == "integer"
+    shapenfo = _nextr(data)
+    if shapenfo[0] == "scalar":
+        if integer:
+            value = int(next(data)[1])
+        else:
+            value = float(next(data)[1])
+    else:
+        shape = tuple(np.array(shapenfo[1:], dtype=int))
+        vcnt = int(next(data)[1])
+        vlist = []
+        for __ in range(vcnt):
+            vlist.append(next(data)[0])
+        if integer:
+            value = np.array(vlist, dtype=int).reshape(shape)
+        else:
+            value = np.array(vlist, dtype=float).reshape(shape)
+
+    return varlib.Variable(name, value, symbol, units, description)
+
+
 def load_var(varfile):
     """Load a variable from file.
 
@@ -457,59 +506,11 @@ def load_var(varfile):
     try:
         with open(varfile, "r") as vfile:
             data = csv.reader(vfile)
-            if next(data)[0] != "Variable":
-                raise Exception
-            name = next(data)[1]
-            symbol = next(data)[1]
-            units = next(data)[1]
-            description = next(data)[1]
-            integer = next(data)[0] == "integer"
-            shapenfo = _nextr(data)
-            if shapenfo[0] == "scalar":
-                if integer:
-                    value = int(next(data)[1])
-                else:
-                    value = float(next(data)[1])
-            else:
-                shape = tuple(np.array(shapenfo[1:], dtype=int))
-                vcnt = int(next(data)[1])
-                vlist = []
-                for __ in range(vcnt):
-                    vlist.append(next(data)[0])
-                if integer:
-                    value = np.array(vlist, dtype=int).reshape(shape)
-                else:
-                    value = np.array(vlist, dtype=float).reshape(shape)
-
-        var = varlib.Variable(name, value, symbol, units, description)
+            var = _load_var_data(data)
     except Exception:
         try:
             data = csv.reader(varfile)
-            if next(data)[0] != "Variable":
-                raise Exception
-            name = next(data)[1]
-            symbol = next(data)[1]
-            units = next(data)[1]
-            description = next(data)[1]
-            integer = next(data)[0] == "integer"
-            shapenfo = _nextr(data)
-            if shapenfo[0] == "scalar":
-                if integer:
-                    value = int(next(data)[1])
-                else:
-                    value = float(next(data)[1])
-            else:
-                shape = tuple(np.array(shapenfo[1:], dtype=int))
-                vcnt = int(next(data)[1])
-                vlist = []
-                for __ in range(vcnt):
-                    vlist.append(next(data)[0])
-                if integer:
-                    value = np.array(vlist, dtype=int).reshape(shape)
-                else:
-                    value = np.array(vlist, dtype=float).reshape(shape)
-
-            var = varlib.Variable(name, value, symbol, units, description)
+            var = _load_var_data(data)
         except Exception:
             raise Exception("loadVar: loading the variable was not possible")
     return var
@@ -525,11 +526,20 @@ def load_obs(obsfile):
     obsfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(obsfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            if next(data)[0] != "Observation":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[0] != "Observation":
                 raise Exception
             name = next(data)[1]
             steady = next(data)[1] == "steady"
@@ -561,11 +571,20 @@ def load_well(welfile):
     welfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(welfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            if next(data)[0] != "Well":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[0] != "Well":
                 raise Exception
             name = next(data)[1]
             radf = next(data)[1]
@@ -594,11 +613,20 @@ def load_campaign(cmpfile):
     cmpfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(cmpfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            if next(data)[0] != "Campaign":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[0] != "Campaign":
                 raise Exception
             name = next(data)[1]
             description = next(data)[1]
@@ -625,7 +653,7 @@ def load_campaign(cmpfile):
         )
     except Exception:
         raise Exception(
-            "loadPumpingTest: loading the pumpingtest " + "was not possible"
+            "loadPumpingTest: loading the pumpingtest was not possible"
         )
     return campaign
 
@@ -640,11 +668,20 @@ def load_fieldsite(fdsfile):
     fdsfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(fdsfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            if next(data)[0] != "Fieldsite":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[0] != "Fieldsite":
                 raise Exception
             name = next(data)[1]
             description = next(data)[1]
@@ -656,7 +693,7 @@ def load_fieldsite(fdsfile):
         fieldsite = campaignlib.FieldSite(name, description, coordinates)
     except Exception:
         raise Exception(
-            "loadFieldSite: loading the fieldsite " + "was not possible"
+            "loadFieldSite: loading the fieldsite was not possible"
         )
     return fieldsite
 
@@ -671,19 +708,27 @@ def load_test(tstfile):
     tstfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(tstfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            row = _nextr(data)
-            if row[0] != "Testtype":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[0] != "Testtype":
                 raise Exception
-            if row[1] == "PumpingTest":
+            if header[1] == "PumpingTest":
                 routine = _load_pumping_test
             else:
                 raise Exception
     except Exception:
-        raise Exception("loadTest: loading the test " + "was not possible")
+        raise Exception("loadTest: loading the test was not possible")
 
     return routine(tstfile)
 
@@ -698,11 +743,20 @@ def _load_pumping_test(tstfile):
     tstfile : :class:`str`
         Path to the file
     """
+    # default version string
+    version_string = "1.0.0"
     try:
         with zipfile.ZipFile(tstfile, "r") as zfile:
             info = TxtIO(zfile.open("info.csv"))
             data = csv.reader(info)
-            if next(data)[1] != "PumpingTest":
+            first_line = _nextr(data)
+            if first_line[0] == "wtp-version":
+                version_string = first_line[1]
+                header = _nextr(data)
+            else:
+                header = first_line
+            version = version_parse(version_string)
+            if header[1] != "PumpingTest":
                 raise Exception
             name = next(data)[1]
             description = next(data)[1]
@@ -733,6 +787,6 @@ def _load_pumping_test(tstfile):
         )
     except Exception:
         raise Exception(
-            "loadPumpingTest: loading the pumpingtest " + "was not possible"
+            "loadPumpingTest: loading the pumpingtest was not possible"
         )
     return pumpingtest
