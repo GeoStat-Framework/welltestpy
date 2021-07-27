@@ -20,7 +20,7 @@ The following classes and functions are provided
    Well
 """
 from copy import deepcopy as dcopy
-
+import numbers
 import numpy as np
 
 from . import data_io
@@ -121,16 +121,16 @@ class Variable:
 
     @value.setter
     def value(self, value):
-        if np.asanyarray(value).dtype == np.float:
+        if issubclass(np.asanyarray(value).dtype.type, numbers.Real):
             if np.ndim(np.squeeze(value)) == 0:
-                self.__value = np.float(np.squeeze(value))
+                self.__value = float(np.squeeze(value))
             else:
-                self.__value = np.squeeze(np.asanyarray(value, dtype=np.float))
-        elif np.asanyarray(value).dtype == np.int:
+                self.__value = np.squeeze(np.array(value, dtype=float))
+        elif issubclass(np.asanyarray(value).dtype.type, numbers.Integral):
             if np.ndim(np.squeeze(value)) == 0:
-                self.__value = np.int(np.squeeze(value))
+                self.__value = int(np.squeeze(value))
             else:
-                self.__value = np.squeeze(np.asanyarray(value, dtype=np.int))
+                self.__value = np.squeeze(np.array(value, dtype=int))
         else:
             raise ValueError("Variable: 'value' is neither integer nor float")
 
@@ -466,8 +466,6 @@ class Observation:
     def _settime(self, time):
         if isinstance(time, Variable):
             self._time = dcopy(time)
-        elif self._time is None:
-            self._time = TimeVar(time)
         elif time is None:
             self._time = None
         else:
