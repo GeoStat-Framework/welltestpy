@@ -4,6 +4,10 @@ All notable changes to **welltestpy** will be documented in this file.
 
 ## [Unreleased]
 
+### Enhancements
+- added version information to output files
+- added `screensize` attribute to `Well` class
+
 ### Changes
 - modernized packaging workflow using `pyproject.toml`
 - removed `setup.py` (use `pip>21.1` for editable installs)
