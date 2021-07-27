@@ -213,6 +213,7 @@ def save_well(well, path="", name=None):
         coordname = name[:-4] + "_CooVar.var"
         welldname = name[:-4] + "_WedVar.var"
         aquifname = name[:-4] + "_AqdVar.var"
+        screename = name[:-4] + "_ScrVar.var"
         # save variable-files
         writer.writerow(["radius", radiuname])
         well.wellradius.save(patht, radiuname)
@@ -222,6 +223,8 @@ def save_well(well, path="", name=None):
         well.welldepth.save(patht, welldname)
         writer.writerow(["aquiferdepth", aquifname])
         well.aquiferdepth.save(patht, aquifname)
+        writer.writerow(["screensize", screename])
+        well.screensize.save(patht, screename)
     # compress everything to one zip-file
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
@@ -231,6 +234,7 @@ def save_well(well, path="", name=None):
         zfile.write(os.path.join(patht, coordname), coordname)
         zfile.write(os.path.join(patht, welldname), welldname)
         zfile.write(os.path.join(patht, aquifname), aquifname)
+        zfile.write(os.path.join(patht, screename), screename)
     # delete the temporary directory
     shutil.rmtree(patht, ignore_errors=True)
     return file_path
@@ -587,17 +591,25 @@ def load_well(welfile):
             if header[0] != "Well":
                 raise Exception
             name = next(data)[1]
+            # radius
             radf = next(data)[1]
-            coordf = next(data)[1]
-            welldf = next(data)[1]
-            aquidf = next(data)[1]
-
             rad = load_var(TxtIO(zfile.open(radf)))
+            # coordinates
+            coordf = next(data)[1]
             coord = load_var(TxtIO(zfile.open(coordf)))
+            # well depth
+            welldf = next(data)[1]
             welld = load_var(TxtIO(zfile.open(welldf)))
+            # aquifer depth
+            aquidf = next(data)[1]
             aquid = load_var(TxtIO(zfile.open(aquidf)))
+            # read screensize implemented in v1.1
+            screend = None
+            if version.release >= (1, 1):
+                screenf = next(data)[1]
+                screend = load_var(TxtIO(zfile.open(screenf)))
 
-        well = varlib.Well(name, rad, coord, welld, aquid)
+        well = varlib.Well(name, rad, coord, welld, aquid, screend)
     except Exception:
         raise Exception("loadWell: loading the well was not possible")
     return well
