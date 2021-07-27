@@ -2,13 +2,13 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1229051.svg)](https://doi.org/10.5281/zenodo.1229051)
 [![PyPI version](https://badge.fury.io/py/welltestpy.svg)](https://badge.fury.io/py/welltestpy)
-[![Build Status](https://github.com/GeoStat-Framework/welltestpy/workflows/Continuous%20Integration/badge.svg?branch=develop)](https://github.com/GeoStat-Framework/welltestpy/actions)
-[![Coverage Status](https://coveralls.io/repos/github/GeoStat-Framework/welltestpy/badge.svg?branch=develop)](https://coveralls.io/github/GeoStat-Framework/welltestpy?branch=develop)
+[![Build Status](https://github.com/GeoStat-Framework/welltestpy/workflows/Continuous%20Integration/badge.svg?branch=main)](https://github.com/GeoStat-Framework/welltestpy/actions)
+[![Coverage Status](https://coveralls.io/repos/github/GeoStat-Framework/welltestpy/badge.svg?branch=main)](https://coveralls.io/github/GeoStat-Framework/welltestpy?branch=main)
 [![Documentation Status](https://readthedocs.org/projects/welltestpy/badge/?version=latest)](https://geostat-framework.readthedocs.io/projects/welltestpy/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/WTP.png" alt="welltestpy-LOGO" width="251px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/WTP.png" alt="welltestpy-LOGO" width="251px"/>
 </p>
 
 ## Purpose
@@ -47,11 +47,11 @@ campaign.plot()
 #### This will give the following plots:
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/01_wells.png" alt="Wells" width="600px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/01_wells.png" alt="Wells" width="600px"/>
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/01_pumptest.png" alt="Pumptest" width="600px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/01_pumptest.png" alt="Pumptest" width="600px"/>
 </p>
 
 
@@ -73,19 +73,19 @@ estimation.run()
 Type-Curve fitting:
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_fit.png" alt="Fit" width="600px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_fit.png" alt="Fit" width="600px"/>
 </p>
 
 Evolution of parameter estimation with SCE:
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_paratrace.png" alt="Trace" width="600px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_paratrace.png" alt="Trace" width="600px"/>
 </p>
 
 Scatterplot of paramter distribution during estimation:
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/master/docs/source/pics/02_parainter.png" alt="Interaction" width="600px"/>
+<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_parainter.png" alt="Interaction" width="600px"/>
 </p>
 
 The results are:
@@ -123,5 +123,5 @@ You can contact us via <info@geostat-framework.org>.
 
 [MIT][license_link] © 2018-2021
 
-[license_link]: https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE
+[license_link]: https://github.com/GeoStat-Framework/welltestpy/blob/main/LICENSE
 [doc_link]: https://welltestpy.readthedocs.io

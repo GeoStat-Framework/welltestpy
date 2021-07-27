@@ -9,3 +9,4 @@ Contents
    index
    examples/index
    package
+   changelog

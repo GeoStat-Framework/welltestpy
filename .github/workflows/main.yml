@@ -3,13 +3,12 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - "master"
-      - "develop"
+      - "main"
     tags:
       - "*"
   pull_request:
     branches:
-      - "develop"
+      - "main"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -39,7 +38,7 @@ jobs:
           pip install --editable .
       - name: black check
         run: |
-          python -m black --check .
+          python -m black --check --diff --color .
       # - name: pylint check
       #   run: |
       #     python -m pylint welltestpy/
@@ -94,8 +93,8 @@ jobs:
           path: dist
 
       - name: Publish to Test PyPI
-        # only if working on develop
-        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
+        # only if working on main
+        if: github.ref == 'refs/heads/main'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__

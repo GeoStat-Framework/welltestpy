@@ -48,4 +48,4 @@ Requirements
 License
 =======
 
-`MIT <https://github.com/GeoStat-Framework/welltestpy/blob/master/LICENSE>`_
+`MIT <https://github.com/GeoStat-Framework/welltestpy/blob/main/LICENSE>`_
