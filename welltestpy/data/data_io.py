@@ -30,6 +30,10 @@ except ImportError:  # pragma: nocover
 # TOOLS ###
 
 
+class LoadError(Exception):
+    pass
+
+
 def _formstr(string):
     # remove spaces, tabs, linebreaks and other separators
     return "".join(str(string).split())
@@ -136,7 +140,6 @@ def save_obs(obs, path="", name=None):
     # create temporal directory for the included files
     patht = tempfile.mkdtemp(dir=path)
     # write the csv-file
-    # with open(patht+name[:-4]+".csv", 'w') as csvf:
     with open(os.path.join(patht, "info.csv"), "w") as csvf:
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
@@ -160,7 +163,6 @@ def save_obs(obs, path="", name=None):
     # compress everything to one zip-file
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
-        # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
         zfile.write(os.path.join(patht, "info.csv"), "info.csv")
         if obs.state == "transient":
             zfile.write(os.path.join(patht, timname), timname)
@@ -200,7 +202,6 @@ def save_well(well, path="", name=None):
     # create temporal directory for the included files
     patht = tempfile.mkdtemp(dir=path)
     # write the csv-file
-    # with open(patht+name[:-4]+".csv", 'w') as csvf:
     with open(os.path.join(patht, "info.csv"), "w") as csvf:
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
@@ -228,7 +229,6 @@ def save_well(well, path="", name=None):
     # compress everything to one zip-file
     file_path = os.path.join(path, name)
     with zipfile.ZipFile(file_path, "w") as zfile:
-        # zfile.write(patht+name[:-4]+".csv", name[:-4]+".csv")
         zfile.write(os.path.join(patht, "info.csv"), "info.csv")
         zfile.write(os.path.join(patht, radiuname), radiuname)
         zfile.write(os.path.join(patht, coordname), coordname)
@@ -271,7 +271,6 @@ def save_campaign(campaign, path="", name=None):
     # create temporal directory for the included files
     patht = tempfile.mkdtemp(dir=path)
     # write the csv-file
-    # with open(patht+name[:-4]+".csv", 'w') as csvf:
     with open(os.path.join(patht, "info.csv"), "w") as csvf:
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
@@ -352,7 +351,6 @@ def save_fieldsite(fieldsite, path="", name=None):
     # create temporal directory for the included files
     patht = tempfile.mkdtemp(dir=path)
     # write the csv-file
-    # with open(patht+name[:-4]+".csv", 'w') as csvf:
     with open(os.path.join(patht, "info.csv"), "w") as csvf:
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
@@ -411,7 +409,6 @@ def save_pumping_test(pump_test, path="", name=None):
     # create temporal directory for the included files
     patht = tempfile.mkdtemp(dir=path)
     # write the csv-file
-    # with open(patht+name[:-4]+".csv", 'w') as csvf:
     with open(os.path.join(patht, "info.csv"), "w") as csvf:
         writer = csv.writer(
             csvf, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n"
@@ -470,8 +467,12 @@ def _load_var_data(data):
     else:
         header = first_line
     version = version_parse(version_string)
+    if version.release < (1, 0):
+        raise ValueError(f"load_var: unknown version '{version.public}'")
     if header[0] != "Variable":
-        raise Exception
+        raise ValueError(
+            f"load_var: expected 'Variable' but got '{header[0]}'"
+        )
     name = next(data)[1]
     symbol = next(data)[1]
     units = next(data)[1]
@@ -507,16 +508,32 @@ def load_var(varfile):
     varfile : :class:`str`
         Path to the file
     """
+    cleanup = False
     try:
-        with open(varfile, "r") as vfile:
-            data = csv.reader(vfile)
-            var = _load_var_data(data)
-    except Exception:
+        # read file
+        data_file = open(varfile, "r")
+    except TypeError:  # if it is an instance of TextIOWrapper
         try:
+            # read stream
             data = csv.reader(varfile)
-            var = _load_var_data(data)
-        except Exception:
-            raise Exception("loadVar: loading the variable was not possible")
+        except Exception as exc:
+            raise LoadError(
+                f"load_var: couldn't read file '{varfile}'"
+            ) from exc
+    else:
+        data = csv.reader(data_file)
+        cleanup = True
+
+    try:
+        var = _load_var_data(data)
+    except Exception as exc:
+        raise LoadError(
+            f"load_var: couldn't load variable '{varfile}'"
+        ) from exc
+
+    if cleanup:
+        data_file.close()
+
     return var
 
 
@@ -543,25 +560,32 @@ def load_obs(obsfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_obs: unknown version '{version.public}'"
+                )
             if header[0] != "Observation":
-                raise Exception
+                raise ValueError(
+                    f"load_obs: expected 'Observation' but got '{header[0]}'"
+                )
             name = next(data)[1]
             steady = next(data)[1] == "steady"
             description = next(data)[1]
             if not steady:
                 timef = next(data)[1]
             obsf = next(data)[1]
-
+            # read time if not steady
+            time = None
             if not steady:
                 time = load_var(TxtIO(zfile.open(timef)))
-            else:
-                time = None
-
+            # read observation
             obs = load_var(TxtIO(zfile.open(obsf)))
-
+        # generate observation object
         observation = varlib.Observation(name, obs, time, description)
-    except Exception:
-        raise Exception("loadObs: loading the observation was not possible")
+    except Exception as exc:
+        raise LoadError(
+            f"load_obs: couldn't load observation '{obsfile}'"
+        ) from exc
     return observation
 
 
@@ -588,8 +612,14 @@ def load_well(welfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_obs: unknown version '{version.public}'"
+                )
             if header[0] != "Well":
-                raise Exception
+                raise ValueError(
+                    f"load_well: expected 'Well' but got '{header[0]}'"
+                )
             name = next(data)[1]
             # radius
             radf = next(data)[1]
@@ -610,8 +640,8 @@ def load_well(welfile):
                 screend = load_var(TxtIO(zfile.open(screenf)))
 
         well = varlib.Well(name, rad, coord, welld, aquid, screend)
-    except Exception:
-        raise Exception("loadWell: loading the well was not possible")
+    except Exception as exc:
+        raise LoadError(f"load_well: couldn't load well '{welfile}'") from exc
     return well
 
 
@@ -638,8 +668,14 @@ def load_campaign(cmpfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_campaign: unknown version '{version.public}'"
+                )
             if header[0] != "Campaign":
-                raise Exception
+                raise ValueError(
+                    f"load_campaign: expected 'Campaign' but got '{header[0]}'"
+                )
             name = next(data)[1]
             description = next(data)[1]
             timeframe = next(data)[1]
@@ -663,10 +699,10 @@ def load_campaign(cmpfile):
         campaign = campaignlib.Campaign(
             name, fieldsite, wells, tests, timeframe, description
         )
-    except Exception:
-        raise Exception(
-            "loadPumpingTest: loading the pumpingtest was not possible"
-        )
+    except Exception as exc:
+        raise LoadError(
+            f"load_campaign: couldn't load campaign '{cmpfile}'"
+        ) from exc
     return campaign
 
 
@@ -693,8 +729,15 @@ def load_fieldsite(fdsfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_fieldsite: unknown version '{version.public}'"
+                )
             if header[0] != "Fieldsite":
-                raise Exception
+                raise ValueError(
+                    "load_fieldsite: expected 'Fieldsite' "
+                    f"but got '{header[0]}'"
+                )
             name = next(data)[1]
             description = next(data)[1]
             coordinfo = next(data)[1]
@@ -703,10 +746,10 @@ def load_fieldsite(fdsfile):
             else:
                 coordinates = load_var(TxtIO(zfile.open(coordinfo)))
         fieldsite = campaignlib.FieldSite(name, description, coordinates)
-    except Exception:
-        raise Exception(
-            "loadFieldSite: loading the fieldsite was not possible"
-        )
+    except Exception as exc:
+        raise LoadError(
+            f"load_fieldsite: couldn't load fieldsite '{fdsfile}'"
+        ) from exc
     return fieldsite
 
 
@@ -733,15 +776,20 @@ def load_test(tstfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_var: unknown version '{version.public}'"
+                )
             if header[0] != "Testtype":
-                raise Exception
+                raise ValueError(
+                    f"load_test: expected 'Testtype' but got '{header[0]}'"
+                )
             if header[1] == "PumpingTest":
                 routine = _load_pumping_test
             else:
-                raise Exception
-    except Exception:
-        raise Exception("loadTest: loading the test was not possible")
-
+                raise ValueError(f"load_test: unknown test type '{header[1]}'")
+    except Exception as exc:
+        raise LoadError(f"load_test: couldn't load test '{tstfile}'") from exc
     return routine(tstfile)
 
 
@@ -768,8 +816,14 @@ def _load_pumping_test(tstfile):
             else:
                 header = first_line
             version = version_parse(version_string)
+            if version.release < (1, 0):
+                raise ValueError(
+                    f"load_test: unknown version '{version.public}'"
+                )
             if header[1] != "PumpingTest":
-                raise Exception
+                raise ValueError(
+                    f"load_test: expected 'PumpingTest' but got '{header[1]}'"
+                )
             name = next(data)[1]
             description = next(data)[1]
             timeframe = next(data)[1]
@@ -797,8 +851,8 @@ def _load_pumping_test(tstfile):
             description,
             timeframe,
         )
-    except Exception:
-        raise Exception(
-            "loadPumpingTest: loading the pumpingtest was not possible"
-        )
+    except Exception as exc:
+        raise LoadError(
+            f"load_test: couldn't load pumpingtest '{tstfile}'"
+        ) from exc
     return pumpingtest
