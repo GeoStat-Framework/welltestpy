@@ -824,6 +824,11 @@ class Well:
             raise ValueError("Well: 'aquiferdepth' needs to be positiv")
 
     @property
+    def is_piezometer(self):
+        """:class:`bool`: Whether the well is only a standpipe piezometer."""
+        return np.isclose(self.screen, 0)
+
+    @property
     def screen(self):
         """:class:`float`: Screen size at the well."""
         return self._screensize.value
@@ -840,7 +845,7 @@ class Well:
         elif self._screensize is None:
             self._screensize = Variable(
                 "screensize",
-                self.depth if screensize is None else screensize,
+                0.0 if screensize is None else screensize,
                 "L_s",
                 self.welldepth.units,
                 "screen size at well '" + str(self.name) + "'",
@@ -849,8 +854,8 @@ class Well:
             self._screensize(screensize)
         if not self._screensize.scalar:
             raise ValueError("Well: 'screensize' needs to be scalar")
-        if self.screensize.value <= 0.0:
-            raise ValueError("Well: 'screensize' needs to be positiv")
+        if self.screensize.value < 0.0:
+            raise ValueError("Well: 'screensize' needs to be non-negative")
 
     def distance(self, well):
         """Calculate distance to the well.
