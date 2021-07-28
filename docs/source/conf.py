@@ -104,8 +104,8 @@ master_doc = "contents"
 # General information about the project.
 curr_year = datetime.datetime.now().year
 project = "welltestpy"
-copyright = "2018 - {}, Sebastian Mueller".format(curr_year)
-author = "Sebastian Mueller"
+copyright = "2018 - {}, Sebastian Müller, Jarno Herrmann".format(curr_year)
+author = "Sebastian Müller, Jarno Herrmann"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -210,7 +210,7 @@ latex_documents = [
         master_doc,
         "welltestpy.tex",
         "welltestpy Documentation",
-        "Sebastian Mueller",
+        author,
         "manual",
     )
 ]

@@ -5,8 +5,10 @@ All notable changes to **welltestpy** will be documented in this file.
 ## [Unreleased]
 
 ### Enhancements
+- added `cooper_jacob_correction` to `process` (thanks to Jarno Herrmann)
+- added `diagnostic_plots` module (thanks to Jarno Herrmann)
+- added `screensize`, `screen`, `aquifer` and `is_piezometer` attribute to `Well` class
 - added version information to output files
-- added `screensize` attribute to `Well` class
 
 ### Changes
 - modernized packaging workflow using `pyproject.toml`
