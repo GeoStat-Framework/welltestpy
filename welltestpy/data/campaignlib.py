@@ -471,6 +471,14 @@ class Campaign:
                 f"diagnostic_plot: test '{pumping_test}' could not be found!"
             )
 
+    def __repr__(self):
+        """Representation."""
+        return (
+            f"Campaign '{self.name}' at '{self.fieldsite}' with "
+            f"{len(self.wells)} wells and "
+            f"{len(self.tests)} tests"
+        )
+
     def save(self, path="", name=None):
         """Save the campaign to file.
 
