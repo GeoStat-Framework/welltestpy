@@ -52,6 +52,12 @@ def _nextr(data):
     return tuple(filter(None, next(data)))
 
 
+def _check_version(version):
+    """At least check major version."""
+    if version.major > version_parse(__version__).major:
+        raise ValueError(f"Unknown version '{version.public}'")
+
+
 # SAVE ###
 
 
@@ -469,8 +475,7 @@ def _load_var_data(data):
     else:
         header = first_line
     version = version_parse(version_string)
-    if version.release < (1, 0):
-        raise ValueError(f"load_var: unknown version '{version.public}'")
+    _check_version(version)
     if header[0] != "Variable":
         raise ValueError(
             f"load_var: expected 'Variable' but got '{header[0]}'"
@@ -562,10 +567,7 @@ def load_obs(obsfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_obs: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[0] != "Observation":
                 raise ValueError(
                     f"load_obs: expected 'Observation' but got '{header[0]}'"
@@ -614,10 +616,7 @@ def load_well(welfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_obs: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[0] != "Well":
                 raise ValueError(
                     f"load_well: expected 'Well' but got '{header[0]}'"
@@ -670,10 +669,7 @@ def load_campaign(cmpfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_campaign: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[0] != "Campaign":
                 raise ValueError(
                     f"load_campaign: expected 'Campaign' but got '{header[0]}'"
@@ -731,10 +727,7 @@ def load_fieldsite(fdsfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_fieldsite: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[0] != "Fieldsite":
                 raise ValueError(
                     "load_fieldsite: expected 'Fieldsite' "
@@ -778,10 +771,7 @@ def load_test(tstfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_var: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[0] != "Testtype":
                 raise ValueError(
                     f"load_test: expected 'Testtype' but got '{header[0]}'"
@@ -818,10 +808,7 @@ def _load_pumping_test(tstfile):
             else:
                 header = first_line
             version = version_parse(version_string)
-            if version.release < (1, 0):
-                raise ValueError(
-                    f"load_test: unknown version '{version.public}'"
-                )
+            _check_version(version)
             if header[1] != "PumpingTest":
                 raise ValueError(
                     f"load_test: expected 'PumpingTest' but got '{header[1]}'"
