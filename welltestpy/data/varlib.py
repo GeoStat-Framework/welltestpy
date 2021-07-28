@@ -274,7 +274,7 @@ class CoordinatesVar(Variable):
             or ilat.shape != ilon.shape
         ):
             raise ValueError(
-                "CoordinatesVar: 'lat' and 'lon' should have"
+                "CoordinatesVar: 'lat' and 'lon' should have "
                 "same quantity and should be given as lists"
             )
 
