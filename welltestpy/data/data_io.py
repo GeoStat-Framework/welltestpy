@@ -31,6 +31,8 @@ except ImportError:  # pragma: nocover
 
 
 class LoadError(Exception):
+    """Loading error for all reading routines."""
+
     pass
 
 
