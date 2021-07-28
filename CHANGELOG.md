@@ -4,10 +4,18 @@ All notable changes to **welltestpy** will be documented in this file.
 
 ## [Unreleased]
 
+### Enhancements
+- added `cooper_jacob_correction` to `process` (thanks to Jarno Herrmann)
+- added `diagnostic_plots` module (thanks to Jarno Herrmann)
+- added `screensize`, `screen`, `aquifer` and `is_piezometer` attribute to `Well` class
+- added version information to output files
+- added `__repr__` to `Campaign`
+
 ### Changes
 - modernized packaging workflow using `pyproject.toml`
 - removed `setup.py` (use `pip>21.1` for editable installs)
 - removed `dev` as extra install dependencies
+- better exceptions in loading routines
 
 ### Bugfixes
 - loading steady pumping tests was not possible due to a bug
