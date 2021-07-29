@@ -22,79 +22,30 @@ You can install the latest version with the following command:
 
     pip install welltestpy
 
+Or from conda
+
+    conda install -c conda-forge welltestpy
+
 
 ## Documentation for welltestpy
 
-You can find the documentation under [https://welltestpy.readthedocs.io][doc_link].
+You can find the documentation including tutorials and examples under
+https://welltestpy.readthedocs.io.
 
 
-### Example 1: A campaign containing a pumping test
+## Citing welltestpy
 
-In the following, we will take a look at an artificial pumping test campaign,
-that is stored in a file called `Cmp_UFZ-campaign.cmp`.
+If you are using this package you can cite our
+[Groundwater publication](https://doi.org/10.1111/gwat.13121) by:
 
-```python
-import welltestpy as wtp
+> Müller, S., Leven, C., Dietrich, P., Attinger, S. and Zech, A. (2021):
+> How to Find Aquifer Statistics Utilizing Pumping Tests? Two Field Studies Using welltestpy.
+> Groundwater, https://doi.org/10.1111/gwat.13121
 
-# load the campaign
-campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
-
-# plot the well constellation and a test overview
-campaign.plot_wells()
-campaign.plot()
-```
-
-#### This will give the following plots:
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/01_wells.png" alt="Wells" width="600px"/>
-</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/01_pumptest.png" alt="Pumptest" width="600px"/>
-</p>
+To cite the code, please visit the [Zenodo page](https://doi.org/10.5281/zenodo.1229051).
 
 
-### Example 2: Estimate transmissivity and storativity
-
-The pumping test from example 1 can now be loaded and used to estimate the values for
-transmissivity and storativity.
-
-```python
-import welltestpy as wtp
-
-campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
-estimation = wtp.estimate.Theis("Estimate_theis", campaign, generate=True)
-estimation.run()
-```
-
-#### This will give the following plots:
-
-Type-Curve fitting:
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_fit.png" alt="Fit" width="600px"/>
-</p>
-
-Evolution of parameter estimation with SCE:
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_paratrace.png" alt="Trace" width="600px"/>
-</p>
-
-Scatterplot of paramter distribution during estimation:
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/GeoStat-Framework/welltestpy/main/docs/source/pics/02_parainter.png" alt="Interaction" width="600px"/>
-</p>
-
-The results are:
-
-* `ln(T) = -9.22` which is equivalent to `T = 0.99 * 10^-4 m^2/s`
-* `ln(S) = -9.10` which is equivalent to `S = 1.11 * 10^-4`
-
-
-### Provided Subpackages
+## Provided Subpackages
 
 ```python
 welltestpy.data      # Subpackage to handle data from field campaigns
@@ -108,7 +59,6 @@ welltestpy.tools     # Subpackage with tools for plotting and triagulation
 
 - [NumPy >= 1.14.5](https://www.numpy.org)
 - [SciPy >= 1.1.0](https://www.scipy.org)
-- [Pandas >= 0.23.2](https://pandas.pydata.org)
 - [AnaFlow >= 1.0.0](https://github.com/GeoStat-Framework/AnaFlow)
 - [SpotPy >= 1.5.0](https://github.com/thouska/spotpy)
 - [Matplotlib >= 3.0.0](https://matplotlib.org)
@@ -121,7 +71,4 @@ You can contact us via <info@geostat-framework.org>.
 
 ## License
 
-[MIT][license_link] © 2018-2021
-
-[license_link]: https://github.com/GeoStat-Framework/welltestpy/blob/main/LICENSE
-[doc_link]: https://welltestpy.readthedocs.io
+[MIT](https://github.com/GeoStat-Framework/welltestpy/blob/main/LICENSE)
