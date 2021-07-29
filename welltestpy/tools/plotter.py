@@ -24,6 +24,7 @@ import warnings
 import functools as ft
 
 import numpy as np
+from scipy.stats import gaussian_kde
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -759,8 +760,6 @@ def plotfit_steady(
 
 def plotparainteract(result, paranames, plotname=None, fig=None, style="WTP"):
     """Plot of parameter interaction."""
-    import pandas as pd
-
     style = copy.deepcopy(plt.rcParams) if style is None else style
     keep_fs = False
     if style == "WTP":
@@ -775,21 +774,9 @@ def plotparainteract(result, paranames, plotname=None, fig=None, style="WTP"):
             # font type fix (resetted in default)
             plt.rcParams.update({"pdf.fonttype": pdf_ft, "ps.fonttype": ps_ft})
             plt.rcParams.update({"font.size": font_size})
-        fig, ax = _get_fig_ax(fig, ax=None, figsize=(12, 12))
         fields = [par for par in result.dtype.names if par.startswith("par")]
-        parameterdistribtion = result[fields]
-        df = pd.DataFrame(
-            np.asarray(parameterdistribtion).T.tolist(), columns=paranames
-        )
-        with warnings.catch_warnings():
-            # We know that fig is resetted, but we need to give ax to set fig
-            warnings.simplefilter("ignore", UserWarning)
-            if len(paranames) > 1:
-                pd.plotting.scatter_matrix(
-                    df, alpha=0.2, ax=ax, diagonal="kde"
-                )
-            else:
-                df.plot.kde(ax=ax)
+        para = [result[:][name] for name in fields]
+        fig = _scatter_matrix(para, paranames, fig)
         fig.tight_layout()
         fig.subplots_adjust(hspace=0, wspace=0, bottom=0.1)
         if plotname is not None:
@@ -895,3 +882,55 @@ def plotsensitivity(
                 bbox_inches="tight",
             )
     return ax
+
+
+def _scatter_matrix(data, label, fig=None):
+    data = np.array(data, ndmin=2, dtype=float)
+    n = len(data)
+    axes = np.empty(n ** 2, dtype=object)
+    for i in range(n ** 2):
+        fig, axes[i] = _get_fig_ax(fig, figsize=(8, 8), sub_args=(n, n, i + 1))
+    axes = axes.reshape(n, n)
+
+    boundaries_list = []
+    for dat in data:
+        rmin, rmax = np.min(dat), np.max(dat)
+        rdelta = (rmax - rmin) * 0.025
+        boundaries_list.append((rmin - rdelta, rmax + rdelta))
+
+    for i, a in enumerate(data):
+        for j, b in enumerate(data):
+            ax = axes[i, j]
+            if i == j:
+                ind = np.linspace(a.min(), a.max(), 1000)
+                ax.plot(ind, gaussian_kde(a).evaluate(ind))
+            else:
+                ax.scatter(b, a, marker=".", alpha=0.2, edgecolors="none")
+                ax.set_ylim(boundaries_list[i])
+            ax.set_xlim(boundaries_list[j])
+            ax.set_xlabel(label[j])
+            ax.set_ylabel(label[i])
+            if j != 0:
+                ax.yaxis.set_visible(False)
+            if i != n - 1:
+                ax.xaxis.set_visible(False)
+
+    # reset labels of first kde plot to match scatter plots
+    if n > 1:
+        lim1 = boundaries_list[0]
+        locs = axes[0, 1].yaxis.get_majorticklocs()
+        locs = locs[(lim1[0] <= locs) & (locs <= lim1[1])]
+        adj = (locs - lim1[0]) / (lim1[1] - lim1[0])
+
+        lim0 = axes[0, 0].get_ylim()
+        adj = adj * (lim0[1] - lim0[0]) + lim0[0]
+        axes[0, 0].yaxis.set_ticks(adj)
+        locs = locs.astype(int) if np.all(locs == locs.astype(int)) else locs
+        axes[0, 0].yaxis.set_ticklabels(locs)
+        fig.align_ylabels(axes[:, 0])
+        fig.align_xlabels(axes[-1, :])
+
+    for ax in axes[-1, :]:
+        plt.setp(ax.get_xticklabels(), rotation=90)
+
+    return fig
