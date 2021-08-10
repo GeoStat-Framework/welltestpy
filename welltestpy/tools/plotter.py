@@ -196,7 +196,7 @@ def campaign_well_plot(
     fig : Figure, optional
         Matplotlib figure to plot on. The default is None.
     style : str, optional
-        Plot stlye. The default is "WTP".
+        Plot style. The default is "WTP".
 
     Returns
     -------
@@ -274,7 +274,7 @@ def plot_pump_test(
     pump_test: :class:`PumpingTest`
         Pumping test class that should be plotted.
     wells : :class:`dict`
-        Dictonary containing the well classes sorted by name.
+        Dictionary containing the well classes sorted by name.
     exclude: :class:`list`, optional
         List of wells that should be excluded from the plot.
         Default: ``None``
@@ -283,7 +283,7 @@ def plot_pump_test(
     ax : :class:`Axes`
         Matplotlib axes to plot on. The default is None.
     style : str, optional
-        Plot stlye. The default is "WTP".
+        Plot style. The default is "WTP".
 
     Returns
     -------
@@ -327,7 +327,7 @@ def plot_pump_test(
             ax1 = None
             ax2 = ax
         else:
-            raise ValueError("plot_pump_test: unknow state of pumping test.")
+            raise ValueError("plot_pump_test: unknown state of pumping test.")
         for i, k in enumerate(plot_wells):
             if k != pump_test.pumpingwell:
                 dist = wells[k] - wells[pump_test.pumpingwell]
@@ -427,7 +427,7 @@ def plot_well_pos(
     fig : Figure, optional
         Matplotlib figure to plot on. The default is None.
     style : str, optional
-        Plot stlye. The default is "WTP".
+        Plot style. The default is "WTP".
 
     Returns
     -------
@@ -441,7 +441,7 @@ def plot_well_pos(
     col_n = int(np.ceil(np.sqrt(total_n)))
     # enough rows to catch all plots
     row_n = int(np.ceil(total_n / col_n))
-    # Possition numbers as array
+    # Position numbers as array
     pos_tuple = np.arange(total_n) + 1
 
     # generate names for points if undefined
@@ -450,7 +450,7 @@ def plot_well_pos(
         for i in range(len(well_const[0])):
             names.append("p" + str(i))
 
-    # genearte commen borders for all plots
+    # generate common borders for all plots
     xmax = -np.inf
     xmin = np.inf
     ymax = -np.inf
@@ -558,7 +558,7 @@ def plotfit_transient(
         clr_n = len(clrs)
     with plt.style.context(style2):
         if keep_fs:
-            # font type fix (resetted in default)
+            # font type fix (reset in default)
             plt.rcParams.update({"pdf.fonttype": pdf_ft, "ps.fonttype": ps_ft})
             plt.rcParams.update({"font.size": font_size})
         fig, ax = _get_fig_ax(fig, ax, ax_name=Axes3D.name, figsize=(7.5, 7))

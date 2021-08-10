@@ -25,7 +25,7 @@ class Test:
     """General class for a well based test.
 
     This is a class for a well based test on a field site.
-    It has a name, a descrition and a timeframe string.
+    It has a name, a description and a timeframe string.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ class Test:
         ax : :class:`Axes`
             Axes where the plot should be done.
         wells : :class:`dict`
-            Dictonary containing the well classes sorted by name.
+            Dictionary containing the well classes sorted by name.
         exclude: :class:`list`, optional
             List of wells that should be excluded from the plot.
             Default: ``None``
@@ -83,7 +83,7 @@ class PumpingTest(Test):
     """Class for a pumping test.
 
     This is a class for a pumping test on a field site.
-    It has a name, a descrition, a timeframe and a pumpingwell string.
+    It has a name, a description, a timeframe and a pumpingwell string.
 
     Parameters
     ----------

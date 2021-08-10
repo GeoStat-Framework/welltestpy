@@ -258,7 +258,7 @@ def cooper_jacob_correction(observation, sat_thickness):
     observation : :class:`welltestpy.data.Observation`
         The observation to be corrected.
     sat_thickness : :class:`float`
-        vertical length of the aquifer in which its pores are filled with water.
+        Vertical length of the aquifer in which its pores are filled with water.
 
     Returns
     -------
@@ -292,7 +292,7 @@ def smoothing_derivative(head, time, method="bourdet"):
 
     Returns
     ---------
-    the derivative of the observed heads.
+    The derivative of the observed heads.
 
     """
     # create arrays for the input of head and time.

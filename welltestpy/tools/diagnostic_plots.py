@@ -36,7 +36,7 @@ def diagnostic_plot_pump_test(
     Parameters
     ----------
     observation : :class:`welltestpy.data.Observation`
-         The observation to calculate the derivative.
+        The observation to calculate the derivative.
     rate : :class:`float`
         Pumping rate.
     method : :class:`str`, optional
@@ -90,10 +90,8 @@ def diagnostic_plot_pump_test(
         if keep_fs:
             plt.rcParams.update({"font.size": font_size})
         fig, ax = plotter._get_fig_ax(fig, ax)
-        ax.scatter(x, y, color="red", label="drawdown")
-        ax.plot(sx, sy, c="red")
-        ax.plot(dx, dy, c="black", linestyle="dashed")
-        ax.scatter(dx, dy, c="black", marker="+", label="time derivative")
+        ax.scatter(x, y, color="blue", label="drawdown")
+        ax.plot(dx, dy, c="red", label="time derivative")
         ax.set_xscale("symlog", linthresh=linthresh_time)
         ax.set_yscale("symlog", linthresh=linthresh_head)
         ax.set_xlabel("$t$ in [s]", fontsize=16)

@@ -50,19 +50,19 @@ class ExtTheis3D(transient_lib.TransientPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -134,16 +134,16 @@ class ExtTheis2D(transient_lib.TransientPumping):
         paramters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -209,19 +209,19 @@ class Neuman2004(transient_lib.TransientPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -285,19 +285,19 @@ class Theis(transient_lib.TransientPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -353,23 +353,23 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     make_steady : :class:`bool`, optional
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -438,23 +438,23 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     make_steady : :class:`bool`, optional
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -517,23 +517,23 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     make_steady : :class:`bool`, optional
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -593,23 +593,23 @@ class Thiem(steady_lib.SteadyPumping):
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     make_steady : :class:`bool`, optional
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional

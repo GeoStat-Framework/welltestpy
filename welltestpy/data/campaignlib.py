@@ -21,7 +21,7 @@ class FieldSite:
     """Class for a field site.
 
     This is a class for a field site.
-    It has a name and a descrition.
+    It has a name and a description.
 
     Parameters
     ----------
@@ -199,7 +199,7 @@ class Campaign:
             else:
                 raise ValueError(
                     "Campaign: 'wells' should be given "
-                    + "as dictonary or list"
+                    + "as dictionary or list"
                 )
         else:
             self.__wells = {}
@@ -274,7 +274,7 @@ class Campaign:
         else:
             raise ValueError(
                 "Campaign_addwells: 'wells' should be "
-                + "given as dictonary, list or single 'Well'"
+                + "given as dictionary, list or single 'Well'"
             )
 
     def delwells(self, wells):
@@ -330,7 +330,7 @@ class Campaign:
             else:
                 raise ValueError(
                     "Campaign: 'tests' should be given "
-                    + "as dictonary, list or 'Test'"
+                    + "as dictionary, list or 'Test'"
                 )
         else:
             self.__tests = {}
@@ -385,7 +385,7 @@ class Campaign:
         else:
             raise ValueError(
                 "Campaign_addtests: 'tests' should be "
-                + "given as dictonary, list or single 'Test'"
+                + "given as dictionary, list or single 'Test'"
             )
 
     def deltests(self, tests):

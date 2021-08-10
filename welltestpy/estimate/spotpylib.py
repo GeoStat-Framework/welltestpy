@@ -44,7 +44,7 @@ def fast_rep(para_no, infer_fac=4, freq_step=2):
     para_no : :class:`int`
         Number of parameters in the model.
     infer_fac : :class:`int`, optional
-        The inference fractor. Default: 4
+        The inference factor. Default: 4
     freq_step : :class:`int`, optional
         The frequency step. Default: 2
     """
@@ -70,17 +70,17 @@ class TypeCurve:
         Observed data as array. Will be reshaped to flat array.
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     fit_type : :class:`dict` or :any:`None`
         Dictionary containing fitting type for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         fit_type can be "lin", "log" (np.exp(val) will be used)
         or a callable function.
@@ -91,11 +91,11 @@ class TypeCurve:
 
             {value-name: kwargs-name in type_curve}
 
-        This is usefull if fitting is not done by linear values.
+        This is useful if fitting is not done by linear values.
         By default, parameter names will be value names.
         Default: None
     val_plot_names : :class:`dict` or :any:`None`
-        Dictionary containing plotable strings for the parameters.
+        Dictionary containing plottable strings for the parameters.
 
             {value-name: plotting-string}
 
@@ -175,7 +175,7 @@ class TypeCurve:
         return self.sim(**self.sim_kwargs).reshape(-1)
 
     def evaluation(self):
-        """Accesss the observation data."""
+        """Accesses the observation data."""
         return self.data
 
     def objectivefunction(self, simulation, evaluation):
