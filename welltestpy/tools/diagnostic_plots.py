@@ -74,10 +74,6 @@ def diagnostic_plot_pump_test(
         head=head, time=time, method=method
     )
     # setting variables
-    x = time
-    y = head
-    sx = time
-    sy = head
     dx = time[1:-1]
     dy = derivative[1:-1]
 
@@ -90,8 +86,8 @@ def diagnostic_plot_pump_test(
         if keep_fs:
             plt.rcParams.update({"font.size": font_size})
         fig, ax = plotter._get_fig_ax(fig, ax)
-        ax.scatter(x, y, color="blue", label="drawdown")
-        ax.plot(dx, dy, c="red", label="time derivative")
+        ax.scatter(time, head, color="C0", label="drawdown")
+        ax.plot(dx, dy, color="C1", label="time derivative")
         ax.set_xscale("symlog", linthresh=linthresh_time)
         ax.set_yscale("symlog", linthresh=linthresh_head)
         ax.set_xlabel("$t$ in [s]", fontsize=16)
