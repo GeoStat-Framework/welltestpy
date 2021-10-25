@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-welltestpy subpackage providing base classe for transient estimations.
+welltestpy subpackage providing base classes for transient estimations.
 
 .. currentmodule:: welltestpy.estimate.transient_lib
 
@@ -36,22 +36,22 @@ class TransientPumping:
         Name of the Estimation.
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
-        paramters
+        parameters
     type_curve : :any:`callable`
         The given type-curve. Output will be reshaped to flat array.
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         Default: None
     fit_type : :class:`dict` or :any:`None`
         Dictionary containing fitting type for each value in the type-curve.
-        Names should be as in the type-curve signiture
+        Names should be as in the type-curve signature
         or replaced in val_kw_names.
         fit_type can be "lin", "log" (np.exp(val) will be used)
         or a callable function.
@@ -62,7 +62,7 @@ class TransientPumping:
 
             {value-name: kwargs-name in type_curve}
 
-        This is usefull if fitting is not done by linear values.
+        This is useful if fitting is not done by linear values.
         By default, parameter names will be value names.
         Default: None
     val_plot_names : :class:`dict` or :any:`None`
@@ -70,11 +70,11 @@ class TransientPumping:
 
             {value-name: string for plot legend}
 
-        This is usefull to get better plots.
+        This is useful to get better plots.
         By default, parameter names will be value names.
         Default: None
     testinclude : :class:`dict`, optional
-        dictonary of which tests should be included. If ``None`` is given,
+        Dictionary of which tests should be included. If ``None`` is given,
         all available tests are included.
         Default: ``None``
     generate : :class:`bool`, optional
@@ -137,7 +137,7 @@ class TransientPumping:
         self.sens = None
         """:class:`dict`: result of the spotpy sensitivity analysis"""
         self.testinclude = {}
-        """:class:`dict`: dictonary of which tests should be included"""
+        """:class:`dict`: dictionary of which tests should be included"""
 
         if testinclude is None:
             tests = list(self.campaign.tests.keys())
@@ -208,7 +208,7 @@ class TransientPumping:
         ----------
         time : :class:`numpy.ndarray`, optional
             Array of specified time points. If ``None`` is given, they will
-            be determind by the observation data.
+            be determined by the observation data.
             Default: ``None``
         tmin : :class:`float`, optional
             Minimal time value. It will set a minimal value of 10s.
@@ -380,7 +380,7 @@ class TransientPumping:
             ``"_estimate"``.
             Default: ``None``
         plot_style : str, optional
-            Plot stlye. The default is "WTP".
+            Plot style. The default is "WTP".
         """
         if self.setup.dummy:
             raise ValueError(
@@ -544,12 +544,12 @@ class TransientPumping:
             ``"_estimate"``.
             Default: ``None``
         plot_style : str, optional
-            Plot stlye. The default is "WTP".
+            Plot style. The default is "WTP".
         """
         if len(self.setup.para_names) == 1 and not self.setup.dummy:
             raise ValueError(
                 "Sensitivity: for estimation with only one parameter"
-                " you have to use a dummy paramter."
+                " you have to use a dummy parameter."
             )
         if rep is None:
             rep = spotpylib.fast_rep(

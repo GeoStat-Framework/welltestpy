@@ -38,7 +38,7 @@ def triangulate(distances, prec, all_pos=False):
         If a distance is unknown, you can set it to ``-1``.
     prec : :class:`float`
         Given Precision to be used within the algorithm. This can be used to
-        smooth away messure errors
+        smooth away measure errors
     all_pos : :class:`bool`, optional
         If `True` all possible constellations will be calculated. Otherwise,
         the first possibility will be returned.
@@ -89,7 +89,7 @@ def _triangulatesgl(distances, sp1, sp2, prec):
     """
     Try to triangulate points.
 
-    With startingpoints sp1 and sp2 and a given precicion.
+    With starting points sp1 and sp2 and a given precision.
     Thereby sp1 will be at the origin (0,0) and sp2 will be at (|sp2-sp1|,0).
     """
     res = []
@@ -129,7 +129,7 @@ def _addpoints(sol, distances, prec):
     """
     Try for each point to add it to a given solution-approach.
 
-    gives all possibilties and a status about the solution:
+    gives all possibilities and a status about the solution:
         state = 0: possibilities found
         state = 1: no possibilities
         state = 2: solution-approach has a contradiction with a point
@@ -168,7 +168,7 @@ def _addpoint(sol, i, distances, prec):
     """
     Try to add point i to a given solution-approach.
 
-    gives all possibilties and a status about the solution:
+    gives all possibilities and a status about the solution:
         state = 0: possibilities found
         state = 1: no possibilities but no contradiction
         state = 2: solution-approach has a contradiction with point i
@@ -225,7 +225,7 @@ def _pntcoord(sol, i, n, m, distances, prec):
     if distances[i, n] < -0.5 or distances[i, m] < -0.5:
         return tmppnt, state
 
-    # if the Triangle inequality is not fullfilled give a contradiction
+    # if the Triangle inequality is not fulfilled give a contradiction
     if distances[i, n] + distances[i, m] < _dist(sol[n], sol[m]):
         state = 2
         return tmppnt, state
@@ -237,7 +237,7 @@ def _pntcoord(sol, i, n, m, distances, prec):
     x = _xvalue(distances[i, n], distances[i, m], _dist(sol[n], sol[m]))
     y1, y2 = _yvalue(distances[i, n], distances[i, m], _dist(sol[n], sol[m]))
 
-    # generate the possible positons
+    # generate the possible positions
     pos1 = g(np.array([x, y1]))
     pos2 = g(np.array([x, y2]))
 
@@ -267,7 +267,7 @@ def _pntcoord(sol, i, n, m, distances, prec):
 
 def _solequal(sol1, sol2, prec):
     """
-    Compare two different solutions with a given precicion.
+    Compare two different solutions with a given precision.
 
     Return True if they equal.
     """
@@ -288,7 +288,7 @@ def _distvalid(dis, err=0.0, verbose=True):
     """
     Check if the given distances between the points are valid.
 
-    I.e. if they fullfill the triangle-equation.
+    I.e. if they fulfill the triangle-equation.
     """
     valid = True
     valid &= np.all(dis == dis.T)
@@ -333,13 +333,13 @@ def _yvalue(b, a, c):
     lying on the x-axes, a is the distance of the unknown point to the origen
     and b is the distance of the unknown point to the righter given point
     """
-    # ckeck flatness to eliminate numerical errors when the triangle is flat
+    # check flatness to eliminate numerical errors when the triangle is flat
     if a + b <= c or a + c <= b or b + c <= a:
         return 0.0, -0.0
 
     res = 2 * ((a * b) ** 2 + (a * c) ** 2 + (b * c) ** 2)
     res -= a ** 4 + b ** 4 + c ** 4
-    # in case of numerical errors set res to 0 (hope you check validty before)
+    # in case of numerical errors set res to 0 (hope you check validity before)
     res = max(res, 0.0)
     res = np.sqrt(res)
     res /= 2 * c
@@ -364,9 +364,9 @@ def _rotate(res):
 
 def _tranmat(a, b):
     """
-    Get the coefficents for the affine-linear function f(x)=Ax+s.
+    Get the coefficients for the affine-linear function f(x)=Ax+s.
 
-    Which fullfills that A is a rotation-matrix,
+    Which fulfills that A is a rotation-matrix,
     f(a) = [0,0] and f(b) = [|b-a|,0].
     """
     A = np.zeros((2, 2))
@@ -381,7 +381,7 @@ def _tranmat(a, b):
 
 def _invtranmat(A, s):
     """
-    Get the coefficents for the affine-linear function g(x)=Bx+t.
+    Get the coefficients for the affine-linear function g(x)=Bx+t.
 
     which is inverse to f(x)=Ax+s
     """

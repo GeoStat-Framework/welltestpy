@@ -288,7 +288,7 @@ class Observation:
     Class for a observation.
 
     This is a class for time-dependent observations.
-    It has a name and a descrition.
+    It has a name and a description.
 
     Parameters
     ----------
@@ -345,11 +345,11 @@ class Observation:
         return self.value
 
     def __repr__(self):
-        """Represenetation."""
+        """Representation."""
         return f"Observation '{self.name}' {self.label}"
 
     def __str__(self):
-        """Represenetation."""
+        """Representation."""
         return self.__repr__()
 
     @property
@@ -366,9 +366,9 @@ class Observation:
 
     @property
     def info(self):
-        """Get informations about the observation.
+        """Get information about the observation.
 
-        Here you can display informations about the observation.
+        Here you can display information about the observation.
         """
         info = ""
         info += "Observation-name: " + str(self.name) + "\n"
@@ -448,7 +448,7 @@ class Observation:
         return f"{self._time.units}, {self._observation.units}"
 
     def reshape(self):
-        """Reshape obeservations to flat array."""
+        """Reshape observations to flat array."""
         if self.state == "transient":
             tmp = len(np.shape(self.time))
             self._settime(np.reshape(self.time, -1))
@@ -479,7 +479,7 @@ class Observation:
             != np.shape(self.observation)[: len(np.shape(self.time))]
         ):
             raise ValueError(
-                "Observation: 'observation' has a shape-missmatch with 'time'"
+                "Observation: 'observation' has a shape-mismatch with 'time'"
             )
 
     def __iter__(self):
@@ -552,7 +552,7 @@ class StdyObs(Observation):
 
 class TimeSeries(Observation):
     """
-    Time series obeservation.
+    Time series observation.
 
     Parameters
     ----------
@@ -684,9 +684,9 @@ class Well:
 
     @property
     def info(self):
-        """Get informations about the variable.
+        """Get information about the variable.
 
-        Here you can display informations about the variable.
+        Here you can display information about the variable.
         """
         info = ""
         info += "----\n"
@@ -727,7 +727,7 @@ class Well:
         if not self._radius.scalar:
             raise ValueError("Well: 'radius' needs to be scalar")
         if not self.radius > 0.0:
-            raise ValueError("Well: 'radius' needs to be positiv")
+            raise ValueError("Well: 'radius' needs to be positive")
 
     @property
     def pos(self):
@@ -786,7 +786,7 @@ class Well:
         if not self._welldepth.scalar:
             raise ValueError("Well: 'welldepth' needs to be scalar")
         if not self.depth > 0.0:
-            raise ValueError("Well: 'welldepth' needs to be positiv")
+            raise ValueError("Well: 'welldepth' needs to be positive")
 
     @property
     def aquifer(self):
@@ -815,7 +815,7 @@ class Well:
         if not self._aquiferdepth.scalar:
             raise ValueError("Well: 'aquiferdepth' needs to be scalar")
         if not self.aquifer > 0.0:
-            raise ValueError("Well: 'aquiferdepth' needs to be positiv")
+            raise ValueError("Well: 'aquiferdepth' needs to be positive")
 
     @property
     def is_piezometer(self):
@@ -867,13 +867,13 @@ class Well:
             raise ValueError(
                 "Well: the distant-well needs to be an "
                 "instance of Well-class "
-                "or a tupel of x-y coordinates "
+                "or a tuple of x-y coordinates "
                 "or a single distance value "
                 "and of same coordinates-type."
             )
 
     def __repr__(self):
-        """Represenetation."""
+        """Representation."""
         return f"{self.name} r={self.radius} at {self._coordinates}"
 
     def __sub__(self, well):
