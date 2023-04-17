@@ -53,13 +53,25 @@ class ExtTheis3D(transient_lib.TransientPumping):
         parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -77,27 +89,30 @@ class ExtTheis3D(transient_lib.TransientPumping):
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
         def_ranges = {
-            "mu": (-16, -2),
+            "cond_gmean": (1e-7, 2e-1),
             "var": (0, 10),
             "len_scale": (1, 50),
-            "lnS": (-13, -1),
+            "storage": (2e-6, 4e-1),
             "anis": (0, 1),
         }
-        val_ranges = {} if val_ranges is None else val_ranges
-        val_fix = {"lat_ext": 1.0} if val_fix is None else val_fix
+        val_ranges = val_ranges or {}
+        val_fix = val_fix or {"lat_ext": 1.0}
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "cond_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("cond_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "cond_gmean": "$K_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
             "anis": "$e$",
         }
         super().__init__(
@@ -106,8 +121,8 @@ class ExtTheis3D(transient_lib.TransientPumping):
             type_curve=ana.ext_theis_3d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -134,13 +149,25 @@ class ExtTheis2D(transient_lib.TransientPumping):
         paramters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -158,25 +185,28 @@ class ExtTheis2D(transient_lib.TransientPumping):
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
         def_ranges = {
-            "mu": (-16, -2),
+            "trans_gmean": (1e-7, 2e-1),
             "var": (0, 10),
             "len_scale": (1, 50),
-            "lnS": (-13, -1),
+            "storage": (2e-6, 4e-1),
         }
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
         }
         super().__init__(
             name=name,
@@ -184,8 +214,8 @@ class ExtTheis2D(transient_lib.TransientPumping):
             type_curve=ana.ext_theis_2d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -212,13 +242,25 @@ class Neuman2004(transient_lib.TransientPumping):
         parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -236,25 +278,28 @@ class Neuman2004(transient_lib.TransientPumping):
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
         def_ranges = {
-            "mu": (-16, -2),
+            "trans_gmean": (1e-7, 2e-1),
             "var": (0, 10),
             "len_scale": (1, 50),
-            "lnS": (-13, -1),
+            "storage": (2e-6, 4e-1),
         }
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
         }
         super().__init__(
             name=name,
@@ -262,8 +307,8 @@ class Neuman2004(transient_lib.TransientPumping):
             type_curve=ana.neuman2004,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -288,13 +333,25 @@ class Theis(transient_lib.TransientPumping):
         parameters
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -312,24 +369,27 @@ class Theis(transient_lib.TransientPumping):
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "lnS": (-13, -1)}
+        def_ranges = {"transmissivity": (1e-7, 2e-1), "storage": (2e-6, 4e-1)}
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "transmissivity", "lnS": "storage"}
-        val_plot_names = {"mu": r"$\ln(T)$", "lnS": r"$\ln(S)$"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("transmissivity", "log")
+        val_fit_type.setdefault("storage", "log")
+        val_plot_names = {"transmissivity": "$T$", "storage": "$S$"}
         super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.theis,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -360,13 +420,25 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -385,11 +457,13 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
         def_ranges = {
-            "mu": (-16, -2),
+            "cond_gmean": (1e-7, 2e-1),
             "var": (0, 10),
             "len_scale": (1, 50),
             "anis": (0, 1),
@@ -398,10 +472,10 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         val_fix = {"lat_ext": 1.0} if val_fix is None else val_fix
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "cond_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("cond_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "cond_gmean": "$K_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
             "anis": "$e$",
@@ -413,8 +487,8 @@ class ExtThiem3D(steady_lib.SteadyPumping):
             val_ranges=val_ranges,
             make_steady=make_steady,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -445,13 +519,25 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -470,17 +556,19 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "var": (0, 10), "len_scale": (1, 50)}
+        def_ranges = {"trans_gmean": (1e-7, 2e-1), "var": (0, 10), "len_scale": (1, 50)}
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "trans_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
@@ -491,8 +579,8 @@ class ExtThiem2D(steady_lib.SteadyPumping):
             type_curve=ana.ext_thiem_2d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -524,13 +612,25 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -549,17 +649,19 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "var": (0, 10), "len_scale": (1, 50)}
+        def_ranges = {"trans_gmean": (1e-7, 2e-1), "var": (0, 10), "len_scale": (1, 50)}
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "trans_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
@@ -570,8 +672,8 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
             type_curve=ana.neuman2004_steady,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
@@ -600,13 +702,25 @@ class Thiem(steady_lib.SteadyPumping):
         Default: True
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
+        Default: None
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -625,16 +739,18 @@ class Thiem(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2)}
+        def_ranges = {"transmissivity": (1e-7, 2e-1)}
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "transmissivity"}
-        val_plot_names = {"mu": r"$\ln(T)$"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("transmissivity", "log")
+        val_plot_names = {"transmissivity": "$T$"}
         super().__init__(
             name=name,
             campaign=campaign,
@@ -642,8 +758,8 @@ class Thiem(steady_lib.SteadyPumping):
             val_ranges=val_ranges,
             make_steady=make_steady,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
