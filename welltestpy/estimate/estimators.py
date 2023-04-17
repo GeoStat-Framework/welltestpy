@@ -561,7 +561,11 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"trans_gmean": (1e-7, 2e-1), "var": (0, 10), "len_scale": (1, 50)}
+        def_ranges = {
+            "trans_gmean": (1e-7, 2e-1),
+            "var": (0, 10),
+            "len_scale": (1, 50),
+        }
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)
@@ -654,7 +658,11 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"trans_gmean": (1e-7, 2e-1), "var": (0, 10), "len_scale": (1, 50)}
+        def_ranges = {
+            "trans_gmean": (1e-7, 2e-1),
+            "var": (0, 10),
+            "len_scale": (1, 50),
+        }
         val_ranges = {} if val_ranges is None else val_ranges
         for def_name, def_val in def_ranges.items():
             val_ranges.setdefault(def_name, def_val)

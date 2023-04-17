@@ -269,7 +269,7 @@ def cooper_jacob_correction(observation, sat_thickness):
     head = observation.observation
 
     # cooper and jacob correction
-    head = head - (head ** 2) / (2 * sat_thickness)
+    head = head - (head**2) / (2 * sat_thickness)
 
     # return new observation
     observation(observation=head)

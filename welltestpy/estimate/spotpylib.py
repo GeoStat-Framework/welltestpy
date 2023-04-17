@@ -67,7 +67,7 @@ def fast_rep(para_no, infer_fac=4, freq_step=2):
         The frequency step. Default: 2
     """
     return 2 * int(
-        para_no * (1 + 4 * infer_fac ** 2 * (1 + (para_no - 2) * freq_step))
+        para_no * (1 + 4 * infer_fac**2 * (1 + (para_no - 2) * freq_step))
     )
 
 
@@ -152,13 +152,19 @@ class TypeCurve:
             # linear fitting by default
             fit_t = self.val_fit_type.get(val, "lin")
             fit_n = fit_t if fit_t in FIT else "f"
-            self.val_fit_name.setdefault(val, fit_n if fit_n != "lin" else None)
-            self.fit_func[val] = fit_t if _is_callable_tuple(fit_t) else FIT.get(fit_t, None)
+            self.val_fit_name.setdefault(
+                val, fit_n if fit_n != "lin" else None
+            )
+            self.fit_func[val] = (
+                fit_t if _is_callable_tuple(fit_t) else FIT.get(fit_t, None)
+            )
             if not self.fit_func[val]:
                 raise ValueError(f"Fitting transformation for '{val}' missing")
             # apply fitting transformation to ranges
             self.para_dist.append(
-                spotpy.parameter.Uniform(val, *map(self.fit_func[val][0], self.val_ranges[val]))
+                spotpy.parameter.Uniform(
+                    val, *map(self.fit_func[val][0], self.val_ranges[val])
+                )
             )
             self.val_plot_names.setdefault(val, val)
 

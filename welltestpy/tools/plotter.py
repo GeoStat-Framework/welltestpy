@@ -834,9 +834,7 @@ def plotparatrace(
             ax.set_xlim(0, rep)
             ax.margins(y=0.2)
             ax.xaxis.set_ticks(xticks)
-            ax.set_ylabel(
-                parameterlabels[j], fontsize="large"
-            )
+            ax.set_ylabel(parameterlabels[j], fontsize="large")
         ax.set_xlabel("Iterations", fontsize="large")
         fig.align_ylabels(axes)
         fig.tight_layout()
@@ -886,8 +884,8 @@ def plotsensitivity(
 def _scatter_matrix(data, label, fig=None):
     data = np.array(data, ndmin=2, dtype=float)
     n = len(data)
-    axes = np.empty(n ** 2, dtype=object)
-    for i in range(n ** 2):
+    axes = np.empty(n**2, dtype=object)
+    for i in range(n**2):
         fig, axes[i] = _get_fig_ax(fig, figsize=(8, 8), sub_args=(n, n, i + 1))
     axes = axes.reshape(n, n)
 
