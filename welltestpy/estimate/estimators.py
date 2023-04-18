@@ -71,7 +71,8 @@ class ExtTheis3D(transient_lib.TransientPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, conductivity and storage will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -174,7 +175,8 @@ class ExtTheis2D(transient_lib.TransientPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity and storage will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -273,7 +275,8 @@ class Neuman2004(transient_lib.TransientPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity and storage will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -368,7 +371,7 @@ class Theis(transient_lib.TransientPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity and storage will be fitted logarithmically.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -461,7 +464,8 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear and logarithmic.
+        By default, conductivity will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -566,7 +570,8 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -668,7 +673,8 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity will be fitted logarithmically
+        and other values linearly.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
@@ -765,7 +771,7 @@ class Thiem(steady_lib.SteadyPumping):
         or a tuple of two callable functions where the
         first is the transformation and the second is its inverse.
         "log" is for example equivalent to ``(np.log, np.exp)``.
-        By default, values will be fitted linear.
+        By default, transmissivity will be fitted logarithmically.
         Default: None
     val_fit_name : :class:`dict`, optional
         Display name of the fitting transformation.
