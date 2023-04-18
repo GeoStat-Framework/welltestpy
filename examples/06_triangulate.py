@@ -10,7 +10,8 @@ If the solution is not unique, all possible constellations will be returned.
 """
 
 import numpy as np
-from welltestpy.tools import triangulate, sym, plot_well_pos
+
+from welltestpy.tools import plot_well_pos, sym, triangulate
 
 dist_mat = np.zeros((4, 4), dtype=float)
 dist_mat[0, 1] = 3  # distance between well 0 and 1

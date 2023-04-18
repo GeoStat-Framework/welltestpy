@@ -14,9 +14,9 @@ from copy import deepcopy as dcopy
 
 import numpy as np
 
-from ..tools import plotter, diagnostic_plots
-from . import varlib, data_io
 from ..process import processlib
+from ..tools import diagnostic_plots, plotter
+from . import data_io, varlib
 
 __all__ = ["Test", "PumpingTest"]
 

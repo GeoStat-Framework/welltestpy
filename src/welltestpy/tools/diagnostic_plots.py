@@ -12,12 +12,11 @@ The following classes and functions are provided
 # pylint: disable=C0103
 
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ..process import processlib
 from . import plotter
-
-import matplotlib.pyplot as plt
 
 
 def diagnostic_plot_pump_test(

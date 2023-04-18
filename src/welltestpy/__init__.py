@@ -58,8 +58,8 @@ except ImportError:  # pragma: nocover
     __version__ = "0.0.0.dev0"
 
 from .data.campaignlib import Campaign, FieldSite
-from .data.testslib import PumpingTest
 from .data.data_io import load_campaign
+from .data.testslib import PumpingTest
 
 __all__ = ["__version__"]
 __all__ += ["data", "estimate", "process", "tools"]

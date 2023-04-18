@@ -12,7 +12,7 @@ The following classes and functions are provided
 from copy import deepcopy as dcopy
 
 from ..tools import plotter
-from . import data_io, varlib, testslib
+from . import data_io, testslib, varlib
 
 __all__ = ["FieldSite", "Campaign"]
 

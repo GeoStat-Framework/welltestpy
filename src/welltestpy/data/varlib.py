@@ -19,12 +19,12 @@ The following classes and functions are provided
    TimeSeries
    Well
 """
-from copy import deepcopy as dcopy
 import numbers
+from copy import deepcopy as dcopy
+
 import numpy as np
 
 from . import data_io
-
 
 __all__ = [
     "Variable",

@@ -40,19 +40,18 @@ All steady estimators are derived from the following class
    SteadyPumping
 """
 from . import estimators, spotpylib, steady_lib, transient_lib
-
 from .estimators import (
-    ExtTheis3D,
     ExtTheis2D,
-    Neuman2004,
-    Theis,
-    ExtThiem3D,
+    ExtTheis3D,
     ExtThiem2D,
+    ExtThiem3D,
+    Neuman2004,
     Neuman2004Steady,
+    Theis,
     Thiem,
 )
-from .transient_lib import TransientPumping
 from .steady_lib import SteadyPumping
+from .transient_lib import TransientPumping
 
 __all__ = ["estimators", "spotpylib", "steady_lib", "transient_lib"]
 __all__ += [

@@ -8,17 +8,19 @@ The following functions are provided
 
 .. autosummary::
 """
-import os
 import csv
-import shutil
-import zipfile
-import tempfile
-from io import TextIOWrapper as TxtIO, BytesIO as BytIO
 import numbers
+import os
+import shutil
+import tempfile
+import zipfile
+from io import BytesIO as BytIO
+from io import TextIOWrapper as TxtIO
+
 import numpy as np
 from packaging.version import parse as version_parse
 
-from . import varlib, campaignlib, testslib
+from . import campaignlib, testslib, varlib
 
 try:
     from .._version import __version__

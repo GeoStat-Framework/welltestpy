@@ -15,7 +15,6 @@ import functools as ft
 import numpy as np
 import spotpy
 
-
 __all__ = ["TypeCurve", "fast_rep"]
 
 

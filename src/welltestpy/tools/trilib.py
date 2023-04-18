@@ -12,8 +12,8 @@ The following functions are provided
 """
 # pylint: disable=C0103
 from copy import deepcopy as dcopy
-import numpy as np
 
+import numpy as np
 
 __all__ = ["triangulate", "sym"]
 

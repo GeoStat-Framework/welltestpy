@@ -14,6 +14,7 @@ The following classes are provided
    smoothing_derivative
 """
 from copy import deepcopy as dcopy
+
 import numpy as np
 from scipy import signal
 

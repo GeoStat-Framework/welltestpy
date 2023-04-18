@@ -20,15 +20,14 @@ The following classes and functions are provided
 """
 # pylint: disable=C0103
 import copy
-import warnings
 import functools as ft
+import warnings
 
-import numpy as np
-from scipy.stats import gaussian_kde
-
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.stats import gaussian_kde
 
 
 def _get_fig_ax(

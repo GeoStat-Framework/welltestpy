@@ -17,10 +17,10 @@ The following classes and functions are provided
     smoothing_derivative
 """
 from .processlib import (
-    normpumptest,
     combinepumptest,
-    filterdrawdown,
     cooper_jacob_correction,
+    filterdrawdown,
+    normpumptest,
     smoothing_derivative,
 )
 

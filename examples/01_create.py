@@ -6,10 +6,10 @@ In the following we are going to create an artificial pumping test campaign
 on a field site.
 """
 
-import numpy as np
-import welltestpy as wtp
 import anaflow as ana
+import numpy as np
 
+import welltestpy as wtp
 
 ###############################################################################
 # Create the field-site and the campaign

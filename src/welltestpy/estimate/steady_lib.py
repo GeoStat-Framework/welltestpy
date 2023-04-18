@@ -9,17 +9,17 @@ The following classes are provided
 .. autosummary::
    SteadyPumping
 """
-from copy import deepcopy as dcopy
 import os
 import time as timemodule
+from copy import deepcopy as dcopy
 
 import numpy as np
 import spotpy
 
 from ..data import testslib
 from ..process import processlib
-from . import spotpylib
 from ..tools import plotter
+from . import spotpylib
 
 __all__ = [
     "SteadyPumping",

@@ -2,9 +2,11 @@
 """
 This is the unittest of welltestpy.process.
 """
-import unittest
-import numpy as np
 import copy
+import unittest
+
+import numpy as np
+
 import welltestpy as wtp
 
 

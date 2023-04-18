@@ -4,15 +4,16 @@ This is the unittest of AnaFlow.
 """
 
 import unittest
-import numpy as np
+
 import matplotlib as mpl
+import numpy as np
 
 mpl.use("Agg")
 
-import welltestpy as wtp
-from welltestpy.tools import triangulate, sym, plot_well_pos
-
 import anaflow as ana
+
+import welltestpy as wtp
+from welltestpy.tools import plot_well_pos, sym, triangulate
 
 
 class TestWTP(unittest.TestCase):
