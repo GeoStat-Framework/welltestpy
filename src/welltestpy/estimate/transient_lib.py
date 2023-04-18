@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing base classes for transient estimations.
-
-.. currentmodule:: welltestpy.estimate.transient_lib
-
-The following classes are provided
-
-.. autosummary::
-   TransientPumping
-"""
+"""welltestpy subpackage providing base classes for transient estimations."""
 import os
 import time as timemodule
 from copy import deepcopy as dcopy

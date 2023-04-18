@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing routines to estimate pump test parameters.
 
@@ -10,15 +9,16 @@ Estimators
 The following estimators are provided
 
 .. autosummary::
-    ExtTheis3D
-    ExtTheis2D
-    Neuman2004
-    Theis
-    ExtThiem3D
-    ExtThiem2D
-    Neuman2004Steady
-    Thiem
+   :toctree:
 
+   ExtTheis3D
+   ExtTheis2D
+   Neuman2004
+   Theis
+   ExtThiem3D
+   ExtThiem2D
+   Neuman2004Steady
+   Thiem
 
 Base Classes
 ^^^^^^^^^^^^
@@ -29,6 +29,8 @@ Transient
 All transient estimators are derived from the following class
 
 .. autosummary::
+   :toctree:
+
    TransientPumping
 
 Steady Pumping
@@ -37,7 +39,17 @@ Steady Pumping
 All steady estimators are derived from the following class
 
 .. autosummary::
+   :toctree:
+
    SteadyPumping
+
+Helper
+^^^^^^
+
+.. autosummary::
+   :toctree:
+
+   fast_rep
 """
 from . import estimators, spotpylib, steady_lib, transient_lib
 from .estimators import (
@@ -50,6 +62,7 @@ from .estimators import (
     Theis,
     Thiem,
 )
+from .spotpylib import fast_rep
 from .steady_lib import SteadyPumping
 from .transient_lib import TransientPumping
 
@@ -64,4 +77,4 @@ __all__ += [
     "Neuman2004Steady",
     "Thiem",
 ]
-__all__ += ["TransientPumping", "SteadyPumping"]
+__all__ += ["TransientPumping", "SteadyPumping", "fast_rep"]

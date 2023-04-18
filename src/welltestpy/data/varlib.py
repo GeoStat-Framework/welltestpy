@@ -1,24 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing flow datastructures for variables.
-
-.. currentmodule:: welltestpy.data.varlib
-
-The following classes and functions are provided
-
-.. autosummary::
-   Variable
-   TimeVar
-   HeadVar
-   TemporalVar
-   CoordinatesVar
-   Observation
-   StdyObs
-   DrawdownObs
-   StdyHeadObs
-   TimeSeries
-   Well
-"""
+"""welltestpy subpackage providing flow datastructures for variables."""
 import numbers
 from copy import deepcopy as dcopy
 

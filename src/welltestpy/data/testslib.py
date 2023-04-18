@@ -1,15 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing flow datastructures for tests on a fieldsite.
-
-.. currentmodule:: welltestpy.data.testslib
-
-The following classes and functions are provided
-
-.. autosummary::
-   Test
-   PumpingTest
-"""
+"""welltestpy subpackage providing flow datastructures for tests on a fieldsite."""
 from copy import deepcopy as dcopy
 
 import numpy as np

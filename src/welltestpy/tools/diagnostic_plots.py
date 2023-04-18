@@ -1,17 +1,5 @@
-"""
-welltestpy subpackage to make diagnostic plots.
-
-.. currentmodule:: welltestpy.tools.diagnostic_plots
-
-The following classes and functions are provided
-
-.. autosummary::
-   diagnostic_plot_pump_test
-
-"""
+"""welltestpy subpackage to make diagnostic plots."""
 # pylint: disable=C0103
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -61,7 +49,7 @@ def diagnostic_plot_pump_test(
         Default: "WTP".
 
      Returns
-     ---------
+     -------
      Diagnostic plot
     """
     head, time = observation()

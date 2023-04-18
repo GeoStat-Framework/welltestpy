@@ -88,9 +88,10 @@ celerybeat-schedule
 venv/
 ENV/
 
-# Spyder project settings
+# IDE project settings
 .spyderproject
 .spyproject
+.vscode
 
 # Rope project settings
 .ropeproject
@@ -114,7 +115,7 @@ info/
 
 # generated docs
 docs/source/examples/
-docs/source/generated/
+docs/source/api/
 Cmp_UFZ-campaign.cmp
 
 # generated version file

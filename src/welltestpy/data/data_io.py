@@ -1,13 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing input-output routines.
-
-.. currentmodule:: welltestpy.data.data_io
-
-The following functions are provided
-
-.. autosummary::
-"""
+"""welltestpy subpackage providing input-output routines."""
 import csv
 import numbers
 import os

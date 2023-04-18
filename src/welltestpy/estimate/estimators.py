@@ -1,21 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing classes for parameter estimation.
-
-.. currentmodule:: welltestpy.estimate.estimators
-
-The following classes are provided
-
-.. autosummary::
-   ExtTheis3D
-   ExtTheis2D
-   Neuman2004
-   Theis
-   ExtThiem3D
-   ExtThiem2D
-   Neuman2004Steady
-   Thiem
-"""
+"""welltestpy subpackage providing classes for parameter estimation."""
 import anaflow as ana
 
 from . import steady_lib, transient_lib

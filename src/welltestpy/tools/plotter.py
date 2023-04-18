@@ -1,23 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing plotting routines.
-
-.. currentmodule:: welltestpy.tools.plotter
-
-The following classes and functions are provided
-
-.. autosummary::
-   campaign_plot
-   campaign_well_plot
-   plot_pump_test
-   plot_well_pos
-   fadeline
-   plotfit_transient
-   plotfit_steady
-   plotparainteract
-   plotparatrace
-   plotsensitivity
-"""
+"""welltestpy subpackage providing plotting routines."""
 # pylint: disable=C0103
 import copy
 import functools as ft

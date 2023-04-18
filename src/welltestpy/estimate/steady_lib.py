@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing base classes for steady state estimations.
-
-.. currentmodule:: welltestpy.estimate.steady_lib
-
-The following classes are provided
-
-.. autosummary::
-   SteadyPumping
-"""
+"""welltestpy subpackage providing base classes for steady state estimations."""
 import os
 import time as timemodule
 from copy import deepcopy as dcopy

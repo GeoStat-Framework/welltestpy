@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Purpose
 =======
@@ -10,10 +9,12 @@ Subpackages
 ^^^^^^^^^^^
 
 .. autosummary::
-    data
-    estimate
-    process
-    tools
+   :toctree: api
+
+   data
+   estimate
+   process
+   tools
 
 Classes
 ^^^^^^^
@@ -21,33 +22,29 @@ Classes
 Campaign classes
 ~~~~~~~~~~~~~~~~
 
-.. currentmodule:: welltestpy.data.campaignlib
+.. currentmodule:: welltestpy.data
 
 The following classes can be used to handle field campaigns.
 
 .. autosummary::
-    Campaign
-    FieldSite
+   Campaign
+   FieldSite
 
 Field Test classes
 ~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: welltestpy.data.testslib
-
 The following classes can be used to handle field test within a campaign.
 
 .. autosummary::
-    PumpingTest
+   PumpingTest
 
 Loading routines
 ^^^^^^^^^^^^^^^^
 
-.. currentmodule:: welltestpy.data.data_io
-
 Campaign related loading routines
 
 .. autosummary::
-    load_campaign
+   load_campaign
 """
 from . import data, estimate, process, tools
 

@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-"""Welltestpy subpackage providing flow datastructures for field-campaigns.
-
-.. currentmodule:: welltestpy.data.campaignlib
-
-The following classes and functions are provided
-
-.. autosummary::
-   FieldSite
-   Campaign
-"""
+"""Welltestpy subpackage providing flow datastructures for field-campaigns."""
 from copy import deepcopy as dcopy
 
 from ..tools import plotter
@@ -421,7 +411,7 @@ class Campaign:
             Tests that should be plotted. If None, all will be displayed.
             Default: ``None``
         **kwargs
-            Keyword-arguments forwarded to :any:`campaign_plot`
+            Keyword-arguments forwarded to :py:func:`~welltestpy.tools.campaign_plot`
         """
         return plotter.campaign_plot(self, select_tests, **kwargs)
 
@@ -433,7 +423,7 @@ class Campaign:
         Parameters
         ----------
         **kwargs
-            Keyword-arguments forwarded to :any:`campaign_well_plot`.
+            Keyword-arguments forwarded to :py:func:`~welltestpy.tools.campaign_well_plot`.
         """
         return plotter.campaign_well_plot(self, **kwargs)
 
@@ -449,7 +439,7 @@ class Campaign:
             Observation point to make the diagnostic plot.
 
         **kwargs
-            Keyword-arguments forwarded to :any:`campaign_well_plot`.
+            Keyword-arguments forwarded to :py:func:`~welltestpy.tools.campaign_well_plot`.
         """
         # check if this is a pumping test
         if pumping_test in self.tests:

@@ -1,18 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing functions to pre process data.
-
-.. currentmodule:: welltestpy.process.processlib
-
-The following classes are provided
-
-.. autosummary::
-   normpumptest
-   combinepumptest
-   filterdrawdown
-   cooper_jacob_correction
-   smoothing_derivative
-"""
+"""welltestpy subpackage providing functions to pre process data."""
 from copy import deepcopy as dcopy
 
 import numpy as np
@@ -292,7 +278,7 @@ def smoothing_derivative(head, time, method="bourdet"):
         Default: "bourdet"
 
     Returns
-    ---------
+    -------
     The derivative of the observed heads.
 
     """

@@ -1,15 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-welltestpy subpackage providing routines for triangulation.
-
-.. currentmodule:: welltestpy.tools.trilib
-
-The following functions are provided
-
-.. autosummary::
-   triangulate
-   sym
-"""
+"""welltestpy subpackage providing routines for triangulation."""
 # pylint: disable=C0103
 from copy import deepcopy as dcopy
 

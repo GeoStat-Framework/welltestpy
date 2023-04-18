@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing miscellaneous tools.
 
@@ -10,12 +9,16 @@ Included functions
 The following functions are provided for point triangulation
 
 .. autosummary::
+   :toctree:
+
    triangulate
    sym
 
 The following plotting routines are provided
 
 .. autosummary::
+   :toctree:
+
    campaign_plot
    fadeline
    plot_well_pos

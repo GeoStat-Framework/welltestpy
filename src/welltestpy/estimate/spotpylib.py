@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 welltestpy subpackage providing Spotpy classes for the estimating.
 
