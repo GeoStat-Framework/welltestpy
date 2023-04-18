@@ -2,6 +2,30 @@
 
 All notable changes to **welltestpy** will be documented in this file.
 
+
+## [1.2.0] - 2023-04
+
+See [#28](https://github.com/GeoStat-Framework/welltestpy/pull/28), [#31](https://github.com/GeoStat-Framework/welltestpy/pull/31) and [#32](https://github.com/GeoStat-Framework/welltestpy/pull/32)
+
+### Enhancements
+
+- added archive support
+- simplify documentation
+- new arguments `val_fit_type` and `val_fit_name` for all estimators to select fitting transformation
+- `val_fit_name` will be incorporated into the generated plots and the header of the estimation result file
+
+### Changes
+
+- move to `src/` based package structure
+- use [hatchling](https://pypi.org/project/hatchling/) as build backend
+- drop py36 support
+- value names for all arguments in the estimators now need to match the call signatures of the used type-curves
+
+### Bugfixes
+
+- minor fixes for the plotting routines and the estimators
+
+
 ## [1.1.0] - 2021-07
 
 ### Enhancements
@@ -112,7 +136,8 @@ All notable changes to **welltestpy** will be documented in this file.
 
 First alpha release of welltespy.
 
-[Unreleased]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/GeoStat-Framework/welltestpy/compare/v1.0.1...v1.0.2
