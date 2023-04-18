@@ -190,7 +190,7 @@ class TypeCurve:
         return self.sim(**self.sim_kwargs).reshape(-1)
 
     def evaluation(self):
-        """Accesses the observation data."""
+        """Access the observation data."""
         return self.data
 
     def objectivefunction(self, simulation, evaluation):

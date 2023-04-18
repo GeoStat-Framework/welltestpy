@@ -1,7 +1,6 @@
 """
 welltestpy subpackage providing datastructures.
 
-
 Campaign classes
 ~~~~~~~~~~~~~~~~
 

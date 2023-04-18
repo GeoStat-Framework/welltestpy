@@ -18,7 +18,8 @@ def diagnostic_plot_pump_test(
     plotname=None,
     style="WTP",
 ):
-    """plot the derivative with the original data.
+    """
+    Plot the derivative with the original data.
 
     Parameters
     ----------
@@ -48,9 +49,9 @@ def diagnostic_plot_pump_test(
         Plot style.
         Default: "WTP".
 
-     Returns
-     -------
-     Diagnostic plot
+    Returns
+    -------
+    Diagnostic plot
     """
     head, time = observation()
     head = np.array(head, dtype=float).reshape(-1)
