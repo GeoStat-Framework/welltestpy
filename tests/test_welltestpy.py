@@ -79,11 +79,15 @@ class TestWTP(unittest.TestCase):
         estimation.run()
         res = estimation.estimated_para
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
-        self.assertAlmostEqual(np.exp(res["lnS"]), self.storage, 2)
+        self.assertAlmostEqual(
+            np.exp(res["transmissivity"]), self.transmissivity, 2
+        )
+        self.assertAlmostEqual(np.exp(res["storage"]), self.storage, 2)
         sens = estimation.sens
         for s_typ in self.s_types:
-            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["lnS"])
+            self.assertTrue(
+                sens[s_typ]["transmissivity"] > sens[s_typ]["storage"]
+            )
 
     def test_est_thiem(self):
         campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -94,10 +98,14 @@ class TestWTP(unittest.TestCase):
         # we need a dummy parameter to estimate sensitivity
         estimation.gen_setup(dummy=True)
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        self.assertAlmostEqual(
+            np.exp(res["transmissivity"]), self.transmissivity, 2
+        )
         sens = estimation.sens
         for s_typ in self.s_types:
-            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["dummy"])
+            self.assertTrue(
+                sens[s_typ]["transmissivity"] > sens[s_typ]["dummy"]
+            )
 
     def test_est_ext_thiem2D(self):
         campaign = wtp.load_campaign("Cmp_UFZ-campaign.cmp")
@@ -107,11 +115,13 @@ class TestWTP(unittest.TestCase):
         estimation.run()
         res = estimation.estimated_para
         estimation.sensitivity()
-        self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+        self.assertAlmostEqual(
+            np.exp(res["trans_gmean"]), self.transmissivity, 2
+        )
         self.assertAlmostEqual(res["var"], 0.0, 0)
         sens = estimation.sens
         for s_typ in self.s_types:
-            self.assertTrue(sens[s_typ]["mu"] > sens[s_typ]["var"])
+            self.assertTrue(sens[s_typ]["trans_gmean"] > sens[s_typ]["var"])
             self.assertTrue(sens[s_typ]["var"] > sens[s_typ]["len_scale"])
 
     # def test_est_ext_thiem3D(self):
@@ -122,7 +132,7 @@ class TestWTP(unittest.TestCase):
     #     estimation.run()
     #     res = estimation.estimated_para
     #     estimation.sensitivity()
-    #     self.assertAlmostEqual(np.exp(res["mu"]), self.transmissivity, 2)
+    #     self.assertAlmostEqual(np.exp(res["cond_gmean"]), self.transmissivity, 2)
     #     self.assertAlmostEqual(res["var"], 0.0, 0)
 
     def test_triangulate(self):

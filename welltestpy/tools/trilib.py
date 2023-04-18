@@ -322,7 +322,7 @@ def _xvalue(a, b, c):
     lying on the x-axes, a is the distance of the unknown point to the origen
     and b is the distance of the unknown point to the righter given point
     """
-    return (a ** 2 + c ** 2 - b ** 2) / (2 * c)
+    return (a**2 + c**2 - b**2) / (2 * c)
 
 
 def _yvalue(b, a, c):
@@ -338,7 +338,7 @@ def _yvalue(b, a, c):
         return 0.0, -0.0
 
     res = 2 * ((a * b) ** 2 + (a * c) ** 2 + (b * c) ** 2)
-    res -= a ** 4 + b ** 4 + c ** 4
+    res -= a**4 + b**4 + c**4
     # in case of numerical errors set res to 0 (hope you check validity before)
     res = max(res, 0.0)
     res = np.sqrt(res)

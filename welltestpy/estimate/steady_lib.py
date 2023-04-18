@@ -40,8 +40,7 @@ class SteadyPumping:
         The given type-curve. Output will be reshaped to flat array.
     val_ranges : :class:`dict`
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
     make_steady : :class:`bool`, optional
         State if the tests should be converted to steady observations.
@@ -49,24 +48,21 @@ class SteadyPumping:
         Default: True
     val_fix : :class:`dict` or :any:`None`
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Default: None
-    fit_type : :class:`dict` or :any:`None`
-        Dictionary containing fitting type for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
-        fit_type can be "lin", "log" (np.exp(val) will be used)
-        or a callable function.
-        By default, values will be fit linearly.
+    val_fit_type : :class:`dict` or :any:`None`
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, values will be fitted linear.
         Default: None
-    val_kw_names : :class:`dict` or :any:`None`
-        Dictionary containing keyword names in the type-curve for each value.
-
-            {value-name: kwargs-name in type_curve}
-
-        This is useful if fitting is not done by linear values.
-        By default, parameter names will be value names.
+    val_fit_name : :class:`dict` or :any:`None`
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     val_plot_names : :class:`dict` or :any:`None`
         Dictionary containing keyword names in the type-curve for each value.
@@ -94,22 +90,19 @@ class SteadyPumping:
         val_ranges,
         make_steady=True,
         val_fix=None,
-        fit_type=None,
-        val_kw_names=None,
+        val_fit_type=None,
+        val_fit_name=None,
         val_plot_names=None,
         testinclude=None,
         generate=False,
     ):
         val_fix = {} if val_fix is None else val_fix
-        fit_type = {} if fit_type is None else fit_type
-        val_kw_names = {} if val_kw_names is None else val_kw_names
-        val_plot_names = {} if val_plot_names is None else val_plot_names
         self.setup_kw = {
             "type_curve": type_curve,
             "val_ranges": val_ranges,
             "val_fix": val_fix,
-            "fit_type": fit_type,
-            "val_kw_names": val_kw_names,
+            "val_fit_type": val_fit_type,
+            "val_fit_name": val_fit_name,
             "val_plot_names": val_plot_names,
         }
         """:class:`dict`: TypeCurve Spotpy Setup definition"""
@@ -275,19 +268,15 @@ class SteadyPumping:
             sensitivity analysis.
             Default: False
         """
-        self.extra_kw_names = {
-            "Qw": prate_kw,
-            "rad": rad_kw,
-            "r_ref": r_ref_kw,
-            "h_ref": h_ref_kw,
-        }
-        self.setup_kw["val_fix"].setdefault(prate_kw, self.prate)
-        self.setup_kw["val_fix"].setdefault(rad_kw, self.rad)
-        self.setup_kw["val_fix"].setdefault(r_ref_kw, self.r_ref)
-        self.setup_kw["val_fix"].setdefault(h_ref_kw, self.h_ref)
-        self.setup_kw.setdefault("data", self.data)
-        self.setup_kw["dummy"] = dummy
-        self.setup = spotpylib.TypeCurve(**self.setup_kw)
+        self.extra_kw_names = {"rad": rad_kw}
+        setup_kw = dcopy(self.setup_kw)  # create a copy here
+        setup_kw["val_fix"].setdefault(prate_kw, self.prate)
+        setup_kw["val_fix"].setdefault(rad_kw, self.rad)
+        setup_kw["val_fix"].setdefault(r_ref_kw, self.r_ref)
+        setup_kw["val_fix"].setdefault(h_ref_kw, self.h_ref)
+        setup_kw.setdefault("data", self.data)
+        setup_kw["dummy"] = dummy
+        self.setup = spotpylib.TypeCurve(**setup_kw)
 
     def run(
         self,
@@ -389,7 +378,11 @@ class SteadyPumping:
 
         # generate the parameter-names for plotting
         paranames = dcopy(self.setup.para_names)
-        paralabels = [self.setup.val_plot_names[name] for name in paranames]
+        paralabels = []
+        for name in paranames:
+            p_label = self.setup.val_plot_names[name]
+            fit_n = self.setup.val_fit_name[name]
+            paralabels.append(f"{fit_n}({p_label})" if fit_n else p_label)
 
         if parallel == "mpi":
             # send the dbname of rank0
@@ -436,8 +429,9 @@ class SteadyPumping:
             header = []
             for name in void_names:
                 para.append(para_opt[0][name])
-                header.append(name[3:])
-                self.estimated_para[header[-1]] = para[-1]
+                fit_n = self.setup.val_fit_name[name[3:]]
+                header.append(f"{fit_n}-{name[3:]}" if fit_n else name[3:])
+                self.estimated_para[name[3:]] = para[-1]
             np.savetxt(paraname, para, header=" ".join(header))
             # plot the estimation-results
             plotter.plotparatrace(
@@ -554,7 +548,11 @@ class SteadyPumping:
 
         # generate the parameter-names for plotting
         paranames = dcopy(self.setup.para_names)
-        paralabels = [self.setup.val_plot_names[name] for name in paranames]
+        paralabels = []
+        for name in paranames:
+            p_label = self.setup.val_plot_names[name]
+            fit_n = self.setup.val_fit_name[name]
+            paralabels.append(f"{fit_n}({p_label})" if fit_n else p_label)
 
         if self.setup.dummy:
             paranames.append("dummy")

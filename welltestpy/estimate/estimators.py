@@ -33,16 +33,20 @@ __all__ = [
 ]
 
 
-# ext_theis_3D
-
-
 class ExtTheis3D(transient_lib.TransientPumping):
     """Class for an estimation of stochastic subsurface parameters.
 
     With this class you can run an estimation of statistical subsurface
-    parameters. It utilizes the extended theis solution in 3D which assumes
-    a log-normal distributed transmissivity field with a gaussian correlation
+    parameters. It utilizes the extended Theis solution in 3D which assumes
+    a log-normal distributed conductivity field with a gaussian correlation
     function and an anisotropy ratio 0 < e <= 1.
+
+    Available values for fitting:
+    - ``cond_gmean``: geometric mean conductivity
+    - ``var``: variance of log-conductivity
+    - ``len_scale``: correlation length scale of log-conductivity
+    - ``anis``: anisotropy between horizontal and vertical correlation length
+    - ``storage``: storage
 
     Parameters
     ----------
@@ -51,15 +55,29 @@ class ExtTheis3D(transient_lib.TransientPumping):
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
         parameters
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, conductivity and storage will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -71,33 +89,39 @@ class ExtTheis3D(transient_lib.TransientPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "cond_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+        "storage": (2e-6, 4e-1),
+        "anis": (0, 1),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {
-            "mu": (-16, -2),
-            "var": (0, 10),
-            "len_scale": (1, 50),
-            "lnS": (-13, -1),
-            "anis": (0, 1),
-        }
-        val_ranges = {} if val_ranges is None else val_ranges
-        val_fix = {"lat_ext": 1.0} if val_fix is None else val_fix
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        val_fix = val_fix or {}
+        val_fix.setdefault("lat_ext", 1.0)
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "cond_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("cond_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "cond_gmean": "$K_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
             "anis": "$e$",
         }
         super().__init__(
@@ -106,24 +130,27 @@ class ExtTheis3D(transient_lib.TransientPumping):
             type_curve=ana.ext_theis_3d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
 
 
-# ext_theis_2D
-
-
 class ExtTheis2D(transient_lib.TransientPumping):
     """Class for an estimation of stochastic subsurface parameters.
 
     With this class you can run an estimation of statistical subsurface
-    parameters. It utilizes the extended theis solution in 2D which assumes
+    parameters. It utilizes the extended Theis solution in 2D which assumes
     a log-normal distributed transmissivity field with a gaussian correlation
     function.
+
+    Available values for fitting:
+    - ``trans_gmean``: geometric mean transmissivity
+    - ``var``: variance of log-transmissivity
+    - ``len_scale``: correlation length scale of log-transmissivity
+    - ``storage``: storage
 
     Parameters
     ----------
@@ -132,15 +159,29 @@ class ExtTheis2D(transient_lib.TransientPumping):
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
         paramters
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity and storage will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -152,31 +193,36 @@ class ExtTheis2D(transient_lib.TransientPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "trans_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+        "storage": (2e-6, 4e-1),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {
-            "mu": (-16, -2),
-            "var": (0, 10),
-            "len_scale": (1, 50),
-            "lnS": (-13, -1),
-        }
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
         }
         super().__init__(
             name=name,
@@ -184,15 +230,12 @@ class ExtTheis2D(transient_lib.TransientPumping):
             type_curve=ana.ext_theis_2d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
-
-
-# neuman 2004
 
 
 class Neuman2004(transient_lib.TransientPumping):
@@ -203,6 +246,12 @@ class Neuman2004(transient_lib.TransientPumping):
     which assumes a log-normal distributed transmissivity field
     with an exponential correlation function.
 
+    Available values for fitting:
+    - ``trans_gmean``: geometric mean transmissivity
+    - ``var``: variance of log-transmissivity
+    - ``len_scale``: correlation length scale of log-transmissivity
+    - ``storage``: storage
+
     Parameters
     ----------
     name : :class:`str`
@@ -210,15 +259,29 @@ class Neuman2004(transient_lib.TransientPumping):
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
         parameters
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity and storage will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -230,31 +293,36 @@ class Neuman2004(transient_lib.TransientPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "trans_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+        "storage": (2e-6, 4e-1),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {
-            "mu": (-16, -2),
-            "var": (0, 10),
-            "len_scale": (1, 50),
-            "lnS": (-13, -1),
-        }
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "trans_gmean", "lnS": "storage"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
+        val_fit_type.setdefault("storage", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
-            "lnS": r"$\ln(S)$",
+            "storage": "$S$",
         }
         super().__init__(
             name=name,
@@ -262,22 +330,23 @@ class Neuman2004(transient_lib.TransientPumping):
             type_curve=ana.neuman2004,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
 
 
-# theis
-
-
 class Theis(transient_lib.TransientPumping):
     """Class for an estimation of homogeneous subsurface parameters.
 
     With this class you can run an estimation of homogeneous subsurface
-    parameters. It utilizes the theis solution.
+    parameters. It utilizes the Theis solution.
+
+    Available values for fitting:
+    - ``transmissivity``: transmissivity
+    - ``storage``: storage
 
     Parameters
     ----------
@@ -286,15 +355,28 @@ class Theis(transient_lib.TransientPumping):
     campaign : :class:`welltestpy.data.Campaign`
         The pumping test campaign which should be used to estimate the
         parameters
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity and storage will be fitted logarithmically.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -306,46 +388,54 @@ class Theis(transient_lib.TransientPumping):
         Default: ``False``
     """
 
+    default_ranges = {"transmissivity": (1e-7, 2e-1), "storage": (2e-6, 4e-1)}
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
         campaign,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "lnS": (-13, -1)}
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log", "lnS": "log"}
-        val_kw_names = {"mu": "transmissivity", "lnS": "storage"}
-        val_plot_names = {"mu": r"$\ln(T)$", "lnS": r"$\ln(S)$"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("transmissivity", "log")
+        val_fit_type.setdefault("storage", "log")
+        val_plot_names = {"transmissivity": "$T$", "storage": "$S$"}
         super().__init__(
             name=name,
             campaign=campaign,
             type_curve=ana.theis,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
 
 
-# ext_thiem_3d
-
-
 class ExtThiem3D(steady_lib.SteadyPumping):
     """Class for an estimation of stochastic subsurface parameters.
 
     With this class you can run an estimation of statistical subsurface
-    parameters. It utilizes the extended thiem solution in 3D which assumes
-    a log-normal distributed transmissivity field with a gaussian correlation
+    parameters. It utilizes the extended Thiem solution in 3D which assumes
+    a log-normal distributed conductivity field with a gaussian correlation
     function and an anisotropy ratio 0 < e <= 1.
+
+    Available values for fitting:
+    - ``cond_gmean``: geometric mean conductivity
+    - ``var``: variance of log-conductivity
+    - ``len_scale``: correlation length scale of log-conductivity
+    - ``anis``: anisotropy between horizontal and vertical correlation length
 
     Parameters
     ----------
@@ -358,15 +448,29 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, conductivity will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -378,6 +482,14 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "cond_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+        "anis": (0, 1),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
@@ -385,23 +497,20 @@ class ExtThiem3D(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {
-            "mu": (-16, -2),
-            "var": (0, 10),
-            "len_scale": (1, 50),
-            "anis": (0, 1),
-        }
-        val_ranges = {} if val_ranges is None else val_ranges
-        val_fix = {"lat_ext": 1.0} if val_fix is None else val_fix
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        val_fix = val_fix or {}
+        val_fix.setdefault("lat_ext", 1.0)
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "cond_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("cond_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "cond_gmean": "$K_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
             "anis": "$e$",
@@ -413,24 +522,26 @@ class ExtThiem3D(steady_lib.SteadyPumping):
             val_ranges=val_ranges,
             make_steady=make_steady,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
 
 
-# ext_thiem_2D
-
-
 class ExtThiem2D(steady_lib.SteadyPumping):
     """Class for an estimation of stochastic subsurface parameters.
 
     With this class you can run an estimation of statistical subsurface
-    parameters. It utilizes the extended thiem solution in 2D which assumes
+    parameters. It utilizes the extended Thiem solution in 2D which assumes
     a log-normal distributed transmissivity field with a gaussian correlation
     function.
+
+    Available values for fitting:
+    - ``trans_gmean``: geometric mean transmissivity
+    - ``var``: variance of log-transmissivity
+    - ``len_scale``: correlation length scale of log-transmissivity
 
     Parameters
     ----------
@@ -443,15 +554,29 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -463,6 +588,13 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "trans_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
@@ -470,17 +602,18 @@ class ExtThiem2D(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "var": (0, 10), "len_scale": (1, 50)}
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "trans_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
@@ -491,15 +624,12 @@ class ExtThiem2D(steady_lib.SteadyPumping):
             type_curve=ana.ext_thiem_2d,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
-
-
-# neuman 2004 steady
 
 
 class Neuman2004Steady(steady_lib.SteadyPumping):
@@ -511,6 +641,11 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
     which assumes a log-normal distributed transmissivity field
     with an exponential correlation function.
 
+    Available values for fitting:
+    - ``trans_gmean``: geometric mean transmissivity
+    - ``var``: variance of log-transmissivity
+    - ``len_scale``: correlation length scale of log-transmissivity
+
     Parameters
     ----------
     name : :class:`str`
@@ -522,15 +657,29 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity will be fitted logarithmically
+        and other values linearly.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -542,6 +691,13 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         Default: ``False``
     """
 
+    default_ranges = {
+        "trans_gmean": (1e-7, 2e-1),
+        "var": (0, 10),
+        "len_scale": (1, 50),
+    }
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
@@ -549,17 +705,18 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2), "var": (0, 10), "len_scale": (1, 50)}
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "trans_gmean"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("trans_gmean", "log")
         val_plot_names = {
-            "mu": r"$\mu$",
+            "trans_gmean": "$T_G$",
             "var": r"$\sigma^2$",
             "len_scale": r"$\ell$",
         }
@@ -570,22 +727,22 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
             type_curve=ana.neuman2004_steady,
             val_ranges=val_ranges,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,
         )
 
 
-# thiem
-
-
 class Thiem(steady_lib.SteadyPumping):
     """Class for an estimation of homogeneous subsurface parameters.
 
     With this class you can run an estimation of homogeneous subsurface
-    parameters. It utilizes the thiem solution.
+    parameters. It utilizes the Thiem solution.
+
+    Available values for fitting:
+    - ``transmissivity``: transmissivity
 
     Parameters
     ----------
@@ -598,15 +755,28 @@ class Thiem(steady_lib.SteadyPumping):
         State if the tests should be converted to steady observations.
         See: :any:`PumpingTest.make_steady`.
         Default: True
-    val_ranges : :class:`dict`
+    val_ranges : :class:`dict`, optional
         Dictionary containing the fit-ranges for each value in the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
         Ranges should be a tuple containing min and max value.
-    val_fix : :class:`dict` or :any:`None`
+        Will default to `default_ranges`
+    val_fix : :class:`dict`, optional
         Dictionary containing fixed values for the type-curve.
-        Names should be as in the type-curve signature
-        or replaced in val_kw_names.
+        Names should be as in the type-curve signature.
+        Default: None
+    val_fit_type : :class:`dict`, optional
+        Dictionary containing fitting transformation type for each value.
+        Names should be as in the type-curve signature.
+        val_fit_type can be "lin", "log", "exp", "sqrt", "quad", "inv"
+        or a tuple of two callable functions where the
+        first is the transformation and the second is its inverse.
+        "log" is for example equivalent to ``(np.log, np.exp)``.
+        By default, transmissivity will be fitted logarithmically.
+        Default: None
+    val_fit_name : :class:`dict`, optional
+        Display name of the fitting transformation.
+        Will be the val_fit_type string if it is a predefined one,
+        or ``f`` if it is a given callable as default for each value.
         Default: None
     testinclude : :class:`dict`, optional
         Dictionary of which tests should be included. If ``None`` is given,
@@ -618,6 +788,9 @@ class Thiem(steady_lib.SteadyPumping):
         Default: ``False``
     """
 
+    default_ranges = {"transmissivity": (1e-7, 2e-1)}
+    """:class:`dict`: Default value ranges for the estimator."""
+
     def __init__(
         self,
         name,
@@ -625,16 +798,17 @@ class Thiem(steady_lib.SteadyPumping):
         make_steady=True,
         val_ranges=None,
         val_fix=None,
+        val_fit_type=None,
+        val_fit_name=None,
         testinclude=None,
         generate=False,
     ):
-        def_ranges = {"mu": (-16, -2)}
-        val_ranges = {} if val_ranges is None else val_ranges
-        for def_name, def_val in def_ranges.items():
+        val_ranges = val_ranges or {}
+        for def_name, def_val in self.default_ranges.items():
             val_ranges.setdefault(def_name, def_val)
-        fit_type = {"mu": "log"}
-        val_kw_names = {"mu": "transmissivity"}
-        val_plot_names = {"mu": r"$\ln(T)$"}
+        val_fit_type = val_fit_type or {}
+        val_fit_type.setdefault("transmissivity", "log")
+        val_plot_names = {"transmissivity": "$T$"}
         super().__init__(
             name=name,
             campaign=campaign,
@@ -642,8 +816,8 @@ class Thiem(steady_lib.SteadyPumping):
             val_ranges=val_ranges,
             make_steady=make_steady,
             val_fix=val_fix,
-            fit_type=fit_type,
-            val_kw_names=val_kw_names,
+            val_fit_type=val_fit_type,
+            val_fit_name=val_fit_name,
             val_plot_names=val_plot_names,
             testinclude=testinclude,
             generate=generate,

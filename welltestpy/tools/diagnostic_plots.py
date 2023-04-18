@@ -100,8 +100,8 @@ def diagnostic_plot_pump_test(
             min_e = -np.inf
         else:
             min_e = int(np.floor(np.log10(min_v)))
-        ax.set_ylim(10.0 ** min_e, 10.0 ** max_e)
-        yticks = [0 if min_v < linthresh_head else 10.0 ** min_e]
+        ax.set_ylim(10.0**min_e, 10.0**max_e)
+        yticks = [0 if min_v < linthresh_head else 10.0**min_e]
         thresh_e = int(np.floor(np.log10(linthresh_head)))
         first_e = thresh_e if min_v < linthresh_head else (min_e + 1)
         yticks += list(10.0 ** np.arange(first_e, max_e + 1))

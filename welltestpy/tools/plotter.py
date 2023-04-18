@@ -725,8 +725,8 @@ def plotfit_steady(
                 transform=axins.transAxes,
             )
         for ri, re in enumerate(rad):
-            h = plot_f(**{extra["rad"]: re}).reshape(-1)
-            h1 = data[ri]
+            h = np.asarray(plot_f(**{extra["rad"]: re})).reshape(-1)
+            h1 = np.asarray(data[ri]).reshape(-1)
             color = clrs[(test_name.index(radnames[ri, 0]) + 2) % clr_n]
             if radnames[ri, 0] == radnames[ri, 1]:
                 label = "test at '{}'".format(radnames[ri, 0])
@@ -808,9 +808,10 @@ def plotparatrace(
             plt.rcParams.update({"font.size": font_size})
         clrs = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         fig = _get_fig_ax(fig, ax=False, figsize=(15, 3 * rows))
-
+        axes = []
         for j in range(rows):
             ax = fig.add_subplot(rows, 1, 1 + j)
+            axes.append(ax)
             data = result["par" + parameternames[j]]
 
             ax.plot(data, "-", color=clrs[0])
@@ -831,15 +832,11 @@ def plotparatrace(
                 xticks = np.linspace(0, 1, 11) * len(data)
 
             ax.set_xlim(0, rep)
-            ax.set_ylim(
-                np.min(data) - 0.1 * np.max(abs(data)),
-                np.max(data) + 0.1 * np.max(abs(data)),
-            )
+            ax.margins(y=0.2)
             ax.xaxis.set_ticks(xticks)
-            ax.set_ylabel(
-                parameterlabels[j], rotation=0, fontsize="large", labelpad=10
-            )
-
+            ax.set_ylabel(parameterlabels[j], fontsize="large")
+        ax.set_xlabel("Iterations", fontsize="large")
+        fig.align_ylabels(axes)
         fig.tight_layout()
         if plotname is not None:
             fig.savefig(plotname, format="pdf", bbox_inches="tight")
@@ -887,8 +884,8 @@ def plotsensitivity(
 def _scatter_matrix(data, label, fig=None):
     data = np.array(data, ndmin=2, dtype=float)
     n = len(data)
-    axes = np.empty(n ** 2, dtype=object)
-    for i in range(n ** 2):
+    axes = np.empty(n**2, dtype=object)
+    for i in range(n**2):
         fig, axes[i] = _get_fig_ax(fig, figsize=(8, 8), sub_args=(n, n, i + 1))
     axes = axes.reshape(n, n)
 
