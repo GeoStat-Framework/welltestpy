@@ -43,6 +43,7 @@ FIT = {
 
 def _is_callable_tuple(input):
     result = False
+    length = 0
     try:
         length = len(input)
     except TypeError:
