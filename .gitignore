@@ -115,10 +115,10 @@ info/
 # generated docs
 docs/source/examples/
 docs/source/generated/
-examples/Cmp_UFZ-campaign.cmp
+Cmp_UFZ-campaign.cmp
 
 # generated version file
-welltestpy/_version.py
+src/welltestpy/_version.py
 
 *.DS_Store
 

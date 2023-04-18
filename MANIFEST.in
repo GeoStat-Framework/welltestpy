@@ -1,6 +1,0 @@
-prune *
-graft welltestpy
-graft tests
-
-include LICENSE README.md pyproject.toml setup.cfg
-global-exclude __pycache__ *.py[cod] .*

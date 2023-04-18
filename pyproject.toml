@@ -1,25 +1,103 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "setuptools_scm[toml]>=3.5",
+    "hatchling>=1.8.0",
+    "hatch-vcs",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
-write_to = "welltestpy/_version.py"
-write_to_template = "__version__ = '{version}'"
-local_scheme = "no-local-version"
+[project]
+requires-python = ">=3.7"
+name = "welltestpy"
+description = "welltestpy - package to handle well-based Field-campaigns."
+authors = [{name = "Sebastian Müller, Jarno Herrmann", email = "info@geostat-framework.org"}]
+readme = "README.md"
+license = "MIT"
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "anaflow>=1.0.0",
+    "matplotlib>=3.0.0",
+    "numpy>=1.14.5",
+    "scipy>=1.1.0",
+    "spotpy>=1.5.0",
+    "packaging>=20",
+]
+
+[project.optional-dependencies]
+doc = [
+    "m2r2>=0.2.8",
+    "numpydoc>=1.1",
+    "sphinx>=4",
+    "sphinx-gallery>=0.8",
+    "sphinx-rtd-theme>=1,<1.1",
+]
+test = ["pytest-cov>=3"]
+check = [
+  "black>=23,<24",
+  "isort[colors]<6",
+  "pylint<3",
+]
+
+[project.urls]
+Homepage = "https://github.com/GeoStat-Framework/welltestpy"
+Documentation = "https://welltestpy.readthedocs.io"
+Source = "https://github.com/GeoStat-Framework/welltestpy"
+Tracker = "https://github.com/GeoStat-Framework/welltestpy/issues"
+Changelog = "https://github.com/GeoStat-Framework/welltestpy/blob/main/CHANGELOG.md"
+Conda-Forge = "https://anaconda.org/conda-forge/welltestpy"
+
+[tool.hatch.version]
+source = "vcs"
 fallback_version = "0.0.0.dev0"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/welltestpy/_version.py"
+template = "__version__ = '{version}'"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/welltestpy"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 79
 
 [tool.black]
 exclude = "_version.py"
 line-length = 79
-target-version = [
-    "py36",
-    "py37",
-    "py38",
-]
+target-version = ["py37"]
 
 [tool.coverage]
     [tool.coverage.run]
