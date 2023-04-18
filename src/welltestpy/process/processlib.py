@@ -238,7 +238,8 @@ def filterdrawdown(observation, tout=None, dxscale=2):
 
 
 def cooper_jacob_correction(observation, sat_thickness):
-    """correction method for observed drawdown for unconfined aquifers.
+    """
+    Correction method for observed drawdown for unconfined aquifers.
 
     Parameters
     ----------

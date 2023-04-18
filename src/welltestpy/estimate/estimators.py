@@ -24,11 +24,12 @@ class ExtTheis3D(transient_lib.TransientPumping):
     function and an anisotropy ratio 0 < e <= 1.
 
     Available values for fitting:
-    - ``cond_gmean``: geometric mean conductivity
-    - ``var``: variance of log-conductivity
-    - ``len_scale``: correlation length scale of log-conductivity
-    - ``anis``: anisotropy between horizontal and vertical correlation length
-    - ``storage``: storage
+
+    * ``cond_gmean``: geometric mean conductivity
+    * ``var``: variance of log-conductivity
+    * ``len_scale``: correlation length scale of log-conductivity
+    * ``anis``: anisotropy between horizontal and vertical correlation length
+    * ``storage``: storage
 
     Parameters
     ----------
@@ -129,10 +130,11 @@ class ExtTheis2D(transient_lib.TransientPumping):
     function.
 
     Available values for fitting:
-    - ``trans_gmean``: geometric mean transmissivity
-    - ``var``: variance of log-transmissivity
-    - ``len_scale``: correlation length scale of log-transmissivity
-    - ``storage``: storage
+
+    * ``trans_gmean``: geometric mean transmissivity
+    * ``var``: variance of log-transmissivity
+    * ``len_scale``: correlation length scale of log-transmissivity
+    * ``storage``: storage
 
     Parameters
     ----------
@@ -229,10 +231,11 @@ class Neuman2004(transient_lib.TransientPumping):
     with an exponential correlation function.
 
     Available values for fitting:
-    - ``trans_gmean``: geometric mean transmissivity
-    - ``var``: variance of log-transmissivity
-    - ``len_scale``: correlation length scale of log-transmissivity
-    - ``storage``: storage
+
+    * ``trans_gmean``: geometric mean transmissivity
+    * ``var``: variance of log-transmissivity
+    * ``len_scale``: correlation length scale of log-transmissivity
+    * ``storage``: storage
 
     Parameters
     ----------
@@ -327,8 +330,9 @@ class Theis(transient_lib.TransientPumping):
     parameters. It utilizes the Theis solution.
 
     Available values for fitting:
-    - ``transmissivity``: transmissivity
-    - ``storage``: storage
+
+    * ``transmissivity``: transmissivity
+    * ``storage``: storage
 
     Parameters
     ----------
@@ -414,10 +418,11 @@ class ExtThiem3D(steady_lib.SteadyPumping):
     function and an anisotropy ratio 0 < e <= 1.
 
     Available values for fitting:
-    - ``cond_gmean``: geometric mean conductivity
-    - ``var``: variance of log-conductivity
-    - ``len_scale``: correlation length scale of log-conductivity
-    - ``anis``: anisotropy between horizontal and vertical correlation length
+
+    * ``cond_gmean``: geometric mean conductivity
+    * ``var``: variance of log-conductivity
+    * ``len_scale``: correlation length scale of log-conductivity
+    * ``anis``: anisotropy between horizontal and vertical correlation length
 
     Parameters
     ----------
@@ -521,9 +526,10 @@ class ExtThiem2D(steady_lib.SteadyPumping):
     function.
 
     Available values for fitting:
-    - ``trans_gmean``: geometric mean transmissivity
-    - ``var``: variance of log-transmissivity
-    - ``len_scale``: correlation length scale of log-transmissivity
+
+    * ``trans_gmean``: geometric mean transmissivity
+    * ``var``: variance of log-transmissivity
+    * ``len_scale``: correlation length scale of log-transmissivity
 
     Parameters
     ----------
@@ -624,9 +630,10 @@ class Neuman2004Steady(steady_lib.SteadyPumping):
     with an exponential correlation function.
 
     Available values for fitting:
-    - ``trans_gmean``: geometric mean transmissivity
-    - ``var``: variance of log-transmissivity
-    - ``len_scale``: correlation length scale of log-transmissivity
+
+    * ``trans_gmean``: geometric mean transmissivity
+    * ``var``: variance of log-transmissivity
+    * ``len_scale``: correlation length scale of log-transmissivity
 
     Parameters
     ----------
@@ -724,7 +731,8 @@ class Thiem(steady_lib.SteadyPumping):
     parameters. It utilizes the Thiem solution.
 
     Available values for fitting:
-    - ``transmissivity``: transmissivity
+
+    * ``transmissivity``: transmissivity
 
     Parameters
     ----------
